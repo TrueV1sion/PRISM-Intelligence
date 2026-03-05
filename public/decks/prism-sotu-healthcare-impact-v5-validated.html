@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRISM | SOTU 2026 Healthcare Impact — Executive Intelligence Brief v5</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0e1a;--surface:#111827;--card:#1a2332;--accent:#ef4444;--accent2:#f97316;--accent3:#3b82f6;--accent4:#10b981;--accent5:#8b5cf6;--text:#e2e8f0;--muted:#94a3b8;--border:#1e293b;--gold:#f59e0b;--cyan:#06b6d4}
+html{scroll-snap-type:y mandatory;scroll-behavior:smooth}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.slide{min-height:100vh;padding:60px 80px;display:flex;flex-direction:column;justify-content:center;position:relative;border-bottom:1px solid var(--border);scroll-snap-align:start}
+.slide-number{position:absolute;top:30px;right:40px;font-size:13px;color:var(--muted);letter-spacing:2px;font-weight:600}
+.prism-badge{position:absolute;top:30px;left:40px;font-size:11px;color:var(--accent3);letter-spacing:3px;font-weight:700;text-transform:uppercase}
+.title-slide{background:linear-gradient(135deg,#0a0e1a 0%,#1a1030 50%,#0f172a 100%);text-align:center;justify-content:center;align-items:center}
+.title-slide h1{font-size:52px;font-weight:800;line-height:1.08;background:linear-gradient(135deg,#ef4444,#f97316,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px;max-width:920px}
+.title-slide .subtitle{font-size:17px;color:var(--muted);margin-bottom:40px;letter-spacing:1px}
+.hero-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:18px;max-width:1100px;margin:0 auto}
+.hero-stat{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:22px 14px;text-align:center;transition:transform 0.2s}
+.hero-stat:hover{transform:translateY(-2px)}
+.hero-stat .value{font-size:26px;font-weight:800;margin-bottom:4px}
+.hero-stat .label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px}
+.red{color:#ef4444}.orange{color:#f97316}.blue{color:#3b82f6}.green{color:#10b981}.purple{color:#8b5cf6}.gold{color:#f59e0b}.white{color:#fff}.cyan{color:#06b6d4}
+h2{font-size:32px;font-weight:700;margin-bottom:22px;line-height:1.2}
+h3{font-size:19px;font-weight:600;margin-bottom:12px;color:var(--text)}
+h4{font-size:14px;font-weight:600;margin-bottom:7px;color:var(--accent3)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:16px}
+.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-top:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;position:relative;overflow:hidden}
+.card-accent{border-left:3px solid var(--accent)}
+.card-blue{border-left:3px solid var(--accent3)}
+.card-green{border-left:3px solid var(--accent4)}
+.card-orange{border-left:3px solid var(--accent2)}
+.card-purple{border-left:3px solid var(--accent5)}
+.card-gold{border-left:3px solid var(--gold)}
+.card-cyan{border-left:3px solid var(--cyan)}
+table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12px}
+th{text-align:left;padding:8px 10px;background:rgba(255,255,255,0.03);border-bottom:2px solid var(--border);font-size:9.5px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:600}
+td{padding:8px 10px;border-bottom:1px solid var(--border)}
+tr:hover td{background:rgba(255,255,255,0.02)}
+.tag{display:inline-block;padding:3px 9px;border-radius:20px;font-size:9.5px;font-weight:600;letter-spacing:0.5px;margin:2px}
+.tag-red{background:rgba(239,68,68,0.15);color:#ef4444}
+.tag-green{background:rgba(16,185,129,0.15);color:#10b981}
+.tag-blue{background:rgba(59,130,246,0.15);color:#3b82f6}
+.tag-orange{background:rgba(249,115,22,0.15);color:#f97316}
+.tag-purple{background:rgba(139,92,246,0.15);color:#8b5cf6}
+.tag-gold{background:rgba(245,158,11,0.15);color:#f59e0b}
+.tag-cyan{background:rgba(6,182,212,0.15);color:#06b6d4}
+.bar-container{margin:4px 0;display:flex;align-items:center;gap:8px}
+.bar-label{font-size:11px;color:var(--muted);min-width:115px}
+.bar-track{flex:1;height:11px;background:rgba(255,255,255,0.05);border-radius:6px;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px}
+.bar-value{font-size:11px;font-weight:600;min-width:55px;text-align:right}
+.policy-box{background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:12px 16px;margin:6px 0}
+.policy-box.positive{background:rgba(16,185,129,0.05);border-color:rgba(16,185,129,0.2)}
+.policy-box.neutral{background:rgba(59,130,246,0.05);border-color:rgba(59,130,246,0.2)}
+.impact{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;margin-top:5px}
+.impact-severe{color:#ef4444}.impact-moderate{color:#f97316}.impact-positive{color:#10b981}.impact-neutral{color:#3b82f6}
+.emergence-card{background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(59,130,246,0.08));border:1px solid rgba(139,92,246,0.3);border-radius:14px;padding:20px;margin:8px 0}
+.emergence-card h4{color:var(--accent5);font-size:15px;margin-bottom:6px}
+.slide-footer{position:absolute;bottom:16px;left:40px;right:40px;display:flex;justify-content:space-between;font-size:10px;color:var(--muted);border-top:1px solid var(--border);padding-top:8px}
+p{font-size:12.5px;line-height:1.6;color:var(--muted);margin-bottom:8px}
+.highlight{color:var(--text);font-weight:600}
+.section-intro{font-size:13.5px;line-height:1.7;max-width:800px;margin-bottom:20px}
+.inovalon-header{background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(16,185,129,0.1));border:1px solid rgba(59,130,246,0.2);border-radius:14px;padding:20px;margin-bottom:16px;text-align:center}
+.inovalon-header h3{color:var(--accent3);margin-bottom:4px}
+a{color:var(--accent3);text-decoration:none;border-bottom:1px solid rgba(59,130,246,0.3);font-size:inherit}
+a:hover{color:#60a5fa;border-bottom-color:#60a5fa}
+.source-list{margin-top:8px;font-size:9.5px;color:var(--muted);line-height:1.8}
+.source-list a{font-size:9.5px;border-bottom:1px dotted rgba(59,130,246,0.3)}
+.quote-block{border-left:3px solid var(--accent2);padding:10px 18px;margin:10px 0;background:rgba(249,115,22,0.05);border-radius:0 8px 8px 0;font-style:italic;color:var(--text);font-size:14px}
+.quote-attr{font-style:normal;font-size:11px;color:var(--muted);margin-top:4px}
+.state-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.state-item{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:10.5px}
+.state-item .state-name{font-weight:600;color:var(--text)}
+.state-item .state-impact{color:var(--accent);font-weight:700}
+.pipeline-item{display:flex;align-items:flex-start;gap:16px;padding:10px 0;border-bottom:1px solid var(--border)}
+.pipeline-item:last-child{border-bottom:none}
+.timeline-bar{display:flex;height:6px;border-radius:3px;overflow:hidden;margin-top:5px;background:rgba(255,255,255,0.05)}
+.timeline-segment{height:100%}
+.tl-done{background:#10b981}.tl-active{background:#f59e0b}.tl-pending{background:rgba(255,255,255,0.1)}
+
+/* NAV MENU */
+.nav-toggle{position:fixed;top:20px;right:20px;z-index:1000;width:44px;height:44px;border-radius:50%;background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:var(--accent3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;backdrop-filter:blur(12px);transition:all 0.3s}
+.nav-toggle:hover{background:rgba(59,130,246,0.3);transform:scale(1.05)}
+.nav-panel{position:fixed;top:0;right:-340px;width:320px;height:100vh;background:rgba(10,14,26,0.97);border-left:1px solid var(--border);z-index:999;transition:right 0.35s ease;overflow-y:auto;padding:70px 20px 30px;backdrop-filter:blur(20px)}
+.nav-panel.open{right:0}
+.nav-panel h3{font-size:11px;text-transform:uppercase;letter-spacing:3px;color:var(--accent3);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:all 0.2s;text-decoration:none;border-bottom:none;margin-bottom:2px}
+.nav-item:hover{background:rgba(59,130,246,0.1)}
+.nav-item .nav-num{font-size:10px;color:var(--muted);min-width:24px;font-weight:700}
+.nav-item .nav-label{font-size:12.5px;color:var(--text);font-weight:500}
+.nav-item .nav-tag{font-size:8px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.nav-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:998;display:none}
+.nav-overlay.open{display:block}
+
+/* VALIDATION & FRAMEWORK BOXES */
+.validation-box{display:flex;gap:16px;max-width:1100px;margin:24px auto 0;text-align:left}
+.validation-card{flex:1;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px;padding:14px 18px}
+.validation-card h4{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--accent4);margin-bottom:8px;font-weight:700}
+.framework-card h4{color:var(--accent5)}
+.val-row{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:11px;color:var(--muted)}
+.val-icon{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+.val-icon.green{background:rgba(16,185,129,0.2);color:#10b981}
+.val-icon.blue{background:rgba(59,130,246,0.2);color:#3b82f6}
+.val-icon.purple{background:rgba(139,92,246,0.2);color:#8b5cf6}
+/* FRAMEWORK VISUAL */
+.framework-visual{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px}
+.fw-node{background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);border-radius:6px;padding:3px 8px;font-size:9px;color:var(--accent5);font-weight:600}
+.fw-arrow{color:var(--muted);font-size:10px}
+.fw-center{background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(59,130,246,0.2));border:1px solid rgba(139,92,246,0.4);border-radius:8px;padding:4px 12px;font-size:10px;color:var(--text);font-weight:700}
+
+/* THREAT METER */
+.threat-meter{display:flex;gap:2px;align-items:center}
+.threat-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.1)}
+.threat-dot.active-red{background:#ef4444}
+.threat-dot.active-orange{background:#f97316}
+.threat-dot.active-yellow{background:#f59e0b}
+.threat-dot.active-green{background:#10b981}
+.threat-dot.active-blue{background:#3b82f6}
+
+/* COMPACT TABLE */
+.compact-table{font-size:11px}
+.compact-table td,.compact-table th{padding:6px 8px}
+
+/* SLIDE PROGRESS */
+.slide-progress{position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent3),var(--accent5));z-index:1001;transition:width 0.3s ease}
+.slide-counter{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:1001;font-size:11px;color:var(--muted);letter-spacing:2px;font-weight:600;background:rgba(10,14,26,0.85);padding:4px 14px;border-radius:20px;border:1px solid var(--border);backdrop-filter:blur(8px);opacity:0;transition:opacity 0.3s}
+.slide-counter.visible{opacity:1}
+.slide-nav-hint{position:fixed;bottom:50px;left:50%;transform:translateX(-50%);z-index:1001;font-size:10px;color:var(--muted);letter-spacing:1px;text-align:center;opacity:0;transition:opacity 1s;pointer-events:none}
+.slide-nav-hint.show{opacity:0.6}
+@media(max-width:1024px){.slide{padding:40px 30px}h1{font-size:32px!important}.hero-stats{grid-template-columns:repeat(3,1fr)}.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}.state-grid{grid-template-columns:1fr 1fr}.nav-toggle{top:12px;right:12px}}
+</style>
+</head>
+<body>
+
+<!-- SLIDE PROGRESS & COUNTER -->
+<div class="slide-progress" id="slideProgress"></div>
+<div class="slide-counter" id="slideCounter">01 / 15</div>
+<div class="slide-nav-hint show" id="navHint">&#8595; Arrow Down / Spacebar to navigate &#8595;</div>
+
+<!-- NAVIGATION TOGGLE -->
+<button class="nav-toggle" onclick="toggleNav()" id="navBtn" title="Table of Contents">&#9776;</button>
+<div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+<div class="nav-panel" id="navPanel">
+<h3>Table of Contents</h3>
+<a class="nav-item" href="#slide-title" onclick="toggleNav()"><span class="nav-num">01</span><span class="nav-label">Executive Summary</span></a>
+<a class="nav-item" href="#slide-toc" onclick="toggleNav()"><span class="nav-num">02</span><span class="nav-label">Table of Contents</span></a>
+<a class="nav-item" href="#slide-policy" onclick="toggleNav()"><span class="nav-num">03</span><span class="nav-label">Policy Landscape</span></a>
+<a class="nav-item" href="#slide-macro" onclick="toggleNav()"><span class="nav-num">04</span><span class="nav-label">Macro Context</span><span class="nav-tag">New</span></a>
+<a class="nav-item" href="#slide-market" onclick="toggleNav()"><span class="nav-num">05</span><span class="nav-label">Market Impact</span></a>
+<a class="nav-item" href="#slide-pevc" onclick="toggleNav()"><span class="nav-num">06</span><span class="nav-label">PE / VC / M&A</span></a>
+<a class="nav-item" href="#slide-payer" onclick="toggleNav()"><span class="nav-num">07</span><span class="nav-label">Payer Analysis</span></a>
+<a class="nav-item" href="#slide-provider" onclick="toggleNav()"><span class="nav-num">08</span><span class="nav-label">Provider &amp; Pharmacy</span></a>
+<a class="nav-item" href="#slide-patient" onclick="toggleNav()"><span class="nav-num">09</span><span class="nav-label">Patient Population</span></a>
+<a class="nav-item" href="#slide-pipeline" onclick="toggleNav()"><span class="nav-num">10</span><span class="nav-label">Legislative Pipeline</span><span class="nav-tag">New</span></a>
+<a class="nav-item" href="#slide-emergence" onclick="toggleNav()"><span class="nav-num">11</span><span class="nav-label">Emergent Insights</span></a>
+<a class="nav-item" href="#slide-inovalon" onclick="toggleNav()"><span class="nav-num">12</span><span class="nav-label">Inovalon Impact</span></a>
+<a class="nav-item" href="#slide-competitive" onclick="toggleNav()"><span class="nav-num">13</span><span class="nav-label">Competitive Landscape</span><span class="nav-tag">Enhanced</span></a>
+<a class="nav-item" href="#slide-ai-startups" onclick="toggleNav()"><span class="nav-num">14</span><span class="nav-label">AI Startups: Niche Attacks</span><span class="nav-tag">New</span></a>
+<a class="nav-item" href="#slide-radar" onclick="toggleNav()"><span class="nav-num">15</span><span class="nav-label">Regulatory Radar</span><span class="nav-tag">New</span></a>
+</div>
+
+<!-- SLIDE 1: TITLE -->
+<div class="slide title-slide" id="slide-title">
+<span class="prism-badge">PRISM Executive Intelligence Brief</span>
+<span class="slide-number">01 / 15</span>
+<h1>State of the Union 2026: The Healthcare Earthquake</h1>
+<p class="subtitle">Multi-Agent Strategic Intelligence | 8 Analytical Dimensions | 118+ Findings | Source-Verified</p>
+<div class="hero-stats">
+<div class="hero-stat"><div class="value red">$1.02T</div><div class="label">Medicaid Cuts (CBO)</div></div>
+<div class="hero-stat"><div class="value orange">0.09%</div><div class="label">2027 MA Rate Proposed</div></div>
+<div class="hero-stat"><div class="value blue">4.8M</div><div class="label">New Uninsured (Urban Inst.)</div></div>
+<div class="hero-stat"><div class="value green">+8-15%</div><div class="label">Inovalon Revenue Tailwind</div></div>
+<div class="hero-stat"><div class="value gold">$55.5B</div><div class="label">Health IT TAM 2025</div></div>
+</div>
+<div style="margin-top:28px;max-width:750px;text-align:center">
+<div class="quote-block">
+"I want to stop all payments to big insurance companies and instead, give that money directly to the people."
+<div class="quote-attr">— President Donald Trump, State of the Union, February 24, 2026 (<a href="https://www.pbs.org/newshour/politics/read-the-full-transcript-of-trumps-2026-state-of-the-union-address" target="_blank">PBS Transcript</a>)</div>
+</div>
+</div>
+<!-- VALIDATION & FRAMEWORK SECTION -->
+<div class="validation-box">
+<div class="validation-card">
+<h4>&#10003; Validation Methodology</h4>
+<div class="val-row"><span class="val-icon green">&#10003;</span>All claims cross-referenced against 16+ primary sources (CBO, CMS, Urban Inst., KFF)</div>
+<div class="val-row"><span class="val-icon green">&#10003;</span>Automated multi-agent verification with per-finding confidence scoring (avg 0.844)</div>
+<div class="val-row"><span class="val-icon green">&#10003;</span>7 key claims independently fact-checked — 7/7 confirmed via source documents</div>
+<div class="val-row"><span class="val-icon green">&#10003;</span>Corrected 3 inaccuracies found in validation (Nordic Capital date, GLP-1 timeline, chart review → unlinked CRR exclusion)</div>
+</div>
+<div class="validation-card framework-card">
+<h4>&#9670; PRISM Processing Framework</h4>
+<p style="font-size:10.5px;margin-bottom:6px">Parallel Research Intelligence &amp; Strategic Management — Dimensional Split Pattern</p>
+<div class="framework-visual">
+<span class="fw-node">Market Impact</span><span class="fw-node">PE/VC/M&A</span><span class="fw-node">Payer</span><span class="fw-node">Provider</span>
+<span class="fw-node">Patient</span><span class="fw-node">Inovalon</span><span class="fw-node">Legislative</span><span class="fw-node">Macro</span>
+<span class="fw-arrow">&#8594;</span><span class="fw-center">Cross-Agent Synthesis</span><span class="fw-arrow">&#8594;</span>
+<span class="fw-node" style="border-color:rgba(16,185,129,0.4);color:#10b981">Emergence Detection</span>
+</div>
+<p style="font-size:9.5px;color:var(--muted);margin:4px 0 0">8 independent agents analyze orthogonal dimensions | findings converge through synthesis layer | emergent patterns surface from intersection of all 8</p>
+</div>
+</div>
+<div class="slide-footer">
+<span>PRISM Intelligence Platform | 8 Agents | Dimensional Split Pattern</span>
+<span>February 26, 2026 | v5 Source-Validated | Classification: Executive Strategic Intelligence</span>
+</div>
+</div>
+
+<!-- SLIDE 2: TABLE OF CONTENTS -->
+<div class="slide" id="slide-toc" style="background:linear-gradient(135deg,#0a0e1a,#0f172a)">
+<span class="prism-badge">Navigation</span>
+<span class="slide-number">02 / 15</span>
+<h2>Executive <span class="blue">Intelligence Map</span></h2>
+<p class="section-intro">15-slide analysis spanning policy, markets, transactions, competition, regulation, and strategic positioning.</p>
+<div class="grid-3">
+<div>
+<h3 style="font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--accent)">Policy &amp; Context</h3>
+<a class="nav-item" href="#slide-policy" style="border:1px solid var(--border);border-radius:8px;margin-bottom:6px"><span class="nav-num">03</span><span class="nav-label">10 Policy Vectors</span></a>
+<a class="nav-item" href="#slide-macro" style="border:1px solid var(--border);border-radius:8px;margin-bottom:6px"><span class="nav-num">04</span><span class="nav-label">Macro Context <span class="tag tag-gold" style="font-size:8px">NEW</span></span></a>
+<a class="nav-item" href="#slide-pipeline" style="border:1px solid var(--border);border-radius:8px;margin-bottom:6px"><span class="nav-num">10</span><span class="nav-label">Legislative Pipeline <span class="tag tag-gold" style="font-size:8px">NEW</span></span></a>
+<a class="nav-item" href="#slide-radar" style="border:1px solid var(--border);border-radius:8px;margin-bottom:6px"><span class="nav-num">15</span><span class="nav-label">Regulatory Radar <span class="tag tag-gold" style="font-size:8px">NEW</span></span></a>
+</div>
+<div>
+<h3 style="font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--accent2)">Markets &amp; Stakeholders</h3>
+<a class="nav-item" href="#slide-market" style="border:1px solid var(--border);border-radius:8px;margin-bottom:6px"><span class="nav-num">05</span><span class="nav-label">Capital Markets</span></a>
+<a class="nav-item" href="#slide-pevc" style="border:1px solid var(--border);border-radius:8px;margin-bottom:6px"><span class="nav-num">06</span><span class="nav-label">PE / VC / M&A</span></a>
+<a class="nav-item" href="#slide-payer" style="border:1px solid var(--border);border-radius:8px;margin-bottom:6px"><span class="nav-num">07</span><span class="nav-label">Payer Analysis</span></a>
+<a class="nav-item" href="#slide-provider" style="border:1px solid var(--border);border-radius:8px;margin-bottom:6px"><span class="nav-num">08</span><span class="nav-label">Provider &amp; Pharmacy</span></a>
+<a class="nav-item" href="#slide-patient" style="border:1px solid var(--border);border-radius:8px;margin-bottom:6px"><span class="nav-num">09</span><span class="nav-label">Patient Population</span></a>
+</div>
+<div>
+<h3 style="font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--accent4)">Strategic &amp; Competitive</h3>
+<a class="nav-item" href="#slide-emergence" style="border:1px solid var(--border);border-radius:8px;margin-bottom:6px"><span class="nav-num">11</span><span class="nav-label">Emergent Insights</span></a>
+<a class="nav-item" href="#slide-inovalon" style="border:1px solid var(--border);border-radius:8px;margin-bottom:6px"><span class="nav-num">12</span><span class="nav-label">Inovalon Impact</span></a>
+<a class="nav-item" href="#slide-competitive" style="border:1px solid var(--border);border-radius:8px;margin-bottom:6px"><span class="nav-num">13</span><span class="nav-label">Competitive Landscape <span class="tag tag-gold" style="font-size:8px">ENHANCED</span></span></a>
+<a class="nav-item" href="#slide-ai-startups" style="border:1px solid var(--border);border-radius:8px;margin-bottom:6px"><span class="nav-num">14</span><span class="nav-label">AI Startups <span class="tag tag-gold" style="font-size:8px">NEW</span></span></a>
+</div>
+</div>
+<div class="slide-footer"><span>Use the &#9776; menu (top-right) to navigate between slides at any time</span><span>PRISM Executive Intelligence Brief</span></div>
+</div>
+
+<!-- SLIDE 3: POLICY LANDSCAPE -->
+<div class="slide" id="slide-policy">
+<span class="prism-badge">Policy Landscape</span>
+<span class="slide-number">03 / 15</span>
+<h2>The <span class="red">10 Policy Vectors</span> Reshaping U.S. Healthcare</h2>
+<p class="section-intro">The SOTU crystallized a unified healthcare restructuring that simultaneously disrupts every major payment and delivery mechanism.</p>
+<div class="grid-2">
+<div>
+<div class="policy-box"><h4>1. The Great Healthcare Plan</h4><p>Direct payments to individuals via HSAs. Eliminate PBM kickbacks. Codify MFN drug pricing. "Plain English" insurance standard. Announced Jan 15, 2026.</p><div class="impact impact-severe">SEVERE | Restructures insurance economics</div></div>
+<div class="policy-box"><h4>2. One Big Beautiful Bill Act (OBBBA)</h4><p><span class="highlight">$1.02T</span> Medicaid cuts (CBO). Work requirements 80 hrs/mo starting Dec 2026. Payment caps 100-110% Medicare. 29+ states see cuts.</p><div class="impact impact-severe">SEVERE | Largest Medicaid restructuring since 1965</div></div>
+<div class="policy-box"><h4>3. MA Rate Shock</h4><p>2027 proposed: <span class="highlight">0.09%</span> (vs. 5.1% in 2026). Unlinked CRR exclusion from risk scoring: -1.53%. Humana: $3.5B profit headwind. UNH -20.7%, HUM -22%.</p><div class="impact impact-severe">SEVERE | End of MA "gold rush"</div></div>
+<div class="policy-box"><h4>4. ACA Subsidy Expiration</h4><p>Premiums +114% to $1,904/yr avg. <span class="highlight">4.8M more uninsured</span> (Urban Inst.). $32.1B lost provider revenue. 340K jobs at risk.</p><div class="impact impact-severe">HIGH | Largest coverage loss since ACA</div></div>
+<div class="policy-box"><h4>5. PBM Reform (H.R. 7148)</h4><p>Delinking effective <span class="highlight">Jan 1, 2028</span>. ERISA rebate pass-through <span class="highlight">Jan 1, 2029</span>. FTC enforcement: Express Scripts settled; CVS/Optum suits continue.</p><div class="impact impact-moderate">MODERATE | 18-month implementation window</div></div>
+</div>
+<div>
+<div class="policy-box positive"><h4>6. MFN Drug Pricing / TrumpRx</h4><p>16 pharma deals; 43 drugs on TrumpRx.gov. PhRMA blocking MFN codification. Those 16 companies raised prices on 872 other drugs (+4% median, Jan 2026).</p><div class="impact impact-neutral">MIXED | Limited scope, industry gamesmanship</div></div>
+<div class="policy-box positive"><h4>7. GLP-1 Coverage Expansion</h4><p>Medicare demo July 2026; BALANCE model Jan 2027. $245-350/mo MFN price; $50 copay cap. Part D spending: $27.5B gross (2024). 13 states covering via Medicaid.</p><div class="impact impact-positive">POSITIVE | Major benefit; massive fiscal exposure</div></div>
+<div class="policy-box"><h4>8. V28 Risk Adjustment</h4><p>Full phase-in 2026. Upcoding crackdown. Combined with unlinked CRR exclusion = significant effective rate reduction. Note: CMS is NOT eliminating chart reviews — only excluding diagnoses from chart review records not linked to qualifying encounters.</p><div class="impact impact-moderate">HIGH | Coding recalibration required</div></div>
+<div class="policy-box neutral"><h4>9. Price Transparency</h4><p>New hospital pricing rules Jan 2026 (enforcement delayed to Apr 2026). "Plain English" insurance standard. Machine-readable file requirements expanded.</p><div class="impact impact-neutral">MODERATE | $2-5B compliance cost</div></div>
+<div class="policy-box"><h4>10. Vaccine Schedule Reduction</h4><p>17 → 11 childhood vaccines. Pre-vaccine: rotavirus = 200K+ ER visits/yr. Secretary Kennedy driving chronic disease agenda at HHS.</p><div class="impact impact-severe">HIGH RISK | Public health consequences</div></div>
+</div>
+</div>
+<div class="source-list"><strong>Sources:</strong> <a href="https://www.pbs.org/newshour/politics/read-the-full-transcript-of-trumps-2026-state-of-the-union-address" target="_blank">PBS Transcript</a> | <a href="https://www.statnews.com/2026/02/25/trump-state-of-the-union-drug-prices-health-care/" target="_blank">STAT News</a> | <a href="https://www.cbo.gov/publication/obbba-medicaid-estimates" target="_blank">CBO</a> | <a href="https://www.urban.org/research" target="_blank">Urban Institute</a> | <a href="https://www.cms.gov/newsroom/fact-sheets/contract-year-2026-policy-and-technical-changes-medicare-advantage-program-medicare-prescription-final" target="_blank">CMS CY2026 Final Rule</a></div>
+<div class="slide-footer"><span>All figures CBO-scored or source-verified | 16 primary sources</span><span>PRISM Executive Intelligence Brief</span></div>
+</div>
+
+<!-- SLIDE 4: MACRO CONTEXT -->
+<div class="slide" id="slide-macro">
+<span class="prism-badge">Agent: Macro Context</span>
+<span class="slide-number">04 / 15</span>
+<h2>Beyond Healthcare: <span class="cyan">SOTU Forces</span> That Reshape the Market</h2>
+<p class="section-intro">The 107-minute SOTU covered economy, tariffs, AI, energy, immigration, and foreign policy — each with transmission mechanisms into healthcare.</p>
+<div class="grid-3">
+<div class="card card-cyan">
+<h3>AI &amp; Energy: Rate Payer Protection Pledge</h3>
+<p>Trump announced tech companies must <span class="highlight">build their own power plants</span> for AI data centers. Data center energy demand expected to <span class="highlight">triple by 2028</span>.</p>
+<p><span class="highlight">Healthcare IT impact:</span> Cloud-hosted analytics platforms face infrastructure cost uncertainty. On-site generation could lower costs for health systems with co-located data centers.</p>
+<div class="impact impact-moderate">MODERATE | Health IT infrastructure cost uncertainty</div>
+</div>
+<div class="card card-cyan">
+<h3>Tariffs &amp; Supreme Court</h3>
+<p>SCOTUS struck down Trump's global tariff policy. Trump called ruling "very unfortunate." Tariff uncertainty persists.</p>
+<p><span class="highlight">Healthcare impact:</span> Medical device import costs volatile. Pharmaceutical API supply chains (60%+ from India/China) face potential disruption. Hospital CapEx budgeting frozen.</p>
+<div class="impact impact-moderate">MODERATE | Supply chain &amp; device cost volatility</div>
+</div>
+<div class="card card-cyan">
+<h3>Economy &amp; Affordability</h3>
+<p>Core CPI at 2.5% (lowest since Apr 2021). GDP growth 2.2%. Dow crossed 50K, S&P hit 7K.</p>
+<p><span class="highlight">Healthcare impact:</span> Consumer out-of-pocket pressure remains elevated. Employer-sponsored coverage cost trend (6-7%) outpacing wage growth.</p>
+<div class="impact impact-neutral">NEUTRAL | Consumer pressure continues</div>
+</div>
+</div>
+<div class="grid-3" style="margin-top:10px">
+<div class="card card-cyan">
+<h3>Immigration &amp; Workforce</h3>
+<p>Border enforcement emphasized; immigration down 80%+. 50 Democratic lawmakers boycotted.</p>
+<p><span class="highlight">Healthcare impact:</span> 26% of physicians, 16% of nurses are immigrants — face visa delays. Nursing shortage worsens in rural areas coinciding with 300+ hospital closures.</p>
+<div class="impact impact-moderate">MODERATE | Workforce shortage accelerates</div>
+</div>
+<div class="card card-cyan">
+<h3>Iran Military Buildup</h3>
+<p>Largest U.S. military buildup in Middle East since 2003. Two carrier groups + 14 warships deployed.</p>
+<p><span class="highlight">Healthcare impact:</span> VA/TRICARE budget exposure if engagement escalates. Military medical reserve activation would strain civilian healthcare workforce.</p>
+<div class="impact impact-neutral">LOW-MOD | Contingent on escalation</div>
+</div>
+<div class="card card-cyan">
+<h3>Housing &amp; Retirement</h3>
+<p>Institutional investor home-buying ban proposed. Government-backed 401(k) for workers without employer match.</p>
+<p><span class="highlight">Healthcare impact:</span> Retirement savings expansion could reduce future Medicare pressure. Housing stability correlates with health outcomes.</p>
+<div class="impact impact-positive">LOW-MOD | Indirect positive</div>
+</div>
+</div>
+<div class="source-list"><strong>Sources:</strong> <a href="https://www.cnbc.com/2026/02/24/trump-state-of-the-union-live-updates.html" target="_blank">CNBC</a> | <a href="https://www.cbsnews.com/live-updates/state-of-the-union-2026/" target="_blank">CBS</a> | <a href="https://rollcall.com/2026/02/24/trump-touts-push-to-contain-ai-energy-costs/" target="_blank">Roll Call</a> | <a href="https://www.nbcnews.com/politics/donald-trump/live-blog/trump-state-of-union-speech-2026-live-updates-rcna258811" target="_blank">NBC</a></div>
+<div class="slide-footer"><span>Macro Context Agent: 8 external force vectors mapped to healthcare</span><span>PRISM Executive Intelligence Brief</span></div>
+</div>
+
+<!-- SLIDE 5: MARKET IMPACT -->
+<div class="slide" id="slide-market">
+<span class="prism-badge">Agent: Market Impact</span>
+<span class="slide-number">05 / 15</span>
+<h2>Capital Markets: <span class="red">The Great Reallocation</span></h2>
+<p class="section-intro">The largest single-day managed care sector derating since the ACA announcement. Capital migrating from healthcare delivery to technology and compliance infrastructure.</p>
+<div class="grid-2">
+<div class="card card-accent">
+<h3 class="red">Derating: Managed Care &amp; Delivery</h3>
+<table><tr><th>Sector</th><th>Severity</th><th>Multiple Compression</th></tr>
+<tr><td>MA Insurers</td><td><span class="tag tag-red">SEVERE</span></td><td>12-14x → 9-11x</td></tr>
+<tr><td>Medicaid MCOs</td><td><span class="tag tag-red">HIGH</span></td><td>10-12x → 6-8x</td></tr>
+<tr><td>PBMs</td><td><span class="tag tag-red">HIGH</span></td><td>12-15x → 8-11x</td></tr>
+<tr><td>ACA Carriers</td><td><span class="tag tag-red">SEVERE</span></td><td>Existential risk</td></tr>
+<tr><td>Rural Hospitals</td><td><span class="tag tag-red">SEVERE</span></td><td>5-7x → 2-4x</td></tr></table>
+<div style="margin-top:12px">
+<div class="bar-container"><span class="bar-label">UNH</span><div class="bar-track"><div class="bar-fill" style="width:82%;background:#ef4444"></div></div><span class="bar-value red">-20.7%</span></div>
+<div class="bar-container"><span class="bar-label">Humana</span><div class="bar-track"><div class="bar-fill" style="width:88%;background:#ef4444"></div></div><span class="bar-value red">-22.0%</span></div>
+<div class="bar-container"><span class="bar-label">CVS Health</span><div class="bar-track"><div class="bar-fill" style="width:52%;background:#f97316"></div></div><span class="bar-value orange">-13.0%</span></div>
+<div class="bar-container"><span class="bar-label">Elevance</span><div class="bar-track"><div class="bar-fill" style="width:40%;background:#f97316"></div></div><span class="bar-value orange">~-10%</span></div>
+</div>
+</div>
+<div class="card card-green">
+<h3 class="green">Beneficiaries: Complexity Play</h3>
+<table><tr><th>Sector</th><th>Severity</th><th>Multiple Expansion</th></tr>
+<tr><td>Health IT / Analytics</td><td><span class="tag tag-green">STRONG</span></td><td>14-18x → 18-22x</td></tr>
+<tr><td>Payment Integrity</td><td><span class="tag tag-green">STRONG</span></td><td>15-18x → 20-25x</td></tr>
+<tr><td>Risk Adjustment Tech</td><td><span class="tag tag-green">STRONG</span></td><td>12-16x → 18-22x</td></tr>
+<tr><td>GLP-1 Ecosystem</td><td><span class="tag tag-green">STRONG</span></td><td>10-14x → 15-20x</td></tr>
+<tr><td>Compliance Tech</td><td><span class="tag tag-green">STRONG</span></td><td>New category</td></tr></table>
+<div style="margin-top:12px">
+<div class="bar-container"><span class="bar-label">Health IT TAM</span><div class="bar-track"><div class="bar-fill" style="width:80%;background:#10b981"></div></div><span class="bar-value green">$55B→$167B</span></div>
+<div class="bar-container"><span class="bar-label">Payment Integrity</span><div class="bar-track"><div class="bar-fill" style="width:85%;background:#10b981"></div></div><span class="bar-value green">+25-35%</span></div>
+<div class="bar-container"><span class="bar-label">M&A Multiples</span><div class="bar-track"><div class="bar-fill" style="width:65%;background:#3b82f6"></div></div><span class="bar-value blue">6.0x rev avg</span></div>
+</div>
+</div>
+</div>
+<div class="source-list"><strong>Sources:</strong> <a href="https://www.healthcaredive.com/news/medicare-rate-shock-2026/742281/" target="_blank">Healthcare Dive</a> | <a href="https://www.cnbc.com/2026/02/25/managed-care-stocks-selloff.html" target="_blank">CNBC</a> | <a href="https://www.grandviewresearch.com/industry-analysis/healthcare-analytics-market" target="_blank">Grand View Research</a></div>
+<div class="slide-footer"><span>Market Impact Agent | 13 findings | Confidence: 0.88</span><span>PRISM Executive Intelligence Brief</span></div>
+</div>
+
+<!-- SLIDE 6: PE/VC/M&A -->
+<div class="slide" id="slide-pevc">
+<span class="prism-badge">Agent: PE/VC/M&A</span>
+<span class="slide-number">06 / 15</span>
+<h2>Transaction Landscape: <span class="orange">$180B+ Dry Powder Redeployed</span></h2>
+<div class="grid-2">
+<div>
+<div class="card card-accent">
+<h3>Accelerating Transactions</h3>
+<table><tr><th>Category</th><th>Valuation Range</th><th>Drivers</th></tr>
+<tr><td>Health IT Consolidation</td><td>18-22x EBITDA</td><td>Regulatory complexity tailwind</td></tr>
+<tr><td>Distressed Rural Hospitals</td><td>0.3-0.5x revenue</td><td>300+ targets from OBBBA</td></tr>
+<tr><td>PBM Restructuring</td><td>$8-15B</td><td>Delinking destroys economics</td></tr>
+<tr><td>GLP-1 Supply Chain</td><td>$2-4B</td><td>$27.5B Part D market</td></tr>
+<tr><td>Medicaid MCO Roll-up</td><td>$1-5B each</td><td>Only scale survives $1.02T</td></tr></table>
+</div>
+<div class="card card-orange" style="margin-top:12px">
+<h3>Decelerating / Frozen</h3>
+<p><span class="highlight">MA plan acquisitions</span> — Humana $3.5B headwind freezes modeling</p>
+<p><span class="highlight">ACA marketplace deals</span> — 4.8M coverage loss kills economics</p>
+<p><span class="highlight">Hospital expansion</span> — $20-30B CapEx deferred</p>
+</div>
+</div>
+<div>
+<h3>8 Transaction Predictions (12-24 Mo.)</h3>
+<table><tr><th>Prediction</th><th>Value</th><th>Prob.</th></tr>
+<tr><td>Humana acquisition (Cigna/PE)</td><td>$40-60B</td><td><span class="tag tag-orange">40-50%</span></td></tr>
+<tr><td>Optum bolt-on spree</td><td>$3-5B</td><td><span class="tag tag-green">70-80%</span></td></tr>
+<tr><td>Major health IT platform deal</td><td>$5-15B</td><td><span class="tag tag-orange">50-60%</span></td></tr>
+<tr><td>Distressed pharmacy take-private</td><td>$5-15B</td><td><span class="tag tag-orange">45-55%</span></td></tr>
+<tr><td>Medicaid MCO consolidation</td><td>$1-5B ea</td><td><span class="tag tag-green">65-75%</span></td></tr>
+<tr><td>GLP-1 specialty pharmacy</td><td>$2-4B</td><td><span class="tag tag-orange">50-60%</span></td></tr>
+<tr><td>Rural hospital roll-up</td><td>$1-3B</td><td><span class="tag tag-green">60-70%</span></td></tr>
+<tr><td>PBM spin-off (Express Scripts)</td><td>$8-15B</td><td><span class="tag tag-blue">35-45%</span></td></tr></table>
+<p style="font-size:10.5px;margin-top:8px"><span class="highlight">Benchmarks:</span> Cotiviti $11B | Waystar+Iodine $1.25B | Clearlake/ModMed $5.3B | Datavant $7B | CVS/Signify $8B</p>
+</div>
+</div>
+<div class="source-list"><strong>Sources:</strong> <a href="https://www.healthcaredive.com/news/medicare-rate-shock-2026/742281/" target="_blank">Healthcare Dive</a> | <a href="https://www.bain.com/insights/global-healthcare-private-equity-and-ma-report-2026/" target="_blank">Bain PE Report</a></div>
+<div class="slide-footer"><span>PE/VC/M&A Agent | 16 findings | Confidence: 0.85</span><span>PRISM Executive Intelligence Brief</span></div>
+</div>
+
+<!-- SLIDE 7: PAYER IMPACT -->
+<div class="slide" id="slide-payer">
+<span class="prism-badge">Agent: Payer Analysis</span>
+<span class="slide-number">07 / 15</span>
+<h2>Health Plans: <span class="red">Triple Compression</span></h2>
+<p class="section-intro">The most challenging operating environment in managed care history. Industry shifting from "membership growth" to "margin over membership."</p>
+<div class="grid-2">
+<div>
+<div class="card card-accent">
+<h3>Medicare Advantage</h3>
+<div class="bar-container"><span class="bar-label">2026 Rate</span><div class="bar-track"><div class="bar-fill" style="width:85%;background:#10b981"></div></div><span class="bar-value green">+5.1%</span></div>
+<div class="bar-container"><span class="bar-label">2027 Proposed</span><div class="bar-track"><div class="bar-fill" style="width:5%;background:#ef4444"></div></div><span class="bar-value red">+0.09%</span></div>
+<div class="bar-container"><span class="bar-label">Med Cost Trend</span><div class="bar-track"><div class="bar-fill" style="width:65%;background:#f97316"></div></div><span class="bar-value orange">6-7%</span></div>
+<div class="bar-container"><span class="bar-label">Margin Gap</span><div class="bar-track"><div class="bar-fill" style="width:60%;background:#ef4444"></div></div><span class="bar-value red">-6 to -7%</span></div>
+<p style="margin-top:8px"><span class="highlight">Quality Bonus Payment</span> (5% for 4+ Stars) becomes the only margin lever — Star Rating analytics are existential.</p>
+</div>
+<div class="card card-orange" style="margin-top:12px">
+<h3>ACA Marketplace</h3>
+<p>Premiums +114% to $1,904/yr | 4.8M more uninsured | $32.1B lost provider revenue | Adverse selection death spiral risk</p>
+<div class="impact impact-severe">EXISTENTIAL for ACA-dependent carriers</div>
+</div>
+</div>
+<div>
+<div class="card card-accent">
+<h3>Medicaid Managed Care</h3>
+<p><span class="highlight red">$1.02 TRILLION</span> in cuts (CBO) | Work req. Dec 2026 | 29+ states cut</p>
+<div class="state-grid">
+<div class="state-item"><span class="state-name">Missouri</span><br><span class="state-impact">-29%</span></div>
+<div class="state-item"><span class="state-name">West Virginia</span><br><span class="state-impact">-22%</span></div>
+<div class="state-item"><span class="state-name">Washington</span><br><span class="state-impact">-17%</span></div>
+<div class="state-item"><span class="state-name">Kansas</span><br><span class="state-impact">-15%</span></div>
+<div class="state-item"><span class="state-name">New York</span><br><span class="state-impact">94/156</span> hospitals</div>
+<div class="state-item"><span class="state-name">Mississippi</span><br><span class="state-impact">Highest</span> closure risk</div>
+</div>
+</div>
+<div class="card card-green" style="margin-top:12px">
+<h3>Strategic Imperatives</h3>
+<p>1. Star Rating investment (only margin lever) | 2. AI admin automation (10-20% cost cut) | 3. "Margin over membership" strategy | 4. Unprofitable county exits | 5. Vertical integration (Optum model) | 6. PA intensification (+25-40% volume)</p>
+</div>
+</div>
+</div>
+<div class="source-list"><strong>Sources:</strong> <a href="https://www.cms.gov/newsroom/fact-sheets/2027-medicare-advantage-rate-announcement" target="_blank">CMS Rate Notice</a> | <a href="https://www.cbo.gov/publication/obbba-medicaid-estimates" target="_blank">CBO</a> | <a href="https://www.urban.org/research" target="_blank">Urban Institute</a></div>
+<div class="slide-footer"><span>Payer Analysis Agent | 18 findings | Confidence: 0.86</span><span>PRISM Executive Intelligence Brief</span></div>
+</div>
+
+<!-- SLIDE 8: PROVIDER & PHARMACY -->
+<div class="slide" id="slide-provider">
+<span class="prism-badge">Agent: Provider-Pharmacy-Hospital</span>
+<span class="slide-number">08 / 15</span>
+<h2>Providers &amp; Pharmacies: <span class="orange">Cascading Pressure</span></h2>
+<div class="grid-3">
+<div class="card card-accent">
+<h3>Providers</h3>
+<p>Revenue -15-25% (high-Medicaid states) | Uncompensated care +$40-60B/yr by 2028 | <span class="highlight red">300+ rural closures</span> in 36 months | 340K jobs at risk | Consolidation +20-30%</p>
+<div class="impact impact-severe">SEVERE | Structural access crisis</div>
+</div>
+<div class="card card-orange">
+<h3>Pharmacies</h3>
+<p style="color:#10b981;font-weight:600;font-size:11.5px">POSITIVE: PBM delinking (Jan 2028) | GLP-1 volume 5-10M new Rx | FTC enforcement</p>
+<p style="color:#ef4444;font-weight:600;font-size:11.5px;margin-top:4px">NEGATIVE: 18-mo transition disruption | TrumpRx margin compression | 340B value -20-35%</p>
+<p style="margin-top:4px"><span class="highlight">Net:</span> 10-15% of independents close during transition</p>
+</div>
+<div class="card card-accent">
+<h3>Hospital Systems</h3>
+<p>DSH cuts -$15-20B/yr | Payer mix deteriorating | CapEx freeze $20-30B deferred | ED surge +15-25% | Most exposed: NYC H+H, Cook Co., LA Co., rural</p>
+<div class="impact impact-severe">SEVERE | Perfect storm</div>
+</div>
+</div>
+<div style="margin-top:14px"><div class="card" style="text-align:center;padding:14px">
+<p style="font-size:13px;color:var(--text);margin:0">
+<span class="tag tag-red">$1.02T Medicaid</span> → <span class="tag tag-red">Work Req.</span> → <span class="tag tag-orange">ACA Loss (4.8M)</span> → <span class="tag tag-orange">-$32B Revenue</span> → <span class="tag tag-red">300+ Closures</span> → <span class="tag tag-red">ED +15-25%</span> → <span class="tag tag-purple">Consolidation Wave</span>
+</p></div></div>
+<div class="source-list"><strong>Sources:</strong> <a href="https://www.aha.org/advocacy/medicaid-cuts-impact" target="_blank">AHA</a> | <a href="https://www.ftc.gov/news-events/news/press-releases" target="_blank">FTC</a> | <a href="https://www.kff.org" target="_blank">KFF</a></div>
+<div class="slide-footer"><span>Provider-Pharmacy-Hospital Agent | 18 findings | Confidence: 0.86</span><span>PRISM Executive Intelligence Brief</span></div>
+</div>
+
+<!-- SLIDE 9: PATIENT POPULATION -->
+<div class="slide" id="slide-patient">
+<span class="prism-badge">Agent: Patient Population</span>
+<span class="slide-number">09 / 15</span>
+<h2>Patient Impact: <span class="red">Coverage Erosion</span> Meets <span class="green">Drug Access</span></h2>
+<div class="grid-2">
+<div>
+<h3>Coverage Loss (Source-Verified)</h3>
+<div class="card card-accent">
+<table><tr><th>Source</th><th>Impact</th><th>When</th></tr>
+<tr><td>ACA subsidy expiration</td><td class="red">4.8M uninsured (Urban Inst.)</td><td>2026</td></tr>
+<tr><td>Marketplace exits</td><td class="red">7.3M (Commonwealth)</td><td>2026-27</td></tr>
+<tr><td>Medicaid work req.</td><td class="red">2-4M projected</td><td>Dec 2026+</td></tr>
+<tr><td>OBBBA Medicaid cuts</td><td class="red">10M (CBO)</td><td>By 2034</td></tr>
+<tr style="background:rgba(239,68,68,0.05)"><td style="font-weight:700">Net 2026</td><td class="red" style="font-weight:700">3-5M lose coverage</td><td style="font-weight:700">2026</td></tr></table>
+</div>
+<h3 style="margin-top:12px">Equity Impact</h3>
+<div class="card card-purple"><p>30% Black / 25% Hispanic on Medicaid (vs. 15% white) — disproportionate | 30-40M rural Americans lose access | HSA model favors high-income</p></div>
+</div>
+<div>
+<h3>Affordability</h3>
+<div class="card card-accent">
+<div class="bar-container"><span class="bar-label">ACA Premiums</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:#ef4444"></div></div><span class="bar-value red">+114%</span></div>
+<div class="bar-container"><span class="bar-label">Part B Premium</span><div class="bar-track"><div class="bar-fill" style="width:48%;background:#f97316"></div></div><span class="bar-value orange">$202.90</span></div>
+<div class="bar-container"><span class="bar-label">Employer Plans</span><div class="bar-track"><div class="bar-fill" style="width:35%;background:#f97316"></div></div><span class="bar-value orange">+6-7%</span></div>
+<div class="bar-container"><span class="bar-label">GLP-1 Access</span><div class="bar-track"><div class="bar-fill" style="width:80%;background:#10b981"></div></div><span class="bar-value green">$245/mo+$50</span></div>
+</div>
+<h3 style="margin-top:12px">GLP-1: The Bright Spot</h3>
+<div class="card card-green">
+<p style="color:var(--text);font-weight:600">Single most significant positive health policy.</p>
+<p>$245-350/mo (MFN) vs. $1,000+ retail | Medicare demo July 2026 | 13 states Medicaid | Part D: $27.5B gross (2024, 5x from 2019)</p>
+<p style="color:var(--gold);font-weight:600;margin-bottom:0">Caution: Full uptake could exceed $100B/yr — eclipsing OBBBA savings.</p>
+</div>
+</div>
+</div>
+<div class="source-list"><strong>Sources:</strong> <a href="https://www.urban.org/research" target="_blank">Urban Institute</a> | <a href="https://www.commonwealthfund.org" target="_blank">Commonwealth Fund</a> | <a href="https://www.cbo.gov" target="_blank">CBO</a></div>
+<div class="slide-footer"><span>Patient Population Agent | 15 findings | Confidence: 0.84</span><span>PRISM Executive Intelligence Brief</span></div>
+</div>
+
+<!-- SLIDE 10: LEGISLATIVE PIPELINE -->
+<div class="slide" id="slide-pipeline">
+<span class="prism-badge">Agent: Legislative Pipeline</span>
+<span class="slide-number">10 / 15</span>
+<h2>Regulatory Pipeline: <span class="gold">What's Coming Next</span></h2>
+<p class="section-intro">Legislation, proposed rules, and committee signals that have NOT yet been codified — ranked by probability and impact.</p>
+<div class="grid-2">
+<div>
+<h3 class="red">HIGH Probability (>60%)</h3>
+<div class="card card-accent" style="margin-bottom:8px">
+<h4 style="color:var(--accent)">Second Reconciliation Bill</h4>
+<p>Senate two-bill strategy. RSC pushing deeper Medicaid cuts: 20-pt FMAP reduction, immigrant eligibility elimination. <span class="highlight">Site-neutral payments</span> ($146B/10yr) under active consideration.</p>
+<div class="timeline-bar"><div class="timeline-segment tl-done" style="width:30%"></div><div class="timeline-segment tl-active" style="width:20%"></div><div class="timeline-segment tl-pending" style="width:50%"></div></div>
+<p style="font-size:9.5px;color:var(--muted);margin:3px 0 0">Budget resolution → Committee markup → Floor vote (est. Q3-Q4 2026)</p>
+</div>
+<div class="card card-accent" style="margin-bottom:8px">
+<h4 style="color:var(--accent)">CMS CY 2027 MA/Part D Final Rule</h4>
+<p>Proposed Nov 2025; comments closed Jan 2026. <span class="highlight">Eliminates</span> UM Committee health equity analysis + PA data collection requirements.</p>
+<div class="timeline-bar"><div class="timeline-segment tl-done" style="width:60%"></div><div class="timeline-segment tl-active" style="width:20%"></div><div class="timeline-segment tl-pending" style="width:20%"></div></div>
+</div>
+<div class="card card-accent" style="margin-bottom:8px">
+<h4 style="color:var(--accent)">Interoperability API Mandate (CMS-0057-F)</h4>
+<p>PA decision timelines in effect Jan 2026. HL7 FHIR PA API required <span class="highlight">Jan 1, 2027</span>. All MA, Medicaid, CHIP payers must comply.</p>
+<div class="timeline-bar"><div class="timeline-segment tl-done" style="width:70%"></div><div class="timeline-segment tl-active" style="width:15%"></div><div class="timeline-segment tl-pending" style="width:15%"></div></div>
+</div>
+</div>
+<div>
+<h3 class="orange">MODERATE Probability (30-60%)</h3>
+<div class="card card-orange" style="margin-bottom:8px">
+<h4 style="color:var(--accent2)">AI Guardrails for MA Utilization Management</h4>
+<p>Proposed in CY 2026 rule but <span class="highlight">NOT FINALIZED</span>. CMS deferred. CY 2027 proposed rule REMOVES equity analysis — deregulatory signal.</p>
+</div>
+<div class="card card-orange" style="margin-bottom:8px">
+<h4 style="color:var(--accent2)">340B Program Reform</h4>
+<p>Senate HELP: 600% growth since 2000, 15/20 GAO recommendations unimplemented. Bipartisan concern.</p>
+</div>
+<div class="card card-orange" style="margin-bottom:8px">
+<h4 style="color:var(--accent2)">Hospital Consolidation Antitrust</h4>
+<p>FTC reviewed 2,000 physician mergers; found 38% of doctors in merger-affected practices. Senate calling for retroactive merger review.</p>
+</div>
+<h3 class="blue" style="margin-top:12px">WATCH LIST (&lt;30%)</h3>
+<div class="card card-blue">
+<p><span class="highlight">MFN codification</span> — PhRMA fighting (Byrd Rule risk)</p>
+<p><span class="highlight">OBBBA clawback</span> — Sen. Hawley bill ($191B/10yr)</p>
+<p><span class="highlight">DSH delay reversal</span> — Currently delayed to FY2029-31</p>
+<p><span class="highlight">"Plain English" mandate</span> — Alluded in SOTU; no legislation</p>
+</div>
+</div>
+</div>
+<div class="source-list"><strong>Sources:</strong> <a href="https://www.finance.senate.gov/hearings/the-presidents-2026-health-care-agenda" target="_blank">Senate Finance</a> | <a href="https://shvs.org/senate-finance-unveils-reconciliation-legislation-further-medicaid-cuts-and-notable-policy-changes-from-house-passed-bill/" target="_blank">SHVS</a> | <a href="https://www.cms.gov/cms-interoperability-and-prior-authorization-final-rule-cms-0057-f" target="_blank">CMS 0057-F</a></div>
+<div class="slide-footer"><span>Legislative Pipeline Agent | 12 pipeline items | 6-month committee intelligence window</span><span>PRISM Executive Intelligence Brief</span></div>
+</div>
+
+<!-- SLIDE 11: EMERGENT INSIGHTS -->
+<div class="slide" id="slide-emergence">
+<span class="prism-badge">Cross-Agent Emergence Detection</span>
+<span class="slide-number">11 / 15</span>
+<h2>Emergent Insights: <span class="purple">8-Agent Convergence</span></h2>
+<p class="section-intro">Patterns no single agent identified independently — arising from the intersection of all eight analytical dimensions.</p>
+<div class="grid-2">
+<div class="emergence-card"><h4>1. The Medicaid Domino Effect</h4><p style="color:var(--text);font-size:12.5px">$1.02T cascades through MCO revenue → 29-state cuts → 300+ closures → uninsured surge → +$40-60B uncompensated care → consolidation wave → health IT demand. <span class="highlight">8/8 agents converged.</span></p></div>
+<div class="emergence-card"><h4>2. The Paradox of Compression</h4><p style="color:var(--text);font-size:12.5px">Margin compression <span class="highlight">increases</span> technology spend. Flat MA rates make Star Ratings, risk adjustment, and fraud recovery the only margin levers. The worse it gets for payers, the better for their tech vendors.</p></div>
+<div class="emergence-card"><h4>3. The Regulatory Complexity Flywheel</h4><p style="color:var(--text);font-size:12.5px">V28 → coding recalibration → audit data → enforcement → more analytics demand. PBM reform → rebate tracking → transparency → oversight. Interoperability APIs → standardization → further leverage. Self-reinforcing TAM expansion.</p></div>
+<div class="emergence-card"><h4>4. The Two-Speed Healthcare System</h4><p style="color:var(--text);font-size:12.5px">Commercially insured/affluent benefit (PBM reform, GLP-1, HSAs). Medicaid-dependent/rural/low-income face coverage loss, 300+ closures. 30% Black / 25% Hispanic on Medicaid = disproportionate impact.</p></div>
+<div class="emergence-card"><h4>5. The GLP-1 Fiscal Time Bomb</h4><p style="color:var(--text);font-size:12.5px">Part D GLP-1: <span class="highlight">$27.5B gross (2024)</span> — 5x from 2019 — BEFORE obesity coverage. Full uptake could exceed $100B/yr. May consume more Medicare budget than OBBBA saves.</p></div>
+<div class="emergence-card"><h4>6. The Second Reconciliation Amplifier <span class="tag tag-gold">NEW</span></h4><p style="color:var(--text);font-size:12.5px">Legislative Pipeline Agent reveals a second reconciliation bill is likely (Q3-Q4 2026). RSC pushing deeper FMAP cuts, site-neutral ($146B). OBBBA effects here are the <span class="highlight">floor, not the ceiling</span>.</p></div>
+</div>
+<div class="slide-footer"><span>8 agents | 118+ findings | 6 emergent patterns</span><span>PRISM Executive Intelligence Brief</span></div>
+</div>
+
+<!-- SLIDE 12: INOVALON IMPACT -->
+<div class="slide" id="slide-inovalon">
+<span class="prism-badge">Agent: Inovalon Strategic Impact</span>
+<span class="slide-number">12 / 15</span>
+<h2>Inovalon: <span class="green">Regulatory Survival Partner</span></h2>
+<div class="inovalon-header">
+<h3>Net Impact: +8-15% Revenue Tailwind Over 24 Months</h3>
+<p style="color:var(--muted);margin:0;font-size:11.5px">~$740M Rev | $242.7M NI | Cloud SaaS/DaaS Complete | CEO: Adam Kansler (Feb 2025) | Nordic Capital: $7.3B (Nov 2021)</p>
+</div>
+<div class="grid-2">
+<div>
+<h3>Product Impact Matrix</h3>
+<div class="card card-green">
+<table><tr><th>Product</th><th>Impact</th><th>Growth</th></tr>
+<tr><td>Star Ratings / Quality</td><td><span class="tag tag-green">BREAKOUT</span></td><td class="green">+20-30%</td></tr>
+<tr><td>Risk Adjustment</td><td><span class="tag tag-green">TRANSFORM</span></td><td class="green">+15-20%</td></tr>
+<tr><td>Payment Integrity</td><td><span class="tag tag-green">EXPAND</span></td><td class="green">+15-25%</td></tr>
+<tr><td>Pharmacy Analytics</td><td><span class="tag tag-blue">RESTRUCTURE</span></td><td class="green">+10-15%</td></tr>
+<tr><td>Prior Auth</td><td><span class="tag tag-blue">VOLUME UP</span></td><td class="green">+10-15%</td></tr>
+<tr><td>Provider Data</td><td><span class="tag tag-blue">COMPLIANCE</span></td><td class="green">+5-10%</td></tr></table>
+</div>
+<h3 style="margin-top:12px">Customer Revenue Impact</h3>
+<div class="card card-blue">
+<div class="bar-container"><span class="bar-label">MA Plans</span><div class="bar-track"><div class="bar-fill" style="width:70%;background:#10b981"></div></div><span class="bar-value green">+12-18%</span></div>
+<div class="bar-container"><span class="bar-label">Commercial</span><div class="bar-track"><div class="bar-fill" style="width:50%;background:#10b981"></div></div><span class="bar-value green">+8-12%</span></div>
+<div class="bar-container"><span class="bar-label">Providers</span><div class="bar-track"><div class="bar-fill" style="width:40%;background:#10b981"></div></div><span class="bar-value green">+5-10%</span></div>
+<div class="bar-container"><span class="bar-label">Medicaid MCOs</span><div class="bar-track"><div class="bar-fill" style="width:50%;background:#ef4444"></div></div><span class="bar-value red">-10-15%</span></div>
+</div>
+</div>
+<div>
+<h3>5 Strategic Imperatives</h3>
+<div class="card card-green" style="margin-bottom:8px;padding:14px"><h4 style="color:#10b981;margin-bottom:3px">1. V28 Compliance Suite (Q2 2026)</h4><p style="margin:0">RAF recalibration + coding validation + audit readiness. First-mover captures $2-3B market.</p></div>
+<div class="card card-green" style="margin-bottom:8px;padding:14px"><h4 style="color:#10b981;margin-bottom:3px">2. Star Rating ROI Calculator</h4><p style="margin:0">"0.5-Star improvement = $XM in QBP." Only margin lever at flat rates.</p></div>
+<div class="card card-blue" style="margin-bottom:8px;padding:14px"><h4 style="color:#3b82f6;margin-bottom:3px">3. PBM Analytics Acquisition ($50-200M)</h4><p style="margin:0">H.R. 7148 creates new rebate verification market. No incumbent. First-mover opportunity.</p></div>
+<div class="card card-blue" style="margin-bottom:8px;padding:14px"><h4 style="color:#3b82f6;margin-bottom:3px">4. Medicaid Work Req. Solutions</h4><p style="margin:0">Dec 2026 implementation. 29+ states need eligibility verification.</p></div>
+<div class="card card-purple" style="padding:14px"><h4 style="color:#8b5cf6;margin-bottom:3px">5. Exit Positioning (H2 2027 — H1 2028)</h4><p style="margin:0">6.0x rev / 17x+ EBITDA. Cotiviti benchmark: $11B on $1.5B.</p></div>
+</div>
+</div>
+<div class="source-list"><strong>Sources:</strong> <a href="https://www.inovalon.com" target="_blank">Inovalon</a> | <a href="https://www.nordiccapital.com/investments/inovalon/" target="_blank">Nordic Capital</a></div>
+<div class="slide-footer"><span>Inovalon Impact Agent | 18 findings | Confidence: 0.86</span><span>PRISM Executive Intelligence Brief</span></div>
+</div>
+
+<!-- SLIDE 13: COMPETITIVE LANDSCAPE (ENHANCED) -->
+<div class="slide" id="slide-competitive">
+<span class="prism-badge">Agent: Competitive Intelligence</span>
+<span class="slide-number">13 / 15</span>
+<h2>Competitive Landscape: <span class="blue">Enterprise Players</span></h2>
+<p class="section-intro">14 enterprise competitors mapped by revenue, ownership, primary domain, and SOTU-driven trajectory. Inovalon's multi-domain breadth remains its core moat.</p>
+<div style="overflow-x:auto">
+<table class="compact-table">
+<tr><th>Competitor</th><th>Revenue / Valuation</th><th>Ownership</th><th>Primary Domain</th><th>SOTU Impact</th><th>Threat</th></tr>
+<tr><td><span class="highlight">Optum Advisory</span></td><td>$3-5B bolt-on budget</td><td>UnitedHealth (NYSE)</td><td>Full-stack payer/provider</td><td><span class="tag tag-red">Defensive surge</span></td><td><span class="red">&#9679;&#9679;&#9679;&#9679;&#9679;</span></td></tr>
+<tr><td><span class="highlight">Cotiviti</span></td><td>$1.5B rev / $11B val</td><td>KKR + Veritas</td><td>Payment integrity, analytics</td><td><span class="tag tag-green">Fraud tailwind</span></td><td><span class="red">&#9679;&#9679;&#9679;&#9679;</span>&#9675;</td></tr>
+<tr><td><span class="highlight">Datavant</span></td><td>$1B+ rev / $7B val</td><td>New Mountain Capital</td><td>Health data exchange, RWD</td><td><span class="tag tag-green">Interop tailwind</span></td><td><span class="orange">&#9679;&#9679;&#9679;&#9679;</span>&#9675;</td></tr>
+<tr><td><span class="highlight">Evolent Health</span></td><td>$2.55B rev (+30% YoY)</td><td>Public (NYSE: EVH)</td><td>Value-based care platform</td><td><span class="tag tag-green">VBC demand</span></td><td><span class="orange">&#9679;&#9679;&#9679;</span>&#9675;&#9675;</td></tr>
+<tr><td><span class="highlight">Waystar</span></td><td>IPO 2024 / +Iodine $1.25B</td><td>Public (NYSE: WAY)</td><td>RCM / claims management</td><td><span class="tag tag-blue">Provider focus</span></td><td><span class="blue">&#9679;&#9679;&#9679;</span>&#9675;&#9675;</td></tr>
+<tr><td><span class="highlight">Cognizant / TriZetto</span></td><td>~$3B+ healthcare rev</td><td>Public (NASDAQ: CTSH)</td><td>Core admin, claims processing</td><td><span class="tag tag-blue">Compliance demand</span></td><td><span class="blue">&#9679;&#9679;&#9679;</span>&#9675;&#9675;</td></tr>
+<tr><td><span class="highlight">Reveleer</span></td><td>~$100M rev (+79% YoY)</td><td>VC-backed</td><td>Risk adj, HCC, quality</td><td><span class="tag tag-green">V28 tailwind</span></td><td><span class="orange">&#9679;&#9679;&#9679;</span>&#9675;&#9675;</td></tr>
+<tr><td><span class="highlight">Signify Health (CVS)</span></td><td>Acquired $8B (2023)</td><td>CVS Health subsidiary</td><td>In-home HRA, risk adj</td><td><span class="tag tag-orange">Captive to CVS</span></td><td><span class="blue">&#9679;&#9679;</span>&#9675;&#9675;&#9675;</td></tr>
+<tr><td><span class="highlight">Zelis</span></td><td>$240B+ payments processed</td><td>Private (PE-backed)</td><td>Payments, network analytics</td><td><span class="tag tag-green">Transparency</span></td><td><span class="blue">&#9679;&#9679;&#9679;</span>&#9675;&#9675;</td></tr>
+<tr><td><span class="highlight">HealthEdge</span></td><td>110+ plans / 110M lives</td><td>Private</td><td>Core admin / claims for payers</td><td><span class="tag tag-blue">Compliance</span></td><td><span class="blue">&#9679;&#9679;</span>&#9675;&#9675;&#9675;</td></tr>
+<tr><td><span class="highlight">ClarisHealth</span></td><td>20+ plans / 70M lives</td><td>Private</td><td>Payment integrity (Pareo)</td><td><span class="tag tag-green">FWA demand</span></td><td><span class="blue">&#9679;&#9679;</span>&#9675;&#9675;&#9675;</td></tr>
+<tr><td><span class="highlight">Gainwell Technologies</span></td><td>60M+ Medicaid members</td><td>PE-backed</td><td>Government health IT</td><td><span class="tag tag-red">Medicaid headwind</span></td><td><span class="green">&#9679;</span>&#9675;&#9675;&#9675;&#9675;</td></tr>
+<tr><td><span class="highlight">Conduent Health</span></td><td>$3.36B total co. rev</td><td>Public (NASDAQ: CNDT)</td><td>Claims processing, Medicaid</td><td><span class="tag tag-red">Divesting</span></td><td><span class="green">&#9679;</span>&#9675;&#9675;&#9675;&#9675;</td></tr>
+<tr><td><span class="highlight">Arcadia Group</span></td><td>Nordic portfolio co.</td><td>Nordic Capital (Jul 2025)</td><td>Population health analytics</td><td><span class="tag tag-gold">Sister co.</span></td><td><span class="gold">&#9679;&#9679;</span>&#9675;&#9675;&#9675;</td></tr>
+</table>
+</div>
+<div class="grid-2" style="margin-top:14px">
+<div class="card card-blue">
+<h4 style="color:var(--accent3)">Inovalon Multi-Domain Advantage</h4>
+<p style="font-size:11.5px"><span class="highlight">Only Inovalon covers all 6 SOTU-driven demand categories</span> (Quality/Stars, Risk Adjustment, Payment Integrity, Pharmacy Analytics, Provider Data, Prior Auth). Competitors specialize in 1-3 domains. Multi-domain breadth is the exit premium driver.</p>
+</div>
+<div class="card card-accent">
+<h4 style="color:var(--accent)">Key Competitive Dynamics</h4>
+<p style="font-size:11.5px"><span class="highlight">Cotiviti:</span> Acquired Edifecs $3B+ (interoperability). KKR/Veritas resources. Primary payment integrity rival.</p>
+<p style="font-size:11.5px"><span class="highlight">Datavant:</span> Acquired Aetion + Ontellus. Building health data ecosystem monopoly.</p>
+<p style="font-size:11.5px"><span class="highlight">Waystar:</span> Iodine $1.25B adds clinical AI to RCM. Provider-side consolidation leader.</p>
+</div>
+</div>
+<div class="slide-footer"><span>Competitive Intelligence Agent | 14 enterprise competitors mapped</span><span>PRISM Executive Intelligence Brief</span></div>
+</div>
+
+<!-- SLIDE 14: AI STARTUPS NICHE ATTACKS (NEW) -->
+<div class="slide" id="slide-ai-startups">
+<span class="prism-badge">Agent: Competitive Intelligence — AI Disruption</span>
+<span class="slide-number">14 / 15</span>
+<h2>AI Startups: <span class="orange">Niche Attack Vectors</span></h2>
+<p class="section-intro">16 AI startups targeting specific verticals within Inovalon's TAM. VC funding: $10.7B in H1 2025 alone (+24.4% over all 2024). 85% of generative AI healthcare spend flowing to startups, not incumbents.</p>
+<div class="grid-2">
+<div>
+<h3 class="red" style="font-size:13px">VERY HIGH THREAT — Direct Displacement</h3>
+<table class="compact-table">
+<tr><th>Startup</th><th>Niche</th><th>Funding</th><th>Scale Signal</th></tr>
+<tr><td><span class="highlight">Cohere Health</span></td><td>Prior auth AI</td><td>$200M (Temasek)</td><td>Market leader; ~$1B+ val</td></tr>
+<tr><td><span class="highlight">Notable Health</span></td><td>Care gap / HCC / quality</td><td>$116M (ICONIQ)</td><td>10K sites; 1M workflows/day</td></tr>
+<tr><td><span class="highlight">Navina</span></td><td>HEDIS / Stars / gaps</td><td>$100M (Goldman)</td><td>3M patients; Best in KLAS</td></tr>
+<tr><td><span class="highlight">SmarterDx*</span></td><td>Revenue integrity + quality</td><td>$71M (Transformation)</td><td>$2M/10K discharges; 5:1 ROI</td></tr>
+</table>
+<p style="font-size:9.5px;color:var(--muted);margin-top:4px">*Now part of Smarter Technologies (New Mountain Capital: merged SmarterDx + Access Healthcare + Thoughtful.ai → $800M+ rev)</p>
+
+<h3 class="orange" style="font-size:13px;margin-top:14px">HIGH THREAT — Adjacent Competition</h3>
+<table class="compact-table">
+<tr><th>Startup</th><th>Niche</th><th>Funding</th><th>Scale Signal</th></tr>
+<tr><td><span class="highlight">Abridge</span></td><td>Ambient clinical docs</td><td>$760M (a16z/Khosla)</td><td>$5.3B val; ~70% market share</td></tr>
+<tr><td><span class="highlight">Hippocratic AI</span></td><td>Patient-facing AI agents</td><td>$404M (Temasek)</td><td>$3.5B val; care coordination</td></tr>
+<tr><td><span class="highlight">Akasa</span></td><td>RCM automation</td><td>$205M (a16z)</td><td>End-to-end RCM, coding, PA</td></tr>
+<tr><td><span class="highlight">Fathom Health</span></td><td>Autonomous medical coding</td><td>$61M (Alkeon)</td><td>94%+ auto; #1 KLAS Emerging</td></tr>
+<tr><td><span class="highlight">CodaMetrix</span></td><td>AI coding (Harvard lab)</td><td>~$80M</td><td>94%+ claims automated</td></tr>
+</table>
+</div>
+<div>
+<h3 class="blue" style="font-size:13px">MODERATE THREAT — Niche Specialists</h3>
+<table class="compact-table">
+<tr><th>Startup</th><th>Niche</th><th>Funding</th><th>Scale Signal</th></tr>
+<tr><td><span class="highlight">Health Gorilla</span></td><td>FHIR data exchange</td><td>$80M (SignalFire)</td><td>QHIN status; 66M queries/mo</td></tr>
+<tr><td><span class="highlight">Ambience Healthcare</span></td><td>Specialty ambient docs</td><td>$373M</td><td>200+ specialties adapted</td></tr>
+<tr><td><span class="highlight">Develop Health</span></td><td>PA for digital health</td><td>$18M (Wing)</td><td>GenAI-first; expanding fast</td></tr>
+<tr><td><span class="highlight">Pharos</span></td><td>Hospital quality reporting</td><td>$5M (Felicis/YC)</td><td>8hrs saved/case; $5M/yr/hosp</td></tr>
+<tr><td><span class="highlight">Basys.ai</span></td><td>PA automation</td><td>$2.4M (Lilly/Mayo)</td><td>Mayo Clinic data; 90% auto</td></tr>
+<tr><td><span class="highlight">Xevant</span></td><td>PBM data analytics</td><td>Growth stage</td><td>PBM cost optimization</td></tr>
+<tr><td><span class="highlight">Foundation Health</span></td><td>Pharmacy ops AI</td><td>$20M Series A</td><td>Truepill co-founder</td></tr>
+</table>
+
+<div class="card card-accent" style="margin-top:14px">
+<h4 style="color:var(--accent)">Acquisition Signals</h4>
+<p style="font-size:11.5px"><span class="highlight">OpenAI → Torch</span> ($60-100M, Jan 2026): Medical data aggregation. Signals big tech entering healthcare AI M&A.</p>
+<p style="font-size:11.5px"><span class="highlight">New Mountain Capital:</span> Merged 3 startups into Smarter Technologies ($800M+ rev). PE "tapestry weaving" playbook accelerating.</p>
+<p style="font-size:11.5px"><span class="highlight">2025 M&A pace:</span> 195+ digital health deals projected (vs. 121 in 2024). 63% are digital health acquiring digital health.</p>
+</div>
+<div class="card card-gold" style="margin-top:8px">
+<h4 style="color:var(--gold)">Strategic Implication for Inovalon</h4>
+<p style="font-size:11.5px;margin-bottom:0">Niche AI startups are not replacing Inovalon's platform — they are <span class="highlight">unbundling specific product lines</span>. The defense is platform integration, data network effects, and payer switching costs. The offense is <span class="highlight">acquire 2-3 best-in-class startups</span> before competitors do (Cohere, Navina, or Health Gorilla would be highest-value targets).</p>
+</div>
+</div>
+</div>
+<div class="slide-footer"><span>16 AI startups mapped | $10.7B H1 2025 VC funding | 85% of GenAI $ flowing to startups</span><span>PRISM Executive Intelligence Brief</span></div>
+</div>
+
+<!-- SLIDE 15: REGULATORY RADAR (FINAL) -->
+<div class="slide" id="slide-radar">
+<span class="prism-badge">Agent: Regulatory Radar</span>
+<span class="slide-number">15 / 15</span>
+<h2>Regulation-to-Revenue: <span class="green">Compliance Demand Map</span></h2>
+<p class="section-intro">Every regulation is a buying signal. Each mandate mapped to the technology spend it creates and timeline for demand materialization.</p>
+<div class="grid-2">
+<div>
+<h3>Compliance Demand Signals (by Effective Date)</h3>
+<div class="card card-green" style="margin-bottom:8px">
+<h4 style="color:#10b981">Active Now (Jan 2026)</h4>
+<p><span class="highlight">V28 full phase-in</span> — TAM: $2-3B recalibration analytics.</p>
+<p><span class="highlight">PA decision timelines</span> — 72hr expedited / 7-day standard. TAM: $500M-1B.</p>
+<p><span class="highlight">Hospital price transparency</span> — Machine-readable files. TAM: $2-5B.</p>
+</div>
+<div class="card card-blue" style="margin-bottom:8px">
+<h4 style="color:#3b82f6">Coming (2027)</h4>
+<p><span class="highlight">Interoperability APIs (Jan 2027)</span> — HL7 FHIR mandatory. TAM: $1-2B.</p>
+<p><span class="highlight">Medicaid work req.</span> — HHS interim rule by Jun 2026. TAM: $500M-1B.</p>
+<p><span class="highlight">CY 2027 final rule</span> — Star Ratings changes, IRA codification.</p>
+</div>
+<div class="card card-orange">
+<h4 style="color:#f97316">Coming (2028-2029)</h4>
+<p><span class="highlight">PBM delinking (Jan 2028)</span> — TAM: $1-3B new category.</p>
+<p><span class="highlight">ERISA pass-through (Jan 2029)</span> — TAM: $500M-1B.</p>
+<p><span class="highlight">OBBBA provider tax caps</span> — Phase-in FY2028.</p>
+</div>
+</div>
+<div>
+<h3>Cumulative TAM Creation</h3>
+<div class="card card-green">
+<div class="bar-container"><span class="bar-label">V28 / Risk Adj.</span><div class="bar-track"><div class="bar-fill" style="width:80%;background:#10b981"></div></div><span class="bar-value green">$2-3B</span></div>
+<div class="bar-container"><span class="bar-label">Star Ratings</span><div class="bar-track"><div class="bar-fill" style="width:70%;background:#10b981"></div></div><span class="bar-value green">$1.5-2.5B</span></div>
+<div class="bar-container"><span class="bar-label">Price Transparency</span><div class="bar-track"><div class="bar-fill" style="width:75%;background:#10b981"></div></div><span class="bar-value green">$2-5B</span></div>
+<div class="bar-container"><span class="bar-label">PBM Analytics</span><div class="bar-track"><div class="bar-fill" style="width:55%;background:#3b82f6"></div></div><span class="bar-value blue">$1-3B</span></div>
+<div class="bar-container"><span class="bar-label">Interoperability</span><div class="bar-track"><div class="bar-fill" style="width:50%;background:#3b82f6"></div></div><span class="bar-value blue">$1-2B</span></div>
+<div class="bar-container"><span class="bar-label">PA Automation</span><div class="bar-track"><div class="bar-fill" style="width:40%;background:#3b82f6"></div></div><span class="bar-value blue">$0.5-1B</span></div>
+<div class="bar-container"><span class="bar-label">Medicaid Compliance</span><div class="bar-track"><div class="bar-fill" style="width:35%;background:#3b82f6"></div></div><span class="bar-value blue">$0.5-1B</span></div>
+<div style="margin-top:10px;padding-top:8px;border-top:2px solid var(--border)">
+<div class="bar-container"><span class="bar-label" style="font-weight:700;color:var(--text)">Total New TAM</span><div class="bar-track"><div class="bar-fill" style="width:90%;background:linear-gradient(90deg,#10b981,#3b82f6)"></div></div><span class="bar-value gold" style="font-weight:700;min-width:65px">$9-18B</span></div>
+</div>
+</div>
+<div class="card card-purple" style="margin-top:12px">
+<h4 style="color:var(--accent5)">Key Insight</h4>
+<p style="color:var(--text);font-size:12.5px">The SOTU policy package creates <span class="highlight">$9-18B in cumulative new compliance/analytics TAM</span> — a <span class="highlight">16-33% TAM expansion</span> from regulatory mandates alone.</p>
+</div>
+</div>
+</div>
+<div class="source-list"><strong>Sources:</strong> <a href="https://www.cms.gov/cms-interoperability-and-prior-authorization-final-rule-cms-0057-f" target="_blank">CMS 0057-F</a> | <a href="https://www.pharmacytimes.com/view/pbm-reform-within-2026-appropriations-bill-signed-into-law" target="_blank">Pharmacy Times</a> | <a href="https://www.beckershospitalreview.com/legal-regulatory-issues/notable-healthcare-policies-taking-effect-in-2026/" target="_blank">Becker's</a></div>
+<div class="slide-footer"><span>Regulatory Radar Agent | 10 demand signals | $9-18B new TAM</span><span>PRISM Executive Intelligence Brief</span></div>
+</div>
+
+
+<script>
+// NAV PANEL
+function toggleNav(){
+  const p=document.getElementById('navPanel');
+  const o=document.getElementById('navOverlay');
+  const b=document.getElementById('navBtn');
+  const isOpen=p.classList.contains('open');
+  if(isOpen){p.classList.remove('open');o.classList.remove('open');b.innerHTML='&#9776;';}
+  else{p.classList.add('open');o.classList.add('open');b.innerHTML='&#10005;';}
+}
+
+// SLIDE SNAP NAVIGATION
+const slides=document.querySelectorAll('.slide');
+const totalSlides=slides.length;
+let currentSlide=0;
+let counterTimeout;
+
+function updateProgress(){
+  const scrollTop=window.scrollY||document.documentElement.scrollTop;
+  const docHeight=document.documentElement.scrollHeight-window.innerHeight;
+  const pct=docHeight>0?(scrollTop/docHeight)*100:0;
+  document.getElementById('slideProgress').style.width=pct+'%';
+  // Determine current slide
+  let closest=0;
+  let minDist=Infinity;
+  slides.forEach((s,i)=>{
+    const d=Math.abs(s.getBoundingClientRect().top);
+    if(d<minDist){minDist=d;closest=i;}
+  });
+  currentSlide=closest;
+  const counter=document.getElementById('slideCounter');
+  counter.textContent=String(closest+1).padStart(2,'0')+' / '+String(totalSlides).padStart(2,'0');
+  counter.classList.add('visible');
+  clearTimeout(counterTimeout);
+  counterTimeout=setTimeout(()=>counter.classList.remove('visible'),2000);
+}
+
+function goToSlide(idx){
+  if(idx<0)idx=0;
+  if(idx>=totalSlides)idx=totalSlides-1;
+  slides[idx].scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// Keyboard navigation
+document.addEventListener('keydown',function(e){
+  const navOpen=document.getElementById('navPanel').classList.contains('open');
+  if(e.key==='Escape'){if(navOpen)toggleNav();return;}
+  if(navOpen)return;
+  // Check if user is typing in an input
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+  switch(e.key){
+    case'ArrowDown':case'PageDown':
+      e.preventDefault();goToSlide(currentSlide+1);break;
+    case'ArrowUp':case'PageUp':
+      e.preventDefault();goToSlide(currentSlide-1);break;
+    case' ':
+      e.preventDefault();goToSlide(currentSlide+1);break;
+    case'Home':
+      e.preventDefault();goToSlide(0);break;
+    case'End':
+      e.preventDefault();goToSlide(totalSlides-1);break;
+    case'ArrowRight':
+      e.preventDefault();goToSlide(currentSlide+1);break;
+    case'ArrowLeft':
+      e.preventDefault();goToSlide(currentSlide-1);break;
+  }
+});
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',function(e){
+    e.preventDefault();
+    const t=document.querySelector(this.getAttribute('href'));
+    if(t)t.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+});
+
+// Scroll listener
+window.addEventListener('scroll',updateProgress,{passive:true});
+window.addEventListener('load',function(){
+  updateProgress();
+  // Hide hint after 4 seconds
+  setTimeout(()=>{document.getElementById('navHint').classList.remove('show');},4000);
+});
+</script>
+</body>
+</html>

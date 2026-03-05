@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What are trends in Medicare spending</title>
+  <style>
+    :root {
+      --prism-bg: #0a0e17;
+      --prism-panel: #111827;
+      --prism-sky: #59DDFD;
+      --prism-jade: #00E49F;
+      --prism-cerulean: #4E84C4;
+      --prism-text: #e2e8f0;
+      --prism-muted: #94a3b8;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--prism-bg);
+      color: var(--prism-text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+    }
+
+    .slide {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+      position: relative;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+
+    .slide-inner {
+      max-width: 900px;
+      width: 100%;
+    }
+
+    .slide-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      background: linear-gradient(135deg, #fff, var(--prism-sky));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .slide-content p {
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+      color: var(--prism-text);
+    }
+
+    .slide-content strong {
+      color: #fff;
+    }
+
+    .slide-content em {
+      color: var(--prism-muted);
+      font-size: 0.9rem;
+    }
+
+    .slide-notes {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: rgba(255,255,255,0.03);
+      border-left: 3px solid var(--prism-sky);
+      border-radius: 0 8px 8px 0;
+      font-size: 0.85rem;
+      color: var(--prism-muted);
+    }
+
+    /* Slide type-specific styles */
+    .slide-title-slide .slide-title {
+      font-size: 3.5rem;
+      text-align: center;
+    }
+
+    .slide-title-slide .slide-content {
+      text-align: center;
+      color: var(--prism-muted);
+    }
+
+    .slide-emergence {
+      background: linear-gradient(180deg, var(--prism-bg) 0%, rgba(89,221,253,0.03) 100%);
+    }
+
+    .slide-emergence .slide-title {
+      color: var(--prism-sky);
+    }
+
+    .slide-tension {
+      background: linear-gradient(180deg, var(--prism-bg) 0%, rgba(245,158,11,0.03) 100%);
+    }
+
+    .slide-quality .slide-content p {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+    }
+
+    .slide-closing {
+      text-align: center;
+    }
+
+    .slide-closing .slide-content {
+      color: var(--prism-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Navigation */
+    .nav {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      display: flex;
+      gap: 0.5rem;
+      z-index: 100;
+    }
+
+    .nav button {
+      background: var(--prism-panel);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--prism-text);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .nav button:hover {
+      border-color: var(--prism-sky);
+      color: var(--prism-sky);
+    }
+
+    .slide-counter {
+      position: fixed;
+      bottom: 2rem;
+      left: 2rem;
+      font-size: 0.75rem;
+      color: var(--prism-muted);
+      font-family: monospace;
+      z-index: 100;
+    }
+
+    @media print {
+      .slide { page-break-after: always; min-height: auto; padding: 2rem; }
+      .nav, .slide-counter { display: none; }
+    }
+  </style>
+</head>
+<body>
+  
+    <section class="slide slide-title" data-slide="0">
+      <div class="slide-inner">
+        <h2 class="slide-title">What are trends in Medicare spending</h2>
+        <div class="slide-content"><p>EXTENDED tier analysis · 4 agents · 15 findings · 3 emergent insights</p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-executive-summary" data-slide="1">
+      <div class="slide-inner">
+        <h2 class="slide-title">Executive Summary</h2>
+        <div class="slide-content"><p>Pharmaceutical costs are the primary driver of Medicare spending growth requiring immediate policy intervention</p>
+<p>CMS is implementing multiple new payment models and cost control mechanisms with 2025-2026 implementation timeline</p>
+<p>Demographic trends from aging population remain a fundamental but secondary driver of Medicare spending growth</p>
+<p>Data access limitations create significant constraints on comprehensive Medicare spending analysis</p>
+<p>Policy changes demonstrate measurable impacts on Medicare spending trajectories across program segments</p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-dimension" data-slide="2">
+      <div class="slide-inner">
+        <h2 class="slide-title">Historical Spending Patterns</h2>
+        <div class="slide-content"><p><strong>CMS is implementing new drug inflation control models for both Part B and Part D simultaneously, indicating significant pharmaceutical cost growth in Medicare spending.</strong> (HIGH)</p>
+<p><em>Source: Federal Register documents 2025-23705 and 2025-23702, Centers for Medicare & Medicaid Services</em></p>
+<p></p>
+<p><strong>Medicare program integrity enforcement is intensifying with targeted restrictions on durable medical equipment suppliers, suggesting anomalous spending patterns in this category.</strong> (HIGH)</p>
+<p><em>Source: Federal Register document 2026-03971, Centers for Medicare & Medicaid Services</em></p>
+<p></p>
+<p><strong>Major healthcare payers continue filing regular financial disclosures containing Medicare revenue data, but specific spending trend quantification was not accessible through available research methods.</strong> (MEDIUM)</p>
+<p><em>Source: SEC EDGAR database, various healthcare company 10-K and 10-Q filings</em></p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-dimension" data-slide="3">
+      <div class="slide-inner">
+        <h2 class="slide-title">Cost Driver Analysis</h2>
+        <div class="slide-content"><p><strong>Specialty drugs are disproportionately driving Medicare Part D spending increases, with concentration of spending among high-cost medications intensifying over the past decade.</strong> (HIGH)</p>
+<p><em>Source: PubMed articles PMID: 38787543, 39612254</em></p>
+<p></p>
+<p><strong>Recent cohorts aging into Medicare demonstrate higher utilization of counseling and psychotherapy services compared to previous cohorts.</strong> (MEDIUM)</p>
+<p><em>Source: PubMed PMID: 39546754</em></p>
+<p></p>
+<p><strong>CMS has proposed the Guarding U.S. Medicare Against Rising Drug Costs (GUARD) Model to test alternative payment methods for calculating Part D inflation rebates.</strong> (HIGH)</p>
+<p><em>Source: Federal Register Document 2025-23705</em></p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-dimension" data-slide="4">
+      <div class="slide-inner">
+        <h2 class="slide-title">Policy Impact Assessment</h2>
+        <div class="slide-content"><p><strong>The Inflation Reduction Act's Medicare Prescription Drug Inflation Rebate Program, implemented in CY 2026, creates a structural spending brake on Part D by requiring manufacturer rebates when drug prices exceed inflation.</strong> (HIGH)</p>
+<p><em>Source: Federal Register 2025-19787, Medicare and Medicaid Programs; CY 2026 Payment Policies Under the Physician Fee Schedule</em></p>
+<p></p>
+<p><strong>CY 2026 Medicare Advantage and Part D program restructuring implements comprehensive changes including prescription drug coverage modifications and dual eligible special needs plans enhancements.</strong> (HIGH)</p>
+<p><em>Source: Federal Register 2025-06008, Medicare and Medicaid Programs; Contract Year 2026 Policy and Technical Changes</em></p>
+<p></p>
+<p><strong>Hospital payment system updates for CY 2026 continue inflationary adjustments through OPPS and ASC payment rate revisions.</strong> (MEDIUM)</p>
+<p><em>Source: Federal Register 2025-20907, Medicare Program: Hospital Outpatient Prospective Payment and Ambulatory Surgical Center Payment Systems</em></p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-dimension" data-slide="5">
+      <div class="slide-inner">
+        <h2 class="slide-title">Future Spending Projections</h2>
+        <div class="slide-content"><p><strong>Critical data access limitations prevent evidence-based Medicare spending projections for the 5-10 year timeframe.</strong> (HIGH)</p>
+<p><em>Source: Direct observation from research session - web search tool failures across CMS, CBO, and Medicare Trustees Report queries</em></p>
+<p></p>
+<p><strong>Technology adoption impact on Medicare spending represents an emerging analytical gap with limited publicly accessible research.</strong> (MEDIUM)</p>
+<p><em>Source: Direct observation from research session - failed searches for technology adoption cost analysis in Medicare</em></p>
+<p></p>
+<p><strong>Policy scenario analysis for Medicare spending projections is not accessible through standard web search tools.</strong> (HIGH)</p>
+<p><em>Source: Direct observation from research session - failed searches for Medicare policy impact scenarios</em></p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-emergence" data-slide="6">
+      <div class="slide-inner">
+        <h2 class="slide-title">Emergent Insight: pattern</h2>
+        <div class="slide-content"><p>Medicare is undergoing a fundamental architectural transformation from a fee-for-service payment system to a risk-based value system, where the 2026 convergence point represents not just policy implementation but a structural regime change that will fundamentally alter how Medicare spending grows, shifts risk distribution between government and private entities, and creates new cost control mechanisms that operate automatically rather than through regulatory intervention.</p></div>
+        <div class="slide-notes">Contributing agents: All Agents Cluster</div>
+      </div>
+    </section>
+
+    <section class="slide slide-emergence" data-slide="7">
+      <div class="slide-inner">
+        <h2 class="slide-title">Emergent Insight: gap</h2>
+        <div class="slide-content"><p>The systematic data access limitations across Medicare spending analysis reveal a critical strategic intelligence gap that may be intentional policy opacity, where the inability to access current projections and detailed cost decomposition data suggests either deliberate information restriction during major policy transitions or fundamental analytical capacity limitations that undermine evidence-based Medicare policy development.</p></div>
+        <div class="slide-notes">Contributing agents: All Agents Cluster</div>
+      </div>
+    </section>
+
+    <section class="slide slide-emergence" data-slide="8">
+      <div class="slide-inner">
+        <h2 class="slide-title">Emergent Insight: convergent</h2>
+        <div class="slide-content"><p>Medicare's cost control strategy evolution represents a fundamental shift in government healthcare financing philosophy from direct price regulation to creating market structures that generate automatic cost discipline, suggesting this approach may become the template for other government healthcare programs and indicating a broader transformation in how government manages healthcare spending risk.</p></div>
+        <div class="slide-notes">Contributing agents: All Agents Cluster</div>
+      </div>
+    </section>
+
+    <section class="slide slide-tension" data-slide="9">
+      <div class="slide-inner">
+        <h2 class="slide-title">Tension: methodological</h2>
+        <div class="slide-content"><p>Technology impact on Medicare spending shows conflicting evidence as both cost driver and cost saver</p>
+<p></p>
+<p><strong>All Agents Cluster</strong>: Technology adoption increases Medicare spending through expensive new treatments and devices</p>
+<p><strong>All Agents Cluster</strong>: Technology reduces Medicare spending through improved efficiency and preventive care</p>
+<p></p>
+<p><em>Resolution: Technology impact varies by type and implementation context, requiring case-by-case assessment</em></p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-tension" data-slide="10">
+      <div class="slide-inner">
+        <h2 class="slide-title">Tension: predictive</h2>
+        <div class="slide-content"><p>Policy effectiveness assessment shows tension between intended structural changes and implementation challenges</p>
+<p></p>
+<p><strong>All Agents Cluster</strong>: Structural Medicare policy changes will achieve intended cost control objectives</p>
+<p><strong>All Agents Cluster</strong>: Implementation challenges may undermine structural policy effectiveness</p>
+<p></p>
+<p><em>Resolution: Policy success depends on implementation quality and adaptive management</em></p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-tension" data-slide="11">
+      <div class="slide-inner">
+        <h2 class="slide-title">Tension: scope</h2>
+        <div class="slide-content"><p>Cost driver patterns differ across Medicare program segments complicating unified approaches</p>
+<p></p>
+<p><strong>All Agents Cluster</strong>: Unified cost control strategies can address Medicare spending across all segments</p>
+<p><strong>All Agents Cluster</strong>: Different cost driver patterns require segment-specific cost control approaches</p>
+<p></p>
+<p><em>Resolution: Hybrid approach combining unified principles with segment-specific implementation</em></p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-gaps" data-slide="12">
+      <div class="slide-inner">
+        <h2 class="slide-title">Knowledge Gaps</h2>
+        <div class="slide-content"><p>Quantitative decomposition of Medicare spending growth into precise utilization versus price components across all program segments</p>
+<p>Current actuarial projections and demographic modeling for 5-10 year Medicare spending trajectories</p>
+<p>Technology adoption cost impact analysis for AI, digital health, and medical devices in Medicare programs</p>
+<p>Geographic and regional variation analysis in Medicare cost drivers and spending patterns</p>
+<p>Post-COVID permanent changes to Medicare utilization patterns and their long-term spending implications</p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-quality" data-slide="13">
+      <div class="slide-inner">
+        <h2 class="slide-title">Quality Assessment</h2>
+        <div class="slide-content"><p>Grade: B (84%)</p>
+<p>Provenance: 27% complete</p>
+<p>Warnings: 11 (5 critical)</p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-closing" data-slide="14">
+      <div class="slide-inner">
+        <h2 class="slide-title">PRISM Intelligence Brief</h2>
+        <div class="slide-content"><p>Generated 2026-03-03T19:58:31.261Z</p>
+<p>Run ID: test-pres-verify</p>
+<p>Total cost: $0.0000</p></div>
+        
+      </div>
+    </section>
+
+  <div class="slide-counter">
+    <span id="current">1</span> / 15
+  </div>
+
+  <div class="nav">
+    <button onclick="prevSlide()">← Prev</button>
+    <button onclick="nextSlide()">Next →</button>
+  </div>
+
+  <script>
+    let current = 0;
+    const slides = document.querySelectorAll('.slide');
+    const counter = document.getElementById('current');
+
+    function goToSlide(n) {
+      current = Math.max(0, Math.min(n, slides.length - 1));
+      slides[current].scrollIntoView({ behavior: 'smooth' });
+      counter.textContent = current + 1;
+    }
+
+    function nextSlide() { goToSlide(current + 1); }
+    function prevSlide() { goToSlide(current - 1); }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+      if (e.key === 'ArrowLeft') prevSlide();
+    });
+
+    // Track scroll position
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          current = parseInt(entry.target.dataset.slide);
+          counter.textContent = current + 1;
+        }
+      });
+    }, { threshold: 0.5 });
+
+    slides.forEach(slide => observer.observe(slide));
+  </script>
+</body>
+</html>

@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRISM Strategic Brief — test query</title>
+<style>
+
+:root {
+  --inov-navy: #003D79;
+  --inov-cerulean: #4E84C4;
+  --inov-sky: #59DDFD;
+  --inov-midnight: #001E3C;
+  --inov-jade: #00E49F;
+  --inov-sand: #F5E6BB;
+  --inov-violet: #6C6CFF;
+  --inov-cloud: #F4F0EA;
+  --bg-primary: #0a0b10;
+  --bg-secondary: #10121a;
+  --bg-tertiary: #181b26;
+  --bg-elevated: #1e2130;
+  --bg-card: rgba(30, 33, 48, 0.85);
+  --text-primary: #f0f2f8;
+  --text-secondary: #a0a8c0;
+  --text-tertiary: #5c6480;
+  --accent: #4E84C4;
+  --accent-bright: #59DDFD;
+  --accent-success: #00E49F;
+  --accent-warning: #F5E6BB;
+  --accent-error: #ff5c5c;
+  --accent-violet: #6C6CFF;
+  --border: rgba(78, 132, 196, 0.12);
+  --border-bright: rgba(89, 221, 253, 0.25);
+  --text-xs: clamp(0.65rem, 0.6rem + 0.2vw, 0.8rem);
+  --text-sm: clamp(0.8rem, 0.74rem + 0.3vw, 1rem);
+  --text-base: clamp(1rem, 0.92rem + 0.4vw, 1.2rem);
+  --text-lg: clamp(1.2rem, 1.1rem + 0.5vw, 1.5rem);
+  --text-xl: clamp(1.5rem, 1.35rem + 0.65vw, 1.9rem);
+  --text-2xl: clamp(1.9rem, 1.7rem + 0.85vw, 2.5rem);
+  --text-3xl: clamp(2.4rem, 2.1rem + 1.1vw, 3.2rem);
+  --text-hero: clamp(3.2rem, 2.8rem + 1.6vw, 4.5rem);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 200ms;
+  --dur-normal: 350ms;
+  --dur-slow: 600ms;
+  --dur-cinematic: 1000ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg-primary); color: var(--text-primary); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; line-height: 1.6; }
+html { scroll-snap-type: y mandatory; overflow-y: scroll; scroll-behavior: smooth; }
+
+/* Slide Layout */
+.slide {
+  min-height: 100vh; scroll-snap-align: start;
+  display: flex; flex-direction: column; justify-content: center;
+  position: relative; padding: 3rem 5vw; overflow: hidden;
+}
+.slide-inner { max-width: 1200px; margin: 0 auto; width: 100%; position: relative; z-index: 2; }
+.slide-bg-glow {
+  position: absolute; width: 600px; height: 600px; border-radius: 50%;
+  filter: blur(120px); opacity: 0.08; z-index: 0; pointer-events: none;
+}
+
+/* Fixed UI */
+#slideProgress {
+  position: fixed; top: 0; left: 0; height: 3px;
+  background: linear-gradient(90deg, var(--inov-navy), var(--inov-cerulean), var(--inov-sky));
+  z-index: 100; transition: width 0.3s var(--ease-out-quart); width: 0%;
+}
+.prism-mark {
+  position: fixed; top: 1.5rem; left: 2rem;
+  font-size: var(--text-xs); font-weight: 700; letter-spacing: 0.25em;
+  color: var(--accent); z-index: 100; text-transform: uppercase;
+}
+.slide-counter {
+  position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
+  z-index: 1001; font-size: 11px; color: var(--text-tertiary);
+  letter-spacing: 2px; font-weight: 600;
+  background: rgba(10,11,16,0.85); padding: 4px 14px;
+  border-radius: 20px; border: 1px solid var(--border);
+  backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s;
+}
+.slide-counter.visible { opacity: 1; }
+.slide-nav-hint {
+  position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
+  z-index: 1001; font-size: 10px; color: var(--text-tertiary);
+  letter-spacing: 1px; text-align: center; opacity: 0;
+  transition: opacity 1s; pointer-events: none;
+}
+.slide-nav-hint.show { opacity: 0.6; }
+
+/* Nav Panel */
+.nav-toggle {
+  position: fixed; top: 20px; right: 20px; z-index: 1000;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(78, 132, 196, 0.15); border: 1px solid rgba(78, 132, 196, 0.3);
+  color: var(--accent); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; backdrop-filter: blur(12px); transition: all 0.3s;
+}
+.nav-toggle:hover { background: rgba(78, 132, 196, 0.3); transform: scale(1.05); }
+.nav-panel {
+  position: fixed; top: 0; right: -340px; width: 320px; height: 100vh;
+  background: rgba(10, 11, 16, 0.97); border-left: 1px solid var(--border);
+  z-index: 999; transition: right 0.35s ease; overflow-y: auto;
+  padding: 70px 20px 30px; backdrop-filter: blur(20px);
+}
+.nav-panel.open { right: 0; }
+.nav-panel h3 {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 3px;
+  color: var(--accent); margin-bottom: 16px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--border);
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 8px; cursor: pointer;
+  transition: all 0.2s; text-decoration: none; margin-bottom: 2px;
+}
+.nav-item:hover { background: rgba(78, 132, 196, 0.1); }
+.nav-item .nav-num { font-size: 10px; color: var(--text-tertiary); min-width: 24px; font-weight: 700; }
+.nav-item .nav-label { font-size: 12.5px; color: var(--text-primary); font-weight: 500; }
+.nav-item .nav-tag { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-left: auto; }
+.nav-tag-key { color: var(--accent-warning); }
+.nav-tag-new { color: var(--accent-bright); }
+.nav-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 998; display: none; }
+.nav-overlay.open { display: block; }
+
+/* Animation */
+.anim {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity var(--dur-slow) var(--ease-out-expo), transform var(--dur-slow) var(--ease-out-expo);
+}
+.anim.visible { opacity: 1; transform: translateY(0); }
+.anim.d1 { transition-delay: 100ms; } .anim.d2 { transition-delay: 200ms; }
+.anim.d3 { transition-delay: 300ms; } .anim.d4 { transition-delay: 400ms; }
+.anim.d5 { transition-delay: 500ms; } .anim.d6 { transition-delay: 600ms; }
+
+/* Typography */
+.eyebrow { font-size: var(--text-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-tertiary); margin-bottom: 12px; }
+.slide-title {
+  font-size: var(--text-3xl); font-weight: 700; line-height: 1.15; margin-bottom: 16px;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-bright) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.slide-subtitle { font-size: var(--text-base); color: var(--text-secondary); max-width: 700px; margin-bottom: 28px; line-height: 1.7; }
+.section-intro { font-size: 13.5px; line-height: 1.7; max-width: 800px; margin-bottom: 20px; color: var(--text-secondary); }
+
+/* Tags */
+.tag {
+  display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 10px;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-right: 6px;
+}
+.tag.clinical { background: rgba(89,221,253,0.15); color: var(--accent-bright); }
+.tag.financial { background: rgba(0,228,159,0.15); color: var(--accent-success); }
+.tag.regulatory { background: rgba(255,92,92,0.15); color: var(--accent-error); }
+.tag.quality { background: rgba(108,108,255,0.15); color: var(--accent-violet); }
+.tag.strategic { background: rgba(78,132,196,0.15); color: var(--accent); }
+.tag-red { background: rgba(255,92,92,0.15); color: var(--accent-error); }
+.tag-green { background: rgba(0,228,159,0.15); color: var(--accent-success); }
+.tag-blue { background: rgba(78,132,196,0.15); color: var(--accent); }
+.tag-orange { background: rgba(249,115,22,0.15); color: #f97316; }
+.tag-purple { background: rgba(108,108,255,0.15); color: var(--accent-violet); }
+.tag-gold { background: rgba(245,230,187,0.15); color: var(--accent-warning); }
+.tag-cyan { background: rgba(89,221,253,0.15); color: var(--accent-bright); }
+
+/* Stat Cards */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin-top: 16px; }
+.stat-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px; text-align: center; transition: transform 0.2s;
+}
+.stat-card:hover { transform: translateY(-2px); }
+.stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-tertiary); margin-bottom: 6px; }
+.stat-value { font-size: 28px; font-weight: 800; color: var(--text-primary); }
+.stat-value.negative { color: var(--accent-error); }
+.stat-value.positive { color: var(--accent-success); }
+.stat-value.warn { color: var(--accent-warning); }
+.stat-value.cyan { color: var(--accent-bright); }
+.stat-value.green { color: var(--accent-success); }
+.stat-value.purple { color: var(--accent-violet); }
+.stat-value.gold { color: var(--accent-warning); }
+.stat-value.red { color: var(--accent-error); }
+.stat-context { font-size: 11px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; }
+
+/* Finding Cards */
+.finding-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+  border-radius: 0 12px 12px 0; padding: 16px 20px; margin: 10px 0;
+}
+.finding-card.emergent { border-left-color: var(--accent-bright); }
+.finding-card.risk { border-left-color: var(--accent-error); }
+.finding-card.opportunity { border-left-color: var(--accent-success); }
+.finding-title { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+.finding-body { font-size: 12.5px; color: var(--text-secondary); line-height: 1.65; }
+.confidence-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 9px;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 8px;
+}
+.confidence-badge.high { background: rgba(0,228,159,0.15); color: var(--accent-success); }
+.confidence-badge.medium { background: rgba(245,230,187,0.15); color: var(--accent-warning); }
+.confidence-badge.low { background: rgba(255,92,92,0.15); color: var(--accent-error); }
+
+/* Agent Chips */
+.agent-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(78,132,196,0.1); border: 1px solid rgba(78,132,196,0.25);
+  border-radius: 20px; padding: 4px 12px; font-size: 10.5px;
+  color: var(--text-secondary); margin: 3px;
+}
+.agent-chip .dot { width: 6px; height: 6px; border-radius: 50%; }
+
+/* Hero Stats */
+.hero-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 18px; max-width: 1100px; margin: 0 auto; }
+.hero-stat {
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+  border-radius: 12px; padding: 22px 14px; text-align: center; transition: transform 0.2s;
+}
+.hero-stat:hover { transform: translateY(-2px); }
+.hero-stat .value { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
+.hero-stat .label { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1.5px; }
+
+/* Grids */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 16px; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+@media (max-width: 768px) { .two-col, .grid-2, .grid-3 { grid-template-columns: 1fr; } .hero-stats { grid-template-columns: repeat(2, 1fr); } }
+
+/* Emergence */
+.emergent-slide { background: linear-gradient(135deg, var(--bg-primary) 0%, rgba(108,108,255,0.04) 100%); }
+.emergent-number { font-size: 120px; font-weight: 900; color: rgba(89, 221, 253, 0.06); position: absolute; top: -20px; left: -10px; }
+.emergent-why { background: var(--bg-card); border: 1px solid var(--border-bright); border-radius: 12px; padding: 1.5rem; margin-top: 1.5rem; }
+.emergent-why-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-bright); margin-bottom: 8px; font-weight: 700; }
+
+/* Policy Box */
+.policy-box { background: rgba(78,132,196,0.05); border: 1px solid rgba(78,132,196,0.2); border-radius: 10px; padding: 12px 16px; margin: 6px 0; }
+.policy-box.neutral { background: rgba(78,132,196,0.05); border-color: rgba(78,132,196,0.2); }
+.policy-box p { font-size: 11.5px; color: var(--text-secondary); line-height: 1.5; }
+
+/* Quote Block */
+.quote-block { border-left: 3px solid var(--accent-warning); padding: 10px 18px; margin: 10px 0; background: rgba(245,230,187,0.05); border-radius: 0 8px 8px 0; font-style: italic; color: var(--text-primary); font-size: 14px; }
+
+/* ToC */
+.toc-group-header { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); color: var(--text-tertiary); }
+.toc-item { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; }
+
+/* Slide Footer */
+.slide-footer { position: absolute; bottom: 16px; left: 40px; right: 40px; display: flex; justify-content: space-between; font-size: 10px; color: var(--text-tertiary); border-top: 1px solid var(--border); padding-top: 8px; }
+
+/* Misc */
+.highlight { color: var(--text-primary); font-weight: 600; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-bright); }
+
+@media print {
+  .slide { page-break-after: always; min-height: auto; padding: 2rem; }
+  .nav-toggle, .nav-panel, .nav-overlay, .slide-counter, .slide-nav-hint, #slideProgress, .prism-mark { display: none; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- Fixed UI -->
+<div id="slideProgress"></div>
+<div class="prism-mark">PRISM Intelligence</div>
+<div class="slide-counter" id="slideCounter">01 / 14</div>
+<div class="slide-nav-hint show" id="navHint">&#8595; Arrow Down / Spacebar to navigate &#8595;</div>
+
+<!-- Nav Toggle -->
+<button class="nav-toggle" onclick="toggleNav()" id="navBtn" title="Table of Contents">&#9776;</button>
+<div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+<div class="nav-panel" id="navPanel">
+  <h3>Table of Contents</h3>
+  <a class="nav-item" href="#s1" onclick="toggleNav()"><span class="nav-num">01</span><span class="nav-label">Title</span></a>
+  <a class="nav-item" href="#s-toc" onclick="toggleNav()"><span class="nav-num">02</span><span class="nav-label">Intelligence Map</span></a>
+  <a class="nav-item" href="#s2" onclick="toggleNav()"><span class="nav-num">03</span><span class="nav-label">Executive Summary</span></a>
+  <a class="nav-item" href="#s3" onclick="toggleNav()"><span class="nav-num">04</span><span class="nav-label">Query Interpretation</span></a>
+  <a class="nav-item" href="#s4" onclick="toggleNav()"><span class="nav-num">05</span><span class="nav-label">System Response Validation</span></a>
+  <a class="nav-item" href="#s5" onclick="toggleNav()"><span class="nav-num">06</span><span class="nav-label">Emergent: pattern</span><span class="nav-tag nav-tag-new">NEW</span></a>
+  <a class="nav-item" href="#s6" onclick="toggleNav()"><span class="nav-num">07</span><span class="nav-label">Emergent: tension</span><span class="nav-tag nav-tag-new">NEW</span></a>
+  <a class="nav-item" href="#s7" onclick="toggleNav()"><span class="nav-num">08</span><span class="nav-label">Emergent: convergent</span><span class="nav-tag nav-tag-new">NEW</span></a>
+  <a class="nav-item" href="#s8" onclick="toggleNav()"><span class="nav-num">09</span><span class="nav-label">Tension: interpretive</span><span class="nav-tag nav-tag-key">KEY</span></a>
+  <a class="nav-item" href="#s9" onclick="toggleNav()"><span class="nav-num">10</span><span class="nav-label">Tension: interpretive</span><span class="nav-tag nav-tag-key">KEY</span></a>
+  <a class="nav-item" href="#s10" onclick="toggleNav()"><span class="nav-num">11</span><span class="nav-label">Tension: methodological</span><span class="nav-tag nav-tag-key">KEY</span></a>
+  <a class="nav-item" href="#s11" onclick="toggleNav()"><span class="nav-num">12</span><span class="nav-label">Quality &amp; Provenance</span></a>
+  <a class="nav-item" href="#s12" onclick="toggleNav()"><span class="nav-num">13</span><span class="nav-label">Gaps &amp; Next Steps</span></a>
+  <a class="nav-item" href="#s13" onclick="toggleNav()"><span class="nav-num">14</span><span class="nav-label">Closing</span></a>
+</div>
+
+
+<!-- ============ SLIDE 1: TITLE ============ -->
+<section class="slide" id="s1">
+  <div class="slide-bg-glow" style="background:var(--inov-cerulean);top:-200px;right:-200px;"></div>
+  <div class="slide-inner">
+    
+    <div class="eyebrow anim">PRISM Multi-Agent Strategic Brief</div>
+    <h1 class="anim d1" style="font-size:var(--text-hero);font-weight:800;line-height:1.1;background:linear-gradient(135deg,var(--text-primary) 0%,var(--accent-bright) 50%,var(--accent-success) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px;">
+      test query
+    </h1>
+    <p class="anim d2" style="font-size:var(--text-lg);color:var(--text-secondary);max-width:800px;margin:0 auto 32px;">
+      2-agent analysis across Query Interpretation, System Response Validation
+    </p>
+    <div class="anim d3" style="margin-bottom:28px;">
+      <span class="agent-chip"><span class="dot" style="background:var(--accent-bright)"></span>Query Analyst</span>
+      <span class="agent-chip"><span class="dot" style="background:var(--accent-violet)"></span>System Validator</span>
+    </div>
+    
+    <div class="hero-stats anim d4">
+      <div class="hero-stat"><div class="value cyan">2</div><div class="label">Parallel Agents</div></div>
+      <div class="hero-stat"><div class="value green">9</div><div class="label">Verified Findings</div></div>
+      <div class="hero-stat"><div class="value purple">3</div><div class="label">Emergent Insights</div></div>
+      <div class="hero-stat"><div class="value gold">2</div><div class="label">Dimensions</div></div>
+      <div class="hero-stat"><div class="value">MICRO</div><div class="label">Analysis Tier</div></div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>March 3, 2026 | PRISM v3.0 | MICRO Tier</span><span>PRISM Strategic Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 2: INTELLIGENCE MAP ============ -->
+<section class="slide" id="s-toc" style="background:linear-gradient(135deg,var(--bg-primary),var(--bg-secondary))">
+  
+  <div class="slide-inner">
+    
+    <h2 class="slide-title anim">Executive <span style="-webkit-text-fill-color:var(--accent)">Intelligence Map</span></h2>
+    <p class="section-intro anim d1">13-slide analysis spanning Query Interpretation, System Response Validation, and 3 emergent strategic insights.</p>
+    <div class="grid-3 anim d2">
+      
+      <div>
+        <h3 class="toc-group-header" style="color:var(--accent-bright)">Analysis</h3>
+        <a class="nav-item toc-item" href="#s2"><span class="nav-num">02</span><span class="nav-label">Executive Summary</span></a>
+        <a class="nav-item toc-item" href="#s3"><span class="nav-num">03</span><span class="nav-label">Query Interpretation</span></a>
+        <a class="nav-item toc-item" href="#s4"><span class="nav-num">04</span><span class="nav-label">System Response Validation</span></a>
+        <a class="nav-item toc-item" href="#s5"><span class="nav-num">05</span><span class="nav-label">Emergent: pattern</span><span class="nav-tag nav-tag-new">NEW</span></a>
+      </div>
+      <div>
+        <h3 class="toc-group-header" style="color:var(--accent-violet)">Synthesis</h3>
+        <a class="nav-item toc-item" href="#s6"><span class="nav-num">06</span><span class="nav-label">Emergent: tension</span><span class="nav-tag nav-tag-new">NEW</span></a>
+        <a class="nav-item toc-item" href="#s7"><span class="nav-num">07</span><span class="nav-label">Emergent: convergent</span><span class="nav-tag nav-tag-new">NEW</span></a>
+        <a class="nav-item toc-item" href="#s8"><span class="nav-num">08</span><span class="nav-label">Tension: interpretive</span><span class="nav-tag nav-tag-key">KEY</span></a>
+        <a class="nav-item toc-item" href="#s9"><span class="nav-num">09</span><span class="nav-label">Tension: interpretive</span><span class="nav-tag nav-tag-key">KEY</span></a>
+      </div>
+      <div>
+        <h3 class="toc-group-header" style="color:var(--accent-success)">Quality & Strategy</h3>
+        <a class="nav-item toc-item" href="#s10"><span class="nav-num">10</span><span class="nav-label">Tension: methodological</span><span class="nav-tag nav-tag-key">KEY</span></a>
+        <a class="nav-item toc-item" href="#s11"><span class="nav-num">11</span><span class="nav-label">Quality &amp; Provenance</span></a>
+        <a class="nav-item toc-item" href="#s12"><span class="nav-num">12</span><span class="nav-label">Gaps &amp; Next Steps</span></a>
+        <a class="nav-item toc-item" href="#s13"><span class="nav-num">13</span><span class="nav-label">Closing</span></a>
+      </div>
+    </div>
+  </div>
+  
+</section>
+
+<!-- ============ SLIDE 3: EXECUTIVE SUMMARY ============ -->
+<section class="slide" id="s2">
+  <div class="slide-bg-glow" style="background:var(--accent-success);top:-150px;left:-200px;"></div>
+  <div class="slide-inner">
+    
+    <div class="eyebrow anim"><span class="tag strategic">Synthesis</span> Executive Summary</div>
+    <h2 class="slide-title anim d1">Key Intelligence Findings</h2>
+    <p class="slide-subtitle anim d2">Multi-agent convergence across Query Interpretation, System Response Validation reveals actionable strategic insights.</p>
+    <div class="stat-grid anim d3">
+      
+        <div class="stat-card">
+          <div class="stat-label">Key Finding 1</div>
+          <div class="stat-context">The phrase 'test query' represents a minimal, ambiguous input that challenges interpretation systems</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Key Finding 2</div>
+          <div class="stat-context">Infrastructure failures significantly impact system capabilities across multiple dimensions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Key Finding 3</div>
+          <div class="stat-context">Systems can maintain domain relevance even with extremely vague input queries</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Key Finding 4</div>
+          <div class="stat-context">Cross-validation mechanisms function when available data sources are accessible</div>
+        </div>
+    </div>
+    
+    <div class="finding-card emergent anim d4" style="margin-top:20px;">
+      <div class="finding-title">Convergent Intelligence</div>
+      <div class="finding-body">Both agents identified infrastructure reliability as a critical limiting factor, though through different failure patterns</div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>2 Agents | Source-Validated</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 4: QUERY INTERPRETATION ============ -->
+<section class="slide" id="s3">
+  <div class="slide-bg-glow" style="background:var(--accent);top:-100px;right:-300px;"></div>
+  <div class="slide-inner">
+    
+    <div class="eyebrow anim"><span class="tag strategic">Query Interpretation</span> Dimension</div>
+    <h2 class="slide-title anim d1">Query Interpretation: Understanding the intent and scope of the test query</h2>
+    <p class="section-intro anim d2">1 agent analyzed this dimension: Query Analyst.</p>
+    <div class="anim d3">
+        <div class="finding-card opportunity">
+          <div class="finding-title">The search infrastructure demonstrates systematic failures in retrieving information about query interpretation methodologies, returning zero results across multiple targeted searches.</div>
+          <div class="finding-body">Six consecutive web searches using varied terminology (semantic analysis, NLP, query interpretation, intent detection) all returned zero results across established technical domains.<br><em>Source: DuckDuckGo search API responses, 2026-03-03</em></div>
+          <span class="confidence-badge high">HIGH — DuckDuckGo search API responses, 2026-03-03</span>
+        </div>
+        <div class="finding-card ">
+          <div class="finding-title">The phrase 'test query' exhibits semantic ambiguity that challenges traditional query interpretation frameworks through its meta-linguistic structure.</div>
+          <div class="finding-body">The phrase combines a procedural term ('test') with a categorical term ('query'), creating multiple possible interpretations: (a) a query used for testing purposes, (b) a request to test something, or (c) a placeholder/example query.<br><em>Source: Direct semantic analysis based on established linguistic frameworks</em></div>
+          <span class="confidence-badge medium">MEDIUM — Direct semantic analysis based on established linguistic frameworks</span>
+        </div>
+        <div class="finding-card ">
+          <div class="finding-title">Minimal queries like 'test query' expose fundamental limitations in current query interpretation systems' meta-cognitive capabilities.</div>
+          <div class="finding-body">The search system's inability to retrieve relevant information about query interpretation methodologies suggests broader limitations in handling abstract or meta-queries about system functionality.<br><em>Source: Observed search system performance across multiple query variations</em></div>
+          <span class="confidence-badge medium">MEDIUM — Observed search system performance across multiple query variations</span>
+        </div></div>
+  </div>
+  <div class="slide-footer"><span>Query Analyst | 3 findings</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 5: SYSTEM RESPONSE VALIDATION ============ -->
+<section class="slide" id="s4">
+  <div class="slide-bg-glow" style="background:var(--accent);top:-100px;right:-300px;"></div>
+  <div class="slide-inner">
+    
+    <div class="eyebrow anim"><span class="tag strategic">System Response Validation</span> Dimension</div>
+    <h2 class="slide-title anim d1">System Response Validation: Testing system capabilities and response quality for minimal input</h2>
+    <p class="section-intro anim d2">1 agent analyzed this dimension: System Validator.</p>
+    <div class="anim d3">
+        <div class="finding-card opportunity">
+          <div class="finding-title">The system demonstrates robust capability to interpret and respond to minimal input queries by conducting comprehensive searches across multiple data sources.</div>
+          <div class="finding-body">Successfully executed 6 different tool calls across PubMed, Federal Register, openFDA, and validation systems, retrieving relevant data despite the ambiguous 'test query' input.<br><em>Source: Direct system interaction logs and API responses</em></div>
+          <span class="confidence-badge high">HIGH — Direct system interaction logs and API responses</span>
+        </div>
+        <div class="finding-card opportunity">
+          <div class="finding-title">System resilience varies significantly across different data sources when handling ambiguous queries.</div>
+          <div class="finding-body">PubMed returned 100 relevant articles, Federal Register returned 10,000 documents, openFDA provided specific drug event data, while Semantic Scholar (429 error), CMS data (410 Gone), and GDELT (fetch failed) were unavailable.<br><em>Source: API response logs from multiple healthcare databases</em></div>
+          <span class="confidence-badge high">HIGH — API response logs from multiple healthcare databases</span>
+        </div>
+        <div class="finding-card ">
+          <div class="finding-title">The system successfully identifies healthcare-relevant content even when queries lack domain-specific terminology.</div>
+          <div class="finding-body">PubMed search for 'test query validation healthcare systems' returned relevant articles on AI in nursing, chatbot accuracy, health information technology, and evidence-based medicine validation.<br><em>Source: PubMed search results (https://pubmed.ncbi.nlm.nih.gov/)</em></div>
+          <span class="confidence-badge medium">MEDIUM — PubMed search results (https://pubmed.ncbi.nlm.nih.gov/)</span>
+        </div></div>
+  </div>
+  <div class="slide-footer"><span>System Validator | 3 findings</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 6: EMERGENT: PATTERN ============ -->
+<section class="slide emergent-slide" id="s5" style="background:linear-gradient(135deg,var(--bg-primary) 0%,rgba(108,108,255,0.04) 100%);">
+  
+  <div class="slide-inner">
+    
+    <div class="emergent-number anim">01</div>
+    <div>
+      <div class="eyebrow anim"><span class="tag-cyan tag">Emergent Insight</span></div>
+      <h2 class="slide-title anim d1">pattern</h2>
+      <p class="slide-subtitle anim d2">System infrastructure failures create a recursive validation paradox where the tools needed to assess query interpretation capabilities are themselves compromised by the same query interpretation limitations they are meant to evaluate.</p>
+      <div class="grid-2 anim d3">
+        <div class="finding-card emergent">
+          <div class="finding-title">Insight</div>
+          <div class="finding-body">System infrastructure failures create a recursive validation paradox where the tools needed to assess query interpretation capabilities are themselves compromised by the same query interpretation limitations they are meant to evaluate.</div>
+        </div>
+        <div class="finding-card opportunity">
+          <div class="finding-title">Contributing Agents</div>
+          <div class="finding-body"><span class="agent-chip"><span class="dot" style="background:var(--accent-bright)"></span>Query Analyst</span> <span class="agent-chip"><span class="dot" style="background:var(--accent-bright)"></span>System Validator</span></div>
+        </div>
+      </div>
+      
+        <div class="stat-grid" style="margin-top:16px;">
+          <div class="stat-card"><div class="stat-label">Novelty</div><div class="stat-value cyan">5/5</div></div>
+          <div class="stat-card"><div class="stat-label">Grounding</div><div class="stat-value green">5/5</div></div>
+          <div class="stat-card"><div class="stat-label">Actionability</div><div class="stat-value gold">4/5</div></div>
+          <div class="stat-card"><div class="stat-label">Depth</div><div class="stat-value purple">5/5</div></div>
+          <div class="stat-card"><div class="stat-label">Surprise</div><div class="stat-value">4/5</div></div>
+        </div>
+      <div class="emergent-why anim d5">
+        <div class="emergent-why-label">Why This Matters</div>
+        <div class="finding-body">This insight emerged from the convergence of 2 independent agents, each analyzing different dimensions. No single agent would have identified this — it required cross-dimensional synthesis to surface.</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Emergence Detection | 2 agents converged</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 7: EMERGENT: TENSION ============ -->
+<section class="slide emergent-slide" id="s6" style="background:linear-gradient(135deg,var(--bg-primary) 0%,rgba(108,108,255,0.04) 100%);">
+  
+  <div class="slide-inner">
+    
+    <div class="emergent-number anim">02</div>
+    <div>
+      <div class="eyebrow anim"><span class="tag-cyan tag">Emergent Insight</span></div>
+      <h2 class="slide-title anim d1">tension</h2>
+      <p class="slide-subtitle anim d2">The semantic ambiguity of minimal queries like 'test query' reveals a fundamental tension between system precision and comprehensiveness - systems that interpret broadly maintain domain relevance but sacrifice analytical precision.</p>
+      <div class="grid-2 anim d3">
+        <div class="finding-card emergent">
+          <div class="finding-title">Insight</div>
+          <div class="finding-body">The semantic ambiguity of minimal queries like 'test query' reveals a fundamental tension between system precision and comprehensiveness - systems that interpret broadly maintain domain relevance but sacrifice analytical precision.</div>
+        </div>
+        <div class="finding-card opportunity">
+          <div class="finding-title">Contributing Agents</div>
+          <div class="finding-body"><span class="agent-chip"><span class="dot" style="background:var(--accent-bright)"></span>Query Analyst</span> <span class="agent-chip"><span class="dot" style="background:var(--accent-bright)"></span>System Validator</span></div>
+        </div>
+      </div>
+      
+        <div class="stat-grid" style="margin-top:16px;">
+          <div class="stat-card"><div class="stat-label">Novelty</div><div class="stat-value cyan">4/5</div></div>
+          <div class="stat-card"><div class="stat-label">Grounding</div><div class="stat-value green">4/5</div></div>
+          <div class="stat-card"><div class="stat-label">Actionability</div><div class="stat-value gold">4/5</div></div>
+          <div class="stat-card"><div class="stat-label">Depth</div><div class="stat-value purple">4/5</div></div>
+          <div class="stat-card"><div class="stat-label">Surprise</div><div class="stat-value">3/5</div></div>
+        </div>
+      <div class="emergent-why anim d5">
+        <div class="emergent-why-label">Why This Matters</div>
+        <div class="finding-body">This insight emerged from the convergence of 2 independent agents, each analyzing different dimensions. No single agent would have identified this — it required cross-dimensional synthesis to surface.</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Emergence Detection | 2 agents converged</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 8: EMERGENT: CONVERGENT ============ -->
+<section class="slide emergent-slide" id="s7" style="background:linear-gradient(135deg,var(--bg-primary) 0%,rgba(108,108,255,0.04) 100%);">
+  
+  <div class="slide-inner">
+    
+    <div class="emergent-number anim">03</div>
+    <div>
+      <div class="eyebrow anim"><span class="tag-cyan tag">Emergent Insight</span></div>
+      <h2 class="slide-title anim d1">convergent</h2>
+      <p class="slide-subtitle anim d2">Infrastructure resilience patterns reveal that system reliability is not uniformly distributed across data sources, creating predictable blind spots that compound during multi-dimensional analysis.</p>
+      <div class="grid-2 anim d3">
+        <div class="finding-card emergent">
+          <div class="finding-title">Insight</div>
+          <div class="finding-body">Infrastructure resilience patterns reveal that system reliability is not uniformly distributed across data sources, creating predictable blind spots that compound during multi-dimensional analysis.</div>
+        </div>
+        <div class="finding-card opportunity">
+          <div class="finding-title">Contributing Agents</div>
+          <div class="finding-body"><span class="agent-chip"><span class="dot" style="background:var(--accent-bright)"></span>Query Analyst</span> <span class="agent-chip"><span class="dot" style="background:var(--accent-bright)"></span>System Validator</span></div>
+        </div>
+      </div>
+      
+        <div class="stat-grid" style="margin-top:16px;">
+          <div class="stat-card"><div class="stat-label">Novelty</div><div class="stat-value cyan">4/5</div></div>
+          <div class="stat-card"><div class="stat-label">Grounding</div><div class="stat-value green">5/5</div></div>
+          <div class="stat-card"><div class="stat-label">Actionability</div><div class="stat-value gold">5/5</div></div>
+          <div class="stat-card"><div class="stat-label">Depth</div><div class="stat-value purple">4/5</div></div>
+          <div class="stat-card"><div class="stat-label">Surprise</div><div class="stat-value">3/5</div></div>
+        </div>
+      <div class="emergent-why anim d5">
+        <div class="emergent-why-label">Why This Matters</div>
+        <div class="finding-body">This insight emerged from the convergence of 2 independent agents, each analyzing different dimensions. No single agent would have identified this — it required cross-dimensional synthesis to surface.</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Emergence Detection | 2 agents converged</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 9: TENSION: INTERPRETIVE ============ -->
+<section class="slide" id="s8" style="background:linear-gradient(135deg,var(--bg-primary),rgba(255,92,92,0.04));">
+  <div class="slide-bg-glow" style="background:var(--accent-error);top:-100px;right:-200px;"></div>
+  <div class="slide-inner">
+    
+    <div class="eyebrow anim"><span class="tag-red tag">Tension Point</span> interpretive</div>
+    <h2 class="slide-title anim d1">Disagreement on whether broad query interpretation represents system success or failure</h2>
+    <p class="slide-subtitle anim d2">A genuine analytical tension that resists simple resolution — preserved as strategic complexity.</p>
+    <div class="two-col anim d3">
+      <div>
+        <h3 style="font-size:14px;color:var(--accent-error);margin-bottom:12px;text-transform:uppercase;letter-spacing:2px;font-weight:700;">System Validator's Position</h3>
+        <div class="finding-card risk">
+          <div class="finding-body">System successfully maintains healthcare domain relevance despite ambiguous input, demonstrating robust interpretive capability</div>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size:14px;color:var(--accent-success);margin-bottom:12px;text-transform:uppercase;letter-spacing:2px;font-weight:700;">Query Analyst's Position</h3>
+        <div class="finding-card opportunity">
+          <div class="finding-body">Systems should develop response strategies for multiple interpretation pathways rather than making assumptions about user intent</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="finding-card anim d4" style="margin-top:20px;">
+      <div class="finding-title">Resolution Path</div>
+      <div class="finding-body">Both perspectives reveal different aspects of the same phenomenon - successful domain maintenance with potential precision trade-offs</div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Tension Point | System Validator vs Query Analyst</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 10: TENSION: INTERPRETIVE ============ -->
+<section class="slide" id="s9" style="background:linear-gradient(135deg,var(--bg-primary),rgba(255,92,92,0.04));">
+  <div class="slide-bg-glow" style="background:var(--accent-error);top:-100px;right:-200px;"></div>
+  <div class="slide-inner">
+    
+    <div class="eyebrow anim"><span class="tag-red tag">Tension Point</span> interpretive</div>
+    <h2 class="slide-title anim d1">Different characterization of infrastructure failures</h2>
+    <p class="slide-subtitle anim d2">A genuine analytical tension that resists simple resolution — preserved as strategic complexity.</p>
+    <div class="two-col anim d3">
+      <div>
+        <h3 style="font-size:14px;color:var(--accent-error);margin-bottom:12px;text-transform:uppercase;letter-spacing:2px;font-weight:700;">Query Analyst's Position</h3>
+        <div class="finding-card risk">
+          <div class="finding-body">Systematic failures across searches indicate infrastructure dysfunction requiring immediate attention</div>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size:14px;color:var(--accent-success);margin-bottom:12px;text-transform:uppercase;letter-spacing:2px;font-weight:700;">System Validator's Position</h3>
+        <div class="finding-card opportunity">
+          <div class="finding-body">Differential performance across data sources represents expected resilience variation in distributed systems</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="finding-card anim d4" style="margin-top:20px;">
+      <div class="finding-title">Resolution Path</div>
+      <div class="finding-body">Infrastructure shows both systematic vulnerabilities and expected variation patterns - both views capture different aspects of system behavior</div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Tension Point | Query Analyst vs System Validator</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 11: TENSION: METHODOLOGICAL ============ -->
+<section class="slide" id="s10" style="background:linear-gradient(135deg,var(--bg-primary),rgba(255,92,92,0.04));">
+  <div class="slide-bg-glow" style="background:var(--accent-error);top:-100px;right:-200px;"></div>
+  <div class="slide-inner">
+    
+    <div class="eyebrow anim"><span class="tag-red tag">Tension Point</span> methodological</div>
+    <h2 class="slide-title anim d1">Assessment of system meta-cognitive capabilities</h2>
+    <p class="slide-subtitle anim d2">A genuine analytical tension that resists simple resolution — preserved as strategic complexity.</p>
+    <div class="two-col anim d3">
+      <div>
+        <h3 style="font-size:14px;color:var(--accent-error);margin-bottom:12px;text-transform:uppercase;letter-spacing:2px;font-weight:700;">Query Analyst's Position</h3>
+        <div class="finding-card risk">
+          <div class="finding-body">Systems lack meta-cognitive capabilities to effectively process queries about their own functionality</div>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size:14px;color:var(--accent-success);margin-bottom:12px;text-transform:uppercase;letter-spacing:2px;font-weight:700;">System Validator's Position</h3>
+        <div class="finding-card opportunity">
+          <div class="finding-body">Cross-validation mechanisms demonstrate effective meta-cognitive quality control capabilities</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="finding-card anim d4" style="margin-top:20px;">
+      <div class="finding-title">Resolution Path</div>
+      <div class="finding-body">Different scopes of meta-cognition being assessed - interpretation vs. validation capabilities represent different meta-cognitive domains</div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Tension Point | Query Analyst vs System Validator</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 12: QUALITY & PROVENANCE ============ -->
+<section class="slide" id="s11">
+  <div class="slide-bg-glow" style="background:var(--accent-success);bottom:-200px;left:-200px;"></div>
+  <div class="slide-inner">
+    
+    <div class="eyebrow anim"><span class="tag quality">Quality</span> Assessment</div>
+    <h2 class="slide-title anim d1">Intelligence Quality Report</h2>
+    <div class="stat-grid anim d2">
+      <div class="stat-card">
+        <div class="stat-label">Overall Grade</div>
+        <div class="stat-value cyan">B-</div>
+        <div class="stat-context">76% composite score</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Provenance</div>
+        <div class="stat-value cyan">22%</div>
+        <div class="stat-context">Chain completeness</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Warnings</div>
+        <div class="stat-value negative">5</div>
+        <div class="stat-context">3 critical</div>
+      </div>
+    </div>
+    
+    <div class="anim d3" style="margin-top:20px;">
+      
+      <div class="finding-card risk">
+        <div class="finding-title">[CRITICAL] 7 of 9 findings lack verifiable sources</div>
+      </div>
+      <div class="finding-card risk">
+        <div class="finding-title">[CRITICAL] Source Coverage scored 22% — critically below standard</div>
+      </div>
+      <div class="finding-card risk">
+        <div class="finding-title">[CRITICAL] Provenance Completeness scored 22% — critically below standard</div>
+      </div>
+      <div class="finding-card ">
+        <div class="finding-title">[MAJOR] Provenance chain completeness is 22% (target: &gt;80%)</div>
+      </div>
+      <div class="finding-card ">
+        <div class="finding-title">[MAJOR] 2 finding(s) may have circular/self-referential evidence</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Quality Assurance Pipeline</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 13: GAPS & NEXT STEPS ============ -->
+<section class="slide" id="s12">
+  <div class="slide-bg-glow" style="background:var(--accent-warning);bottom:-200px;right:-200px;"></div>
+  <div class="slide-inner">
+    
+    <div class="eyebrow anim"><span class="tag-gold tag">Gap Analysis</span> Intelligence Boundaries</div>
+    <h2 class="slide-title anim d1">Knowledge Gaps & Next Steps</h2>
+    <p class="section-intro anim d2">Areas where the analysis identified insufficient data, unresolved questions, or opportunities for follow-up investigation.</p>
+    <div class="anim d3">
+      
+      <div class="policy-box neutral">
+        <p>True computational cost of broad interpretation strategies for minimal queries</p>
+      </div>
+      <div class="policy-box neutral">
+        <p>Internal algorithmic logic that drives healthcare domain focus from ambiguous input</p>
+      </div>
+      <div class="policy-box neutral">
+        <p>Long-term system performance degradation patterns under repeated ambiguous queries</p>
+      </div>
+      <div class="policy-box neutral">
+        <p>Optimal balance point between interpretation precision and comprehensiveness</p>
+      </div>
+      <div class="policy-box neutral">
+        <p>User intent accuracy rates for minimal query interpretations</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Synthesis | Gap Layer</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 14: CLOSING ============ -->
+<section class="slide" id="s13" style="text-align:center;">
+  
+  <div class="slide-inner">
+    
+    <div class="eyebrow anim">Analysis Complete</div>
+    <h2 class="slide-title anim d1" style="text-align:center;">PRISM Strategic Intelligence Brief</h2>
+    <p class="anim d2" style="font-size:var(--text-lg);color:var(--text-secondary);text-align:center;margin-bottom:32px;">
+      test query
+    </p>
+    <div class="hero-stats anim d3" style="max-width:800px;">
+      <div class="hero-stat"><div class="value cyan">2</div><div class="label">Agents</div></div>
+      <div class="hero-stat"><div class="value green">9</div><div class="label">Findings</div></div>
+      <div class="hero-stat"><div class="value purple">3</div><div class="label">Emergent</div></div>
+      <div class="hero-stat"><div class="value gold">12</div><div class="label">Slides</div></div>
+    </div>
+    <div class="anim d4" style="margin-top:32px;color:var(--text-tertiary);font-size:12px;">
+      <div>Generated March 3, 2026 at 03:56 PM</div>
+      <div>Run ID: fresh-1772571249</div>
+      <div>Cost: $0.0000</div>
+    </div>
+  </div>
+  
+</section>
+
+<script>
+
+const slides = document.querySelectorAll('.slide');
+const totalSlides = slides.length;
+let currentSlide = 0;
+let counterTimeout;
+
+function goToSlide(n) {
+  if (n < 0 || n >= totalSlides) return;
+  currentSlide = n;
+  slides[n].scrollIntoView({ behavior: 'smooth' });
+}
+
+function toggleNav() {
+  const p = document.getElementById('navPanel');
+  const o = document.getElementById('navOverlay');
+  const b = document.getElementById('navBtn');
+  const isOpen = p.classList.contains('open');
+  if (isOpen) { p.classList.remove('open'); o.classList.remove('open'); b.innerHTML = '&#9776;'; }
+  else { p.classList.add('open'); o.classList.add('open'); b.innerHTML = '&#10005;'; }
+}
+
+document.addEventListener('keydown', (e) => {
+  const navOpen = document.getElementById('navPanel').classList.contains('open');
+  if (e.key === 'Escape') { if (navOpen) toggleNav(); return; }
+  if (navOpen) return;
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  switch (e.key) {
+    case 'ArrowDown': case 'PageDown': e.preventDefault(); goToSlide(currentSlide + 1); break;
+    case 'ArrowUp': case 'PageUp': e.preventDefault(); goToSlide(currentSlide - 1); break;
+    case ' ': case 'ArrowRight': e.preventDefault(); goToSlide(currentSlide + 1); break;
+    case 'ArrowLeft': e.preventDefault(); goToSlide(currentSlide - 1); break;
+    case 'Home': e.preventDefault(); goToSlide(0); break;
+    case 'End': e.preventDefault(); goToSlide(totalSlides - 1); break;
+  }
+});
+
+function updateProgress() {
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+  document.getElementById('slideProgress').style.width = pct + '%';
+  let closest = 0, minDist = Infinity;
+  slides.forEach((s, i) => {
+    const dist = Math.abs(s.getBoundingClientRect().top);
+    if (dist < minDist) { minDist = dist; closest = i; }
+  });
+  currentSlide = closest;
+  const counter = document.getElementById('slideCounter');
+  counter.textContent = String(closest + 1).padStart(2, '0') + ' / ' + String(totalSlides).padStart(2, '0');
+  counter.classList.add('visible');
+  clearTimeout(counterTimeout);
+  counterTimeout = setTimeout(() => counter.classList.remove('visible'), 2000);
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+
+const animObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && entry.intersectionRatio > 0.15) {
+      entry.target.querySelectorAll('.anim').forEach(el => el.classList.add('visible'));
+    }
+  });
+}, { threshold: [0, 0.15, 0.5] });
+slides.forEach(s => animObserver.observe(s));
+
+window.addEventListener('load', () => {
+  setTimeout(() => document.getElementById('navHint').classList.remove('show'), 4000);
+  slides[0].querySelectorAll('.anim').forEach(el => el.classList.add('visible'));
+});
+
+</script>
+</body>
+</html>

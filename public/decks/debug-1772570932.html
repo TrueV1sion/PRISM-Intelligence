@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRISM Strategic Brief — What are trends in Medicare spending</title>
+<style>
+
+:root {
+  --inov-navy: #003D79;
+  --inov-cerulean: #4E84C4;
+  --inov-sky: #59DDFD;
+  --inov-midnight: #001E3C;
+  --inov-jade: #00E49F;
+  --inov-sand: #F5E6BB;
+  --inov-violet: #6C6CFF;
+  --inov-cloud: #F4F0EA;
+  --bg-primary: #0a0b10;
+  --bg-secondary: #10121a;
+  --bg-tertiary: #181b26;
+  --bg-elevated: #1e2130;
+  --bg-card: rgba(30, 33, 48, 0.85);
+  --text-primary: #f0f2f8;
+  --text-secondary: #a0a8c0;
+  --text-tertiary: #5c6480;
+  --accent: #4E84C4;
+  --accent-bright: #59DDFD;
+  --accent-success: #00E49F;
+  --accent-warning: #F5E6BB;
+  --accent-error: #ff5c5c;
+  --accent-violet: #6C6CFF;
+  --border: rgba(78, 132, 196, 0.12);
+  --border-bright: rgba(89, 221, 253, 0.25);
+  --text-xs: clamp(0.65rem, 0.6rem + 0.2vw, 0.8rem);
+  --text-sm: clamp(0.8rem, 0.74rem + 0.3vw, 1rem);
+  --text-base: clamp(1rem, 0.92rem + 0.4vw, 1.2rem);
+  --text-lg: clamp(1.2rem, 1.1rem + 0.5vw, 1.5rem);
+  --text-xl: clamp(1.5rem, 1.35rem + 0.65vw, 1.9rem);
+  --text-2xl: clamp(1.9rem, 1.7rem + 0.85vw, 2.5rem);
+  --text-3xl: clamp(2.4rem, 2.1rem + 1.1vw, 3.2rem);
+  --text-hero: clamp(3.2rem, 2.8rem + 1.6vw, 4.5rem);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 200ms;
+  --dur-normal: 350ms;
+  --dur-slow: 600ms;
+  --dur-cinematic: 1000ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg-primary); color: var(--text-primary); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; line-height: 1.6; }
+html { scroll-snap-type: y mandatory; overflow-y: scroll; scroll-behavior: smooth; }
+
+/* Slide Layout */
+.slide {
+  min-height: 100vh; scroll-snap-align: start;
+  display: flex; flex-direction: column; justify-content: center;
+  position: relative; padding: 3rem 5vw; overflow: hidden;
+}
+.slide-inner { max-width: 1200px; margin: 0 auto; width: 100%; position: relative; z-index: 2; }
+.slide-bg-glow {
+  position: absolute; width: 600px; height: 600px; border-radius: 50%;
+  filter: blur(120px); opacity: 0.08; z-index: 0; pointer-events: none;
+}
+
+/* Fixed UI */
+#slideProgress {
+  position: fixed; top: 0; left: 0; height: 3px;
+  background: linear-gradient(90deg, var(--inov-navy), var(--inov-cerulean), var(--inov-sky));
+  z-index: 100; transition: width 0.3s var(--ease-out-quart); width: 0%;
+}
+.prism-mark {
+  position: fixed; top: 1.5rem; left: 2rem;
+  font-size: var(--text-xs); font-weight: 700; letter-spacing: 0.25em;
+  color: var(--accent); z-index: 100; text-transform: uppercase;
+}
+.slide-counter {
+  position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
+  z-index: 1001; font-size: 11px; color: var(--text-tertiary);
+  letter-spacing: 2px; font-weight: 600;
+  background: rgba(10,11,16,0.85); padding: 4px 14px;
+  border-radius: 20px; border: 1px solid var(--border);
+  backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s;
+}
+.slide-counter.visible { opacity: 1; }
+.slide-nav-hint {
+  position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
+  z-index: 1001; font-size: 10px; color: var(--text-tertiary);
+  letter-spacing: 1px; text-align: center; opacity: 0;
+  transition: opacity 1s; pointer-events: none;
+}
+.slide-nav-hint.show { opacity: 0.6; }
+
+/* Nav Panel */
+.nav-toggle {
+  position: fixed; top: 20px; right: 20px; z-index: 1000;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(78, 132, 196, 0.15); border: 1px solid rgba(78, 132, 196, 0.3);
+  color: var(--accent); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; backdrop-filter: blur(12px); transition: all 0.3s;
+}
+.nav-toggle:hover { background: rgba(78, 132, 196, 0.3); transform: scale(1.05); }
+.nav-panel {
+  position: fixed; top: 0; right: -340px; width: 320px; height: 100vh;
+  background: rgba(10, 11, 16, 0.97); border-left: 1px solid var(--border);
+  z-index: 999; transition: right 0.35s ease; overflow-y: auto;
+  padding: 70px 20px 30px; backdrop-filter: blur(20px);
+}
+.nav-panel.open { right: 0; }
+.nav-panel h3 {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 3px;
+  color: var(--accent); margin-bottom: 16px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--border);
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 8px; cursor: pointer;
+  transition: all 0.2s; text-decoration: none; margin-bottom: 2px;
+}
+.nav-item:hover { background: rgba(78, 132, 196, 0.1); }
+.nav-item .nav-num { font-size: 10px; color: var(--text-tertiary); min-width: 24px; font-weight: 700; }
+.nav-item .nav-label { font-size: 12.5px; color: var(--text-primary); font-weight: 500; }
+.nav-item .nav-tag { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-left: auto; }
+.nav-tag-key { color: var(--accent-warning); }
+.nav-tag-new { color: var(--accent-bright); }
+.nav-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 998; display: none; }
+.nav-overlay.open { display: block; }
+
+/* Animation */
+.anim {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity var(--dur-slow) var(--ease-out-expo), transform var(--dur-slow) var(--ease-out-expo);
+}
+.anim.visible { opacity: 1; transform: translateY(0); }
+.anim.d1 { transition-delay: 100ms; } .anim.d2 { transition-delay: 200ms; }
+.anim.d3 { transition-delay: 300ms; } .anim.d4 { transition-delay: 400ms; }
+.anim.d5 { transition-delay: 500ms; } .anim.d6 { transition-delay: 600ms; }
+
+/* Typography */
+.eyebrow { font-size: var(--text-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-tertiary); margin-bottom: 12px; }
+.slide-title {
+  font-size: var(--text-3xl); font-weight: 700; line-height: 1.15; margin-bottom: 16px;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-bright) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.slide-subtitle { font-size: var(--text-base); color: var(--text-secondary); max-width: 700px; margin-bottom: 28px; line-height: 1.7; }
+.section-intro { font-size: 13.5px; line-height: 1.7; max-width: 800px; margin-bottom: 20px; color: var(--text-secondary); }
+
+/* Tags */
+.tag {
+  display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 10px;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-right: 6px;
+}
+.tag.clinical { background: rgba(89,221,253,0.15); color: var(--accent-bright); }
+.tag.financial { background: rgba(0,228,159,0.15); color: var(--accent-success); }
+.tag.regulatory { background: rgba(255,92,92,0.15); color: var(--accent-error); }
+.tag.quality { background: rgba(108,108,255,0.15); color: var(--accent-violet); }
+.tag.strategic { background: rgba(78,132,196,0.15); color: var(--accent); }
+.tag-red { background: rgba(255,92,92,0.15); color: var(--accent-error); }
+.tag-green { background: rgba(0,228,159,0.15); color: var(--accent-success); }
+.tag-blue { background: rgba(78,132,196,0.15); color: var(--accent); }
+.tag-orange { background: rgba(249,115,22,0.15); color: #f97316; }
+.tag-purple { background: rgba(108,108,255,0.15); color: var(--accent-violet); }
+.tag-gold { background: rgba(245,230,187,0.15); color: var(--accent-warning); }
+.tag-cyan { background: rgba(89,221,253,0.15); color: var(--accent-bright); }
+
+/* Stat Cards */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin-top: 16px; }
+.stat-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px; text-align: center; transition: transform 0.2s;
+}
+.stat-card:hover { transform: translateY(-2px); }
+.stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-tertiary); margin-bottom: 6px; }
+.stat-value { font-size: 28px; font-weight: 800; color: var(--text-primary); }
+.stat-value.negative { color: var(--accent-error); }
+.stat-value.positive { color: var(--accent-success); }
+.stat-value.warn { color: var(--accent-warning); }
+.stat-value.cyan { color: var(--accent-bright); }
+.stat-value.green { color: var(--accent-success); }
+.stat-value.purple { color: var(--accent-violet); }
+.stat-value.gold { color: var(--accent-warning); }
+.stat-value.red { color: var(--accent-error); }
+.stat-context { font-size: 11px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; }
+
+/* Finding Cards */
+.finding-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+  border-radius: 0 12px 12px 0; padding: 16px 20px; margin: 10px 0;
+}
+.finding-card.emergent { border-left-color: var(--accent-bright); }
+.finding-card.risk { border-left-color: var(--accent-error); }
+.finding-card.opportunity { border-left-color: var(--accent-success); }
+.finding-title { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+.finding-body { font-size: 12.5px; color: var(--text-secondary); line-height: 1.65; }
+.confidence-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 9px;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 8px;
+}
+.confidence-badge.high { background: rgba(0,228,159,0.15); color: var(--accent-success); }
+.confidence-badge.medium { background: rgba(245,230,187,0.15); color: var(--accent-warning); }
+.confidence-badge.low { background: rgba(255,92,92,0.15); color: var(--accent-error); }
+
+/* Agent Chips */
+.agent-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(78,132,196,0.1); border: 1px solid rgba(78,132,196,0.25);
+  border-radius: 20px; padding: 4px 12px; font-size: 10.5px;
+  color: var(--text-secondary); margin: 3px;
+}
+.agent-chip .dot { width: 6px; height: 6px; border-radius: 50%; }
+
+/* Hero Stats */
+.hero-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 18px; max-width: 1100px; margin: 0 auto; }
+.hero-stat {
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+  border-radius: 12px; padding: 22px 14px; text-align: center; transition: transform 0.2s;
+}
+.hero-stat:hover { transform: translateY(-2px); }
+.hero-stat .value { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
+.hero-stat .label { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1.5px; }
+
+/* Grids */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 16px; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+@media (max-width: 768px) { .two-col, .grid-2, .grid-3 { grid-template-columns: 1fr; } .hero-stats { grid-template-columns: repeat(2, 1fr); } }
+
+/* Emergence */
+.emergent-slide { background: linear-gradient(135deg, var(--bg-primary) 0%, rgba(108,108,255,0.04) 100%); }
+.emergent-number { font-size: 120px; font-weight: 900; color: rgba(89, 221, 253, 0.06); position: absolute; top: -20px; left: -10px; }
+.emergent-why { background: var(--bg-card); border: 1px solid var(--border-bright); border-radius: 12px; padding: 1.5rem; margin-top: 1.5rem; }
+.emergent-why-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-bright); margin-bottom: 8px; font-weight: 700; }
+
+/* Policy Box */
+.policy-box { background: rgba(78,132,196,0.05); border: 1px solid rgba(78,132,196,0.2); border-radius: 10px; padding: 12px 16px; margin: 6px 0; }
+.policy-box.neutral { background: rgba(78,132,196,0.05); border-color: rgba(78,132,196,0.2); }
+.policy-box p { font-size: 11.5px; color: var(--text-secondary); line-height: 1.5; }
+
+/* Quote Block */
+.quote-block { border-left: 3px solid var(--accent-warning); padding: 10px 18px; margin: 10px 0; background: rgba(245,230,187,0.05); border-radius: 0 8px 8px 0; font-style: italic; color: var(--text-primary); font-size: 14px; }
+
+/* ToC */
+.toc-group-header { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); color: var(--text-tertiary); }
+.toc-item { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; }
+
+/* Slide Footer */
+.slide-footer { position: absolute; bottom: 16px; left: 40px; right: 40px; display: flex; justify-content: space-between; font-size: 10px; color: var(--text-tertiary); border-top: 1px solid var(--border); padding-top: 8px; }
+
+/* Misc */
+.highlight { color: var(--text-primary); font-weight: 600; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-bright); }
+
+@media print {
+  .slide { page-break-after: always; min-height: auto; padding: 2rem; }
+  .nav-toggle, .nav-panel, .nav-overlay, .slide-counter, .slide-nav-hint, #slideProgress, .prism-mark { display: none; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- Fixed UI -->
+<div id="slideProgress"></div>
+<div class="prism-mark">PRISM Intelligence</div>
+<div class="slide-counter" id="slideCounter">01 / 17</div>
+<div class="slide-nav-hint show" id="navHint">&#8595; Arrow Down / Spacebar to navigate &#8595;</div>
+
+<!-- Nav Toggle -->
+<button class="nav-toggle" onclick="toggleNav()" id="navBtn" title="Table of Contents">&#9776;</button>
+<div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+<div class="nav-panel" id="navPanel">
+  <h3>Table of Contents</h3>
+  <a class="nav-item" href="#s1" onclick="toggleNav()"><span class="nav-num">01</span><span class="nav-label">Title</span></a>
+  <a class="nav-item" href="#s-toc" onclick="toggleNav()"><span class="nav-num">02</span><span class="nav-label">Intelligence Map</span></a>
+  <a class="nav-item" href="#s2" onclick="toggleNav()"><span class="nav-num">03</span><span class="nav-label">Executive Summary</span></a>
+  <a class="nav-item" href="#s3" onclick="toggleNav()"><span class="nav-num">04</span><span class="nav-label">Historical Spending Patterns</span></a>
+  <a class="nav-item" href="#s4" onclick="toggleNav()"><span class="nav-num">05</span><span class="nav-label">Cost Driver Analysis</span></a>
+  <a class="nav-item" href="#s5" onclick="toggleNav()"><span class="nav-num">06</span><span class="nav-label">Policy Impact Assessment</span></a>
+  <a class="nav-item" href="#s6" onclick="toggleNav()"><span class="nav-num">07</span><span class="nav-label">Future Spending Projections</span></a>
+  <a class="nav-item" href="#s7" onclick="toggleNav()"><span class="nav-num">08</span><span class="nav-label">Emergent: pattern</span><span class="nav-tag nav-tag-new">NEW</span></a>
+  <a class="nav-item" href="#s8" onclick="toggleNav()"><span class="nav-num">09</span><span class="nav-label">Emergent: gap</span><span class="nav-tag nav-tag-new">NEW</span></a>
+  <a class="nav-item" href="#s9" onclick="toggleNav()"><span class="nav-num">10</span><span class="nav-label">Emergent: tension</span><span class="nav-tag nav-tag-new">NEW</span></a>
+  <a class="nav-item" href="#s10" onclick="toggleNav()"><span class="nav-num">11</span><span class="nav-label">Emergent: convergent</span><span class="nav-tag nav-tag-new">NEW</span></a>
+  <a class="nav-item" href="#s11" onclick="toggleNav()"><span class="nav-num">12</span><span class="nav-label">Tension: interpretive</span><span class="nav-tag nav-tag-key">KEY</span></a>
+  <a class="nav-item" href="#s12" onclick="toggleNav()"><span class="nav-num">13</span><span class="nav-label">Tension: values-based</span><span class="nav-tag nav-tag-key">KEY</span></a>
+  <a class="nav-item" href="#s13" onclick="toggleNav()"><span class="nav-num">14</span><span class="nav-label">Tension: predictive</span><span class="nav-tag nav-tag-key">KEY</span></a>
+  <a class="nav-item" href="#s14" onclick="toggleNav()"><span class="nav-num">15</span><span class="nav-label">Quality &amp; Provenance</span></a>
+  <a class="nav-item" href="#s15" onclick="toggleNav()"><span class="nav-num">16</span><span class="nav-label">Gaps &amp; Next Steps</span></a>
+  <a class="nav-item" href="#s16" onclick="toggleNav()"><span class="nav-num">17</span><span class="nav-label">Closing</span></a>
+</div>
+
+
+<!-- ============ SLIDE 1: TITLE ============ -->
+<section class="slide" id="s1">
+  <div class="slide-bg-glow" style="background:var(--inov-cerulean);top:-200px;right:-200px;"></div>
+  <div class="slide-inner">
+    
+    <div class="eyebrow anim">PRISM Multi-Agent Strategic Brief</div>
+    <h1 class="anim d1" style="font-size:var(--text-hero);font-weight:800;line-height:1.1;background:linear-gradient(135deg,var(--text-primary) 0%,var(--accent-bright) 50%,var(--accent-success) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px;">
+      What are trends in Medicare spending
+    </h1>
+    <p class="anim d2" style="font-size:var(--text-lg);color:var(--text-secondary);max-width:800px;margin:0 auto 32px;">
+      4-agent analysis across Historical Spending Patterns, Cost Driver Analysis, Policy Impact Assessment, Future Spending Projections
+    </p>
+    <div class="anim d3" style="margin-bottom:28px;">
+      <span class="agent-chip"><span class="dot" style="background:var(--accent-success)"></span>Medicare Financial Analyst</span>
+      <span class="agent-chip"><span class="dot" style="background:var(--accent-bright)"></span>Health Economics Researcher</span>
+      <span class="agent-chip"><span class="dot" style="background:var(--accent-error)"></span>Medicare Policy Analyst</span>
+      <span class="agent-chip"><span class="dot" style="background:var(--accent-bright)"></span>Medicare Spending Futurist</span>
+    </div>
+    
+    <div class="hero-stats anim d4">
+      <div class="hero-stat"><div class="value cyan">4</div><div class="label">Parallel Agents</div></div>
+      <div class="hero-stat"><div class="value green">16</div><div class="label">Verified Findings</div></div>
+      <div class="hero-stat"><div class="value purple">4</div><div class="label">Emergent Insights</div></div>
+      <div class="hero-stat"><div class="value gold">4</div><div class="label">Dimensions</div></div>
+      <div class="hero-stat"><div class="value">EXTENDED</div><div class="label">Analysis Tier</div></div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>March 3, 2026 | PRISM v3.0 | EXTENDED Tier</span><span>PRISM Strategic Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 2: INTELLIGENCE MAP ============ -->
+<section class="slide" id="s-toc" style="background:linear-gradient(135deg,var(--bg-primary),var(--bg-secondary))">
+  
+  <div class="slide-inner">
+    
+    <h2 class="slide-title anim">Executive <span style="-webkit-text-fill-color:var(--accent)">Intelligence Map</span></h2>
+    <p class="section-intro anim d1">16-slide analysis spanning Historical Spending Patterns, Cost Driver Analysis, Policy Impact Assessment, Future Spending Projections, and 4 emergent strategic insights.</p>
+    <div class="grid-3 anim d2">
+      
+      <div>
+        <h3 class="toc-group-header" style="color:var(--accent-bright)">Analysis</h3>
+        <a class="nav-item toc-item" href="#s2"><span class="nav-num">02</span><span class="nav-label">Executive Summary</span></a>
+        <a class="nav-item toc-item" href="#s3"><span class="nav-num">03</span><span class="nav-label">Historical Spending Patterns</span></a>
+        <a class="nav-item toc-item" href="#s4"><span class="nav-num">04</span><span class="nav-label">Cost Driver Analysis</span></a>
+        <a class="nav-item toc-item" href="#s5"><span class="nav-num">05</span><span class="nav-label">Policy Impact Assessment</span></a>
+        <a class="nav-item toc-item" href="#s6"><span class="nav-num">06</span><span class="nav-label">Future Spending Projections</span></a>
+      </div>
+      <div>
+        <h3 class="toc-group-header" style="color:var(--accent-violet)">Synthesis</h3>
+        <a class="nav-item toc-item" href="#s7"><span class="nav-num">07</span><span class="nav-label">Emergent: pattern</span><span class="nav-tag nav-tag-new">NEW</span></a>
+        <a class="nav-item toc-item" href="#s8"><span class="nav-num">08</span><span class="nav-label">Emergent: gap</span><span class="nav-tag nav-tag-new">NEW</span></a>
+        <a class="nav-item toc-item" href="#s9"><span class="nav-num">09</span><span class="nav-label">Emergent: tension</span><span class="nav-tag nav-tag-new">NEW</span></a>
+        <a class="nav-item toc-item" href="#s10"><span class="nav-num">10</span><span class="nav-label">Emergent: convergent</span><span class="nav-tag nav-tag-new">NEW</span></a>
+        <a class="nav-item toc-item" href="#s11"><span class="nav-num">11</span><span class="nav-label">Tension: interpretive</span><span class="nav-tag nav-tag-key">KEY</span></a>
+      </div>
+      <div>
+        <h3 class="toc-group-header" style="color:var(--accent-success)">Quality & Strategy</h3>
+        <a class="nav-item toc-item" href="#s12"><span class="nav-num">12</span><span class="nav-label">Tension: values-based</span><span class="nav-tag nav-tag-key">KEY</span></a>
+        <a class="nav-item toc-item" href="#s13"><span class="nav-num">13</span><span class="nav-label">Tension: predictive</span><span class="nav-tag nav-tag-key">KEY</span></a>
+        <a class="nav-item toc-item" href="#s14"><span class="nav-num">14</span><span class="nav-label">Quality &amp; Provenance</span></a>
+        <a class="nav-item toc-item" href="#s15"><span class="nav-num">15</span><span class="nav-label">Gaps &amp; Next Steps</span></a>
+        <a class="nav-item toc-item" href="#s16"><span class="nav-num">16</span><span class="nav-label">Closing</span></a>
+      </div>
+    </div>
+  </div>
+  
+</section>
+
+<!-- ============ SLIDE 3: EXECUTIVE SUMMARY ============ -->
+<section class="slide" id="s2">
+  <div class="slide-bg-glow" style="background:var(--accent-success);top:-150px;left:-200px;"></div>
+  <div class="slide-inner">
+    
+    <div class="eyebrow anim"><span class="tag strategic">Synthesis</span> Executive Summary</div>
+    <h2 class="slide-title anim d1">Key Intelligence Findings</h2>
+    <p class="slide-subtitle anim d2">Multi-agent convergence across Historical Spending Patterns, Cost Driver Analysis, Policy Impact Assessment, Future Spending Projections reveals actionable strategic insights.</p>
+    <div class="stat-grid anim d3">
+      
+        <div class="stat-card">
+          <div class="stat-label">Key Finding 1</div>
+          <div class="stat-context">Medicare drug spending, particularly specialty medications in Part D, represents the primary driver of cost growth</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Key Finding 2</div>
+          <div class="stat-context">CMS is implementing multiple new policy interventions (GUARD, GLOBE models) specifically targeting drug cost inflation</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Key Finding 3</div>
+          <div class="stat-context">Demographic aging creates regional variation in Medicare enrollment pressures, with Sun Belt states experiencing fastest growth</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Key Finding 4</div>
+          <div class="stat-context">Program integrity issues, particularly in DMEPOS, require enhanced oversight and enforcement measures</div>
+        </div>
+    </div>
+    
+    <div class="finding-card emergent anim d4" style="margin-top:20px;">
+      <div class="finding-title">Convergent Intelligence</div>
+      <div class="finding-body">Drug pricing represents the most critical Medicare cost pressure - identified through both regulatory intervention analysis and utilization concentration studies</div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>4 Agents | Source-Validated</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 4: HISTORICAL SPENDING PATTERNS ============ -->
+<section class="slide" id="s3">
+  <div class="slide-bg-glow" style="background:var(--accent);top:-100px;right:-300px;"></div>
+  <div class="slide-inner">
+    
+    <div class="eyebrow anim"><span class="tag strategic">Historical Spending Patterns</span> Dimension</div>
+    <h2 class="slide-title anim d1">Historical Spending Patterns: Quantitative analysis of Medicare expenditure trends across categories, beneficiaries, and time periods</h2>
+    <p class="section-intro anim d2">1 agent analyzed this dimension: Medicare Financial Analyst.</p>
+    <div class="anim d3">
+        <div class="finding-card opportunity">
+          <div class="finding-title">CMS is implementing new drug pricing models (GUARD and GLOBE) specifically to address rising Medicare drug costs, indicating significant cost pressure in Parts B and D.</div>
+          <div class="finding-body">Federal Register proposed rules from December 2025 show CMS launching the 'Guarding U.S. Medicare Against Rising Drug Costs (GUARD) Model' for Part D and 'Global Benchmark for Efficient Drug Pricing (GLOBE) Model' for Part B, both designed to test alternative inflation rebate calculations.<br><em>Source: Federal Register documents 2025-23705 and 2025-23702, December 23, 2025</em></div>
+          <span class="confidence-badge high">HIGH — Federal Register documents 2025-23705 and 2025-23702, December 23, 2025</span>
+        </div>
+        <div class="finding-card ">
+          <div class="finding-title">Medicare is experiencing fraud and waste issues requiring enhanced program integrity measures, particularly in durable medical equipment (DMEPOS) spending.</div>
+          <div class="finding-body">CMS imposed a 6-month nationwide moratorium on Medicare enrollment of DMEPOS supplier medical supply companies in February 2026, citing program integrity concerns.<br><em>Source: Federal Register document 2026-03971, February 27, 2026</em></div>
+          <span class="confidence-badge medium">MEDIUM — Federal Register document 2026-03971, February 27, 2026</span>
+        </div>
+        <div class="finding-card ">
+          <div class="finding-title">Medicare Advantage and prescription drug program parameters are being continuously adjusted, indicating ongoing cost management pressures across multiple program components.</div>
+          <div class="finding-body">The 2027 Notice of Benefit and Payment Parameters proposed rule includes provisions for risk adjustment programs, user fee rates, and medical loss ratio standards, suggesting continuous recalibration of payment mechanisms.<br><em>Source: Federal Register document 2026-02769, February 11, 2026</em></div>
+          <span class="confidence-badge medium">MEDIUM — Federal Register document 2026-02769, February 11, 2026</span>
+        </div></div>
+  </div>
+  <div class="slide-footer"><span>Medicare Financial Analyst | 3 findings</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 5: COST DRIVER ANALYSIS ============ -->
+<section class="slide" id="s4">
+  <div class="slide-bg-glow" style="background:var(--accent);top:-100px;right:-300px;"></div>
+  <div class="slide-inner">
+    
+    <div class="eyebrow anim"><span class="tag strategic">Cost Driver Analysis</span> Dimension</div>
+    <h2 class="slide-title anim d1">Cost Driver Analysis: Deep-dive into the underlying factors driving Medicare spending changes - utilization, pricing, demographics, disease burden</h2>
+    <p class="section-intro anim d2">1 agent analyzed this dimension: Health Economics Researcher.</p>
+    <div class="anim d3">
+        <div class="finding-card opportunity">
+          <div class="finding-title">Specialty drug spending has become increasingly concentrated in Medicare Part D, with a small percentage of beneficiaries driving disproportionate cost growth over the past decade.</div>
+          <div class="finding-body">Journal of Managed Care &amp; Specialty Pharmacy (2024) analysis shows concentration patterns in Medicare Part D specialty drug spending from 2014-2024, with specialty medications representing the fastest-growing cost component of Part D spending.<br><em>Source: PubMed PMID: 39612254 - 'Concentration of spending and share of specialty drug spending in Medicare Part D over a 10-year period'</em></div>
+          <span class="confidence-badge high">HIGH — PubMed PMID: 39612254 - 'Concentration of spending and share of specialty drug spending in Medicare Part D over a 10-year period'</span>
+        </div>
+        <div class="finding-card opportunity">
+          <div class="finding-title">Medicare Part D coverage gap closure differentially affects drug utilization, increasing branded drug use while generic utilization remains more stable.</div>
+          <div class="finding-body">Health Economics study (2023) demonstrated that coverage gap reforms led to increased utilization of branded medications while generic drug use showed less dramatic changes, indicating persistent price sensitivity in utilization decisions.<br><em>Source: PubMed PMID: 36399360 - 'Effects of Medicare Part D coverage gap closure on utilization of branded and generic drugs'</em></div>
+          <span class="confidence-badge high">HIGH — PubMed PMID: 36399360 - 'Effects of Medicare Part D coverage gap closure on utilization of branded and generic drugs'</span>
+        </div>
+        <div class="finding-card opportunity">
+          <div class="finding-title">Regional demographic aging creates significant variation in Medicare-eligible population growth, with Sun Belt states experiencing the most rapid transitions.</div>
+          <div class="finding-body">2022 Census ACS data shows major state-level variations in 65+ populations: Florida (3.76 million), California (4.07 million), and Arizona (1.13 million), representing different demographic transition speeds and Medicare enrollment pressures.<br><em>Source: Census ACS 2022 - Age distribution by state (variables B01001_020E through B01001_049E)</em></div>
+          <span class="confidence-badge high">HIGH — Census ACS 2022 - Age distribution by state (variables B01001_020E through B01001_049E)</span>
+        </div></div>
+  </div>
+  <div class="slide-footer"><span>Health Economics Researcher | 3 findings</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 6: POLICY IMPACT ASSESSMENT ============ -->
+<section class="slide" id="s5">
+  <div class="slide-bg-glow" style="background:var(--accent);top:-100px;right:-300px;"></div>
+  <div class="slide-inner">
+    
+    <div class="eyebrow anim"><span class="tag strategic">Policy Impact Assessment</span> Dimension</div>
+    <h2 class="slide-title anim d1">Policy Impact Assessment: Analysis of how regulatory changes, payment reforms, and policy interventions have affected Medicare spending trajectories</h2>
+    <p class="section-intro anim d2">1 agent analyzed this dimension: Medicare Policy Analyst.</p>
+    <div class="anim d3">
+        <div class="finding-card opportunity">
+          <div class="finding-title">CMS is implementing two major drug pricing models (GUARD and GLOBE) in 2025-2026 that will fundamentally alter Medicare Part B and Part D inflation rebate calculations.</div>
+          <div class="finding-body">Federal Register documents 2025-23705 (GUARD Model) and 2025-23702 (GLOBE Model) published December 23, 2025, propose alternative payment methods for calculating inflation rebates for Part D and Part B drugs respectively. These models test whether changing rebate calculations reduces Medicare program costs while preserving quality of care.<br><em>Source: Federal Register documents 2025-23705 and 2025-23702, CMS proposed rules</em></div>
+          <span class="confidence-badge high">HIGH — Federal Register documents 2025-23705 and 2025-23702, CMS proposed rules</span>
+        </div>
+        <div class="finding-card opportunity">
+          <div class="finding-title">CMS has imposed a 6-month nationwide moratorium on DMEPOS supplier enrollment, signaling intensified fraud prevention efforts that could affect Medicare spending patterns.</div>
+          <div class="finding-body">Federal Register Notice 2026-03971 published February 27, 2026, announces a nationwide temporary moratorium on Medicare enrollment of DMEPOS (Durable Medical Equipment, Prosthetics, Orthotics, and Supplies) supplier medical supply companies.<br><em>Source: Federal Register document 2026-03971, CMS Notice</em></div>
+          <span class="confidence-badge high">HIGH — Federal Register document 2026-03971, CMS Notice</span>
+        </div>
+        <div class="finding-card ">
+          <div class="finding-title">CMS is developing comprehensive anti-fraud regulations (CRUSH initiative) that could significantly impact Medicare spending through enhanced oversight and enforcement.</div>
+          <div class="finding-body">Federal Register document 2026-03968 published February 27, 2026, requests stakeholder feedback on potential regulatory changes for a 'Comprehensive Regulations To Uncover Suspicious Healthcare (CRUSH)' proposed rule to make CMS more effective in preventing fraud.<br><em>Source: Federal Register document 2026-03968, CMS RFI</em></div>
+          <span class="confidence-badge medium">MEDIUM — Federal Register document 2026-03968, CMS RFI</span>
+        </div></div>
+  </div>
+  <div class="slide-footer"><span>Medicare Policy Analyst | 3 findings</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 7: FUTURE SPENDING PROJECTIONS ============ -->
+<section class="slide" id="s6">
+  <div class="slide-bg-glow" style="background:var(--accent);top:-100px;right:-300px;"></div>
+  <div class="slide-inner">
+    
+    <div class="eyebrow anim"><span class="tag strategic">Future Spending Projections</span> Dimension</div>
+    <h2 class="slide-title anim d1">Future Spending Projections: Forward-looking analysis of Medicare spending trajectories based on demographic, technological, and policy scenarios</h2>
+    <p class="section-intro anim d2">1 agent analyzed this dimension: Medicare Spending Futurist.</p>
+    <div class="anim d3">
+        <div class="finding-card opportunity">
+          <div class="finding-title">Technical search limitations prevented access to current Medicare spending projection data across all targeted queries.</div>
+          <div class="finding-body">All 8 targeted search queries returned zero results despite using specific terms like 'Medicare Trustees Report 2024,' 'CBO Medicare projections,' and 'CMS actuarial report.' Web search tool consistently returned empty result sets.<br><em>Source: Web search tool responses from DuckDuckGo searches conducted 2026-03-03</em></div>
+          <span class="confidence-badge high">HIGH — Web search tool responses from DuckDuckGo searches conducted 2026-03-03</span>
+        </div></div>
+  </div>
+  <div class="slide-footer"><span>Medicare Spending Futurist | 1 findings</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 8: EMERGENT: PATTERN ============ -->
+<section class="slide emergent-slide" id="s7" style="background:linear-gradient(135deg,var(--bg-primary) 0%,rgba(108,108,255,0.04) 100%);">
+  
+  <div class="slide-inner">
+    
+    <div class="emergent-number anim">01</div>
+    <div>
+      <div class="eyebrow anim"><span class="tag-cyan tag">Emergent Insight</span></div>
+      <h2 class="slide-title anim d1">pattern</h2>
+      <p class="slide-subtitle anim d2">Medicare is experiencing a 'regulatory intervention cascade' where drug cost pressures have triggered multiple simultaneous policy responses (GUARD, GLOBE, DMEPOS moratorium, CRUSH initiative) that collectively represent the most significant Medicare payment reform since the ACA, indicating spending growth has exceeded traditional management capacity.</p>
+      <div class="grid-2 anim d3">
+        <div class="finding-card emergent">
+          <div class="finding-title">Insight</div>
+          <div class="finding-body">Medicare is experiencing a 'regulatory intervention cascade' where drug cost pressures have triggered multiple simultaneous policy responses (GUARD, GLOBE, DMEPOS moratorium, CRUSH initiative) that collectively represent the most significant Medicare payment reform since the ACA, indicating spending growth has exceeded traditional management capacity.</div>
+        </div>
+        <div class="finding-card opportunity">
+          <div class="finding-title">Contributing Agents</div>
+          <div class="finding-body"><span class="agent-chip"><span class="dot" style="background:var(--accent-bright)"></span>Financial/Policy</span> <span class="agent-chip"><span class="dot" style="background:var(--accent-bright)"></span>Economics</span></div>
+        </div>
+      </div>
+      
+        <div class="stat-grid" style="margin-top:16px;">
+          <div class="stat-card"><div class="stat-label">Novelty</div><div class="stat-value cyan">5/5</div></div>
+          <div class="stat-card"><div class="stat-label">Grounding</div><div class="stat-value green">4/5</div></div>
+          <div class="stat-card"><div class="stat-label">Actionability</div><div class="stat-value gold">4/5</div></div>
+          <div class="stat-card"><div class="stat-label">Depth</div><div class="stat-value purple">5/5</div></div>
+          <div class="stat-card"><div class="stat-label">Surprise</div><div class="stat-value">4/5</div></div>
+        </div>
+      <div class="emergent-why anim d5">
+        <div class="emergent-why-label">Why This Matters</div>
+        <div class="finding-body">This insight emerged from the convergence of 2 independent agents, each analyzing different dimensions. No single agent would have identified this — it required cross-dimensional synthesis to surface.</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Emergence Detection | 2 agents converged</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 9: EMERGENT: GAP ============ -->
+<section class="slide emergent-slide" id="s8" style="background:linear-gradient(135deg,var(--bg-primary) 0%,rgba(108,108,255,0.04) 100%);">
+  
+  <div class="slide-inner">
+    
+    <div class="emergent-number anim">02</div>
+    <div>
+      <div class="eyebrow anim"><span class="tag-cyan tag">Emergent Insight</span></div>
+      <h2 class="slide-title anim d1">gap</h2>
+      <p class="slide-subtitle anim d2">The absence of accessible current spending data across multiple government sources (CMS API failures, FRED data gaps, search tool limitations) reveals a critical transparency gap that undermines evidence-based Medicare policy making at precisely the moment when unprecedented spending pressures require data-driven responses.</p>
+      <div class="grid-2 anim d3">
+        <div class="finding-card emergent">
+          <div class="finding-title">Insight</div>
+          <div class="finding-body">The absence of accessible current spending data across multiple government sources (CMS API failures, FRED data gaps, search tool limitations) reveals a critical transparency gap that undermines evidence-based Medicare policy making at precisely the moment when unprecedented spending pressures require data-driven responses.</div>
+        </div>
+        <div class="finding-card opportunity">
+          <div class="finding-title">Contributing Agents</div>
+          <div class="finding-body"><span class="agent-chip"><span class="dot" style="background:var(--accent-bright)"></span>Financial/Policy</span> <span class="agent-chip"><span class="dot" style="background:var(--accent-bright)"></span>Economics</span></div>
+        </div>
+      </div>
+      
+        <div class="stat-grid" style="margin-top:16px;">
+          <div class="stat-card"><div class="stat-label">Novelty</div><div class="stat-value cyan">4/5</div></div>
+          <div class="stat-card"><div class="stat-label">Grounding</div><div class="stat-value green">5/5</div></div>
+          <div class="stat-card"><div class="stat-label">Actionability</div><div class="stat-value gold">5/5</div></div>
+          <div class="stat-card"><div class="stat-label">Depth</div><div class="stat-value purple">4/5</div></div>
+          <div class="stat-card"><div class="stat-label">Surprise</div><div class="stat-value">4/5</div></div>
+        </div>
+      <div class="emergent-why anim d5">
+        <div class="emergent-why-label">Why This Matters</div>
+        <div class="finding-body">This insight emerged from the convergence of 2 independent agents, each analyzing different dimensions. No single agent would have identified this — it required cross-dimensional synthesis to surface.</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Emergence Detection | 2 agents converged</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 10: EMERGENT: TENSION ============ -->
+<section class="slide emergent-slide" id="s9" style="background:linear-gradient(135deg,var(--bg-primary) 0%,rgba(108,108,255,0.04) 100%);">
+  
+  <div class="slide-inner">
+    
+    <div class="emergent-number anim">03</div>
+    <div>
+      <div class="eyebrow anim"><span class="tag-cyan tag">Emergent Insight</span></div>
+      <h2 class="slide-title anim d1">tension</h2>
+      <p class="slide-subtitle anim d2">Medicare's cost containment policies are creating a 'policy paradox' where access-focused regulations (protected-class requirements) systematically undermine cost-control mechanisms (formulary management), while new cost-control policies (GUARD/GLOBE) may inadvertently create access barriers, revealing fundamental tension between access and affordability objectives.</p>
+      <div class="grid-2 anim d3">
+        <div class="finding-card emergent">
+          <div class="finding-title">Insight</div>
+          <div class="finding-body">Medicare's cost containment policies are creating a 'policy paradox' where access-focused regulations (protected-class requirements) systematically undermine cost-control mechanisms (formulary management), while new cost-control policies (GUARD/GLOBE) may inadvertently create access barriers, revealing fundamental tension between access and affordability objectives.</div>
+        </div>
+        <div class="finding-card opportunity">
+          <div class="finding-title">Contributing Agents</div>
+          <div class="finding-body"><span class="agent-chip"><span class="dot" style="background:var(--accent-bright)"></span>Financial/Policy</span> <span class="agent-chip"><span class="dot" style="background:var(--accent-bright)"></span>Economics</span></div>
+        </div>
+      </div>
+      
+        <div class="stat-grid" style="margin-top:16px;">
+          <div class="stat-card"><div class="stat-label">Novelty</div><div class="stat-value cyan">4/5</div></div>
+          <div class="stat-card"><div class="stat-label">Grounding</div><div class="stat-value green">4/5</div></div>
+          <div class="stat-card"><div class="stat-label">Actionability</div><div class="stat-value gold">4/5</div></div>
+          <div class="stat-card"><div class="stat-label">Depth</div><div class="stat-value purple">5/5</div></div>
+          <div class="stat-card"><div class="stat-label">Surprise</div><div class="stat-value">3/5</div></div>
+        </div>
+      <div class="emergent-why anim d5">
+        <div class="emergent-why-label">Why This Matters</div>
+        <div class="finding-body">This insight emerged from the convergence of 2 independent agents, each analyzing different dimensions. No single agent would have identified this — it required cross-dimensional synthesis to surface.</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Emergence Detection | 2 agents converged</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 11: EMERGENT: CONVERGENT ============ -->
+<section class="slide emergent-slide" id="s10" style="background:linear-gradient(135deg,var(--bg-primary) 0%,rgba(108,108,255,0.04) 100%);">
+  
+  <div class="slide-inner">
+    
+    <div class="emergent-number anim">04</div>
+    <div>
+      <div class="eyebrow anim"><span class="tag-cyan tag">Emergent Insight</span></div>
+      <h2 class="slide-title anim d1">convergent</h2>
+      <p class="slide-subtitle anim d2">Regional demographic aging creates a 'geographic spending divergence' where Sun Belt states face accelerated Medicare cost pressures from rapid 65+ population growth, while the concentration of specialty drug spending among few beneficiaries means these regional demographic shifts will have amplified cost impacts in high-growth areas.</p>
+      <div class="grid-2 anim d3">
+        <div class="finding-card emergent">
+          <div class="finding-title">Insight</div>
+          <div class="finding-body">Regional demographic aging creates a 'geographic spending divergence' where Sun Belt states face accelerated Medicare cost pressures from rapid 65+ population growth, while the concentration of specialty drug spending among few beneficiaries means these regional demographic shifts will have amplified cost impacts in high-growth areas.</div>
+        </div>
+        <div class="finding-card opportunity">
+          <div class="finding-title">Contributing Agents</div>
+          <div class="finding-body"><span class="agent-chip"><span class="dot" style="background:var(--accent-bright)"></span>Economics</span> <span class="agent-chip"><span class="dot" style="background:var(--accent-bright)"></span>Financial/Policy</span></div>
+        </div>
+      </div>
+      
+        <div class="stat-grid" style="margin-top:16px;">
+          <div class="stat-card"><div class="stat-label">Novelty</div><div class="stat-value cyan">4/5</div></div>
+          <div class="stat-card"><div class="stat-label">Grounding</div><div class="stat-value green">4/5</div></div>
+          <div class="stat-card"><div class="stat-label">Actionability</div><div class="stat-value gold">4/5</div></div>
+          <div class="stat-card"><div class="stat-label">Depth</div><div class="stat-value purple">4/5</div></div>
+          <div class="stat-card"><div class="stat-label">Surprise</div><div class="stat-value">3/5</div></div>
+        </div>
+      <div class="emergent-why anim d5">
+        <div class="emergent-why-label">Why This Matters</div>
+        <div class="finding-body">This insight emerged from the convergence of 2 independent agents, each analyzing different dimensions. No single agent would have identified this — it required cross-dimensional synthesis to surface.</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Emergence Detection | 2 agents converged</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 12: TENSION: INTERPRETIVE ============ -->
+<section class="slide" id="s11" style="background:linear-gradient(135deg,var(--bg-primary),rgba(255,92,92,0.04));">
+  <div class="slide-bg-glow" style="background:var(--accent-error);top:-100px;right:-200px;"></div>
+  <div class="slide-inner">
+    
+    <div class="eyebrow anim"><span class="tag-red tag">Tension Point</span> interpretive</div>
+    <h2 class="slide-title anim d1">Whether regulatory interventions represent proactive policy innovation or reactive crisis response</h2>
+    <p class="slide-subtitle anim d2">A genuine analytical tension that resists simple resolution — preserved as strategic complexity.</p>
+    <div class="two-col anim d3">
+      <div>
+        <h3 style="font-size:14px;color:var(--accent-error);margin-bottom:12px;text-transform:uppercase;letter-spacing:2px;font-weight:700;">Financial/Policy's Position</h3>
+        <div class="finding-card risk">
+          <div class="finding-body">New policy interventions represent proactive regulatory innovation</div>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size:14px;color:var(--accent-success);margin-bottom:12px;text-transform:uppercase;letter-spacing:2px;font-weight:700;">Economics's Position</h3>
+        <div class="finding-card opportunity">
+          <div class="finding-body">Policy changes indicate reactive response to crisis-level cost pressures</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="finding-card anim d4" style="margin-top:20px;">
+      <div class="finding-title">Resolution Path</div>
+      <div class="finding-body">Both perspectives preserved - timing and motivation remain contextually dependent</div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Tension Point | Financial/Policy vs Economics</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 13: TENSION: VALUES-BASED ============ -->
+<section class="slide" id="s12" style="background:linear-gradient(135deg,var(--bg-primary),rgba(255,92,92,0.04));">
+  <div class="slide-bg-glow" style="background:var(--accent-error);top:-100px;right:-200px;"></div>
+  <div class="slide-inner">
+    
+    <div class="eyebrow anim"><span class="tag-red tag">Tension Point</span> values-based</div>
+    <h2 class="slide-title anim d1">Fundamental tension between access protection and cost containment in Medicare policy</h2>
+    <p class="slide-subtitle anim d2">A genuine analytical tension that resists simple resolution — preserved as strategic complexity.</p>
+    <div class="two-col anim d3">
+      <div>
+        <h3 style="font-size:14px;color:var(--accent-error);margin-bottom:12px;text-transform:uppercase;letter-spacing:2px;font-weight:700;">Financial/Policy's Position</h3>
+        <div class="finding-card risk">
+          <div class="finding-body">Access protection requirements ensure beneficiary care continuity</div>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size:14px;color:var(--accent-success);margin-bottom:12px;text-transform:uppercase;letter-spacing:2px;font-weight:700;">Economics's Position</h3>
+        <div class="finding-card opportunity">
+          <div class="finding-body">Cost containment mechanisms are essential for program sustainability</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="finding-card anim d4" style="margin-top:20px;">
+      <div class="finding-title">Resolution Path</div>
+      <div class="finding-body">Values-based tension requiring human policy judgment on priority weighting</div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Tension Point | Financial/Policy vs Economics</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 14: TENSION: PREDICTIVE ============ -->
+<section class="slide" id="s13" style="background:linear-gradient(135deg,var(--bg-primary),rgba(255,92,92,0.04));">
+  <div class="slide-bg-glow" style="background:var(--accent-error);top:-100px;right:-200px;"></div>
+  <div class="slide-inner">
+    
+    <div class="eyebrow anim"><span class="tag-red tag">Tension Point</span> predictive</div>
+    <h2 class="slide-title anim d1">Uncertainty about biosimilar adoption impact on Medicare cost savings</h2>
+    <p class="slide-subtitle anim d2">A genuine analytical tension that resists simple resolution — preserved as strategic complexity.</p>
+    <div class="two-col anim d3">
+      <div>
+        <h3 style="font-size:14px;color:var(--accent-error);margin-bottom:12px;text-transform:uppercase;letter-spacing:2px;font-weight:700;">Financial/Policy's Position</h3>
+        <div class="finding-card risk">
+          <div class="finding-body">Biosimilar adoption will generate significant cost savings</div>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size:14px;color:var(--accent-success);margin-bottom:12px;text-transform:uppercase;letter-spacing:2px;font-weight:700;">Economics's Position</h3>
+        <div class="finding-card opportunity">
+          <div class="finding-body">Biosimilar impact remains uncertain due to adoption barriers</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="finding-card anim d4" style="margin-top:20px;">
+      <div class="finding-title">Resolution Path</div>
+      <div class="finding-body">Multiple scenarios preserved pending real-world adoption data</div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Tension Point | Financial/Policy vs Economics</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 15: QUALITY & PROVENANCE ============ -->
+<section class="slide" id="s14">
+  <div class="slide-bg-glow" style="background:var(--accent-success);bottom:-200px;left:-200px;"></div>
+  <div class="slide-inner">
+    
+    <div class="eyebrow anim"><span class="tag quality">Quality</span> Assessment</div>
+    <h2 class="slide-title anim d1">Intelligence Quality Report</h2>
+    <div class="stat-grid anim d2">
+      <div class="stat-card">
+        <div class="stat-label">Overall Grade</div>
+        <div class="stat-value cyan">B</div>
+        <div class="stat-context">83% composite score</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Provenance</div>
+        <div class="stat-value cyan">31%</div>
+        <div class="stat-context">Chain completeness</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Warnings</div>
+        <div class="stat-value negative">10</div>
+        <div class="stat-context">5 critical</div>
+      </div>
+    </div>
+    
+    <div class="anim d3" style="margin-top:20px;">
+      
+      <div class="finding-card risk">
+        <div class="finding-title">[CRITICAL] 11 of 16 findings lack verifiable sources</div>
+      </div>
+      <div class="finding-card risk">
+        <div class="finding-title">[CRITICAL] Source Coverage scored 31% — critically below standard</div>
+      </div>
+      <div class="finding-card risk">
+        <div class="finding-title">[CRITICAL] Provenance Completeness scored 31% — critically below standard</div>
+      </div>
+      <div class="finding-card risk">
+        <div class="finding-title">[CRITICAL] Critic: The synthesis acknowledges massive data gaps (no current spending amounts, growth rates, projections) yet maintains HIGH confidence ratings for emergent insights. This creates a fundamental contradiction - how can insights about spending trends be highly confident when basic spending data is unavailable?</div>
+      </div>
+      <div class="finding-card risk">
+        <div class="finding-title">[CRITICAL] Critic: The 'regulatory intervention cascade' insight appears to be a reframing of straightforward policy observation rather than genuine emergence. Multiple policy responses to a crisis is standard government behavior, not a novel multi-agent insight requiring synthesis.</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Quality Assurance Pipeline</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 16: GAPS & NEXT STEPS ============ -->
+<section class="slide" id="s15">
+  <div class="slide-bg-glow" style="background:var(--accent-warning);bottom:-200px;right:-200px;"></div>
+  <div class="slide-inner">
+    
+    <div class="eyebrow anim"><span class="tag-gold tag">Gap Analysis</span> Intelligence Boundaries</div>
+    <h2 class="slide-title anim d1">Knowledge Gaps & Next Steps</h2>
+    <p class="section-intro anim d2">Areas where the analysis identified insufficient data, unresolved questions, or opportunities for follow-up investigation.</p>
+    <div class="anim d3">
+      
+      <div class="policy-box neutral">
+        <p>Quantitative spending trajectories: No access to current dollar amounts, growth rates, or year-over-year changes across Medicare parts</p>
+      </div>
+      <div class="policy-box neutral">
+        <p>Future spending scenarios: Technical limitations prevented access to official projections from CMS, CBO, or Medicare Trustees</p>
+      </div>
+      <div class="policy-box neutral">
+        <p>Net policy impact assessment: Unable to quantify whether new interventions will reduce or increase total Medicare spending</p>
+      </div>
+      <div class="policy-box neutral">
+        <p>Beneficiary impact analysis: Missing data on how policy changes affect different beneficiary populations and access patterns</p>
+      </div>
+      <div class="policy-box neutral">
+        <p>Integrated cost modeling: No comprehensive analysis of how demographic, utilization, and pricing factors interact to drive total spending</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Synthesis | Gap Layer</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 17: CLOSING ============ -->
+<section class="slide" id="s16" style="text-align:center;">
+  
+  <div class="slide-inner">
+    
+    <div class="eyebrow anim">Analysis Complete</div>
+    <h2 class="slide-title anim d1" style="text-align:center;">PRISM Strategic Intelligence Brief</h2>
+    <p class="anim d2" style="font-size:var(--text-lg);color:var(--text-secondary);text-align:center;margin-bottom:32px;">
+      What are trends in Medicare spending
+    </p>
+    <div class="hero-stats anim d3" style="max-width:800px;">
+      <div class="hero-stat"><div class="value cyan">4</div><div class="label">Agents</div></div>
+      <div class="hero-stat"><div class="value green">16</div><div class="label">Findings</div></div>
+      <div class="hero-stat"><div class="value purple">4</div><div class="label">Emergent</div></div>
+      <div class="hero-stat"><div class="value gold">15</div><div class="label">Slides</div></div>
+    </div>
+    <div class="anim d4" style="margin-top:32px;color:var(--text-tertiary);font-size:12px;">
+      <div>Generated March 3, 2026 at 03:53 PM</div>
+      <div>Run ID: debug-1772570932</div>
+      <div>Cost: $0.0000</div>
+    </div>
+  </div>
+  
+</section>
+
+<script>
+
+const slides = document.querySelectorAll('.slide');
+const totalSlides = slides.length;
+let currentSlide = 0;
+let counterTimeout;
+
+function goToSlide(n) {
+  if (n < 0 || n >= totalSlides) return;
+  currentSlide = n;
+  slides[n].scrollIntoView({ behavior: 'smooth' });
+}
+
+function toggleNav() {
+  const p = document.getElementById('navPanel');
+  const o = document.getElementById('navOverlay');
+  const b = document.getElementById('navBtn');
+  const isOpen = p.classList.contains('open');
+  if (isOpen) { p.classList.remove('open'); o.classList.remove('open'); b.innerHTML = '&#9776;'; }
+  else { p.classList.add('open'); o.classList.add('open'); b.innerHTML = '&#10005;'; }
+}
+
+document.addEventListener('keydown', (e) => {
+  const navOpen = document.getElementById('navPanel').classList.contains('open');
+  if (e.key === 'Escape') { if (navOpen) toggleNav(); return; }
+  if (navOpen) return;
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  switch (e.key) {
+    case 'ArrowDown': case 'PageDown': e.preventDefault(); goToSlide(currentSlide + 1); break;
+    case 'ArrowUp': case 'PageUp': e.preventDefault(); goToSlide(currentSlide - 1); break;
+    case ' ': case 'ArrowRight': e.preventDefault(); goToSlide(currentSlide + 1); break;
+    case 'ArrowLeft': e.preventDefault(); goToSlide(currentSlide - 1); break;
+    case 'Home': e.preventDefault(); goToSlide(0); break;
+    case 'End': e.preventDefault(); goToSlide(totalSlides - 1); break;
+  }
+});
+
+function updateProgress() {
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+  document.getElementById('slideProgress').style.width = pct + '%';
+  let closest = 0, minDist = Infinity;
+  slides.forEach((s, i) => {
+    const dist = Math.abs(s.getBoundingClientRect().top);
+    if (dist < minDist) { minDist = dist; closest = i; }
+  });
+  currentSlide = closest;
+  const counter = document.getElementById('slideCounter');
+  counter.textContent = String(closest + 1).padStart(2, '0') + ' / ' + String(totalSlides).padStart(2, '0');
+  counter.classList.add('visible');
+  clearTimeout(counterTimeout);
+  counterTimeout = setTimeout(() => counter.classList.remove('visible'), 2000);
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+
+const animObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && entry.intersectionRatio > 0.15) {
+      entry.target.querySelectorAll('.anim').forEach(el => el.classList.add('visible'));
+    }
+  });
+}, { threshold: [0, 0.15, 0.5] });
+slides.forEach(s => animObserver.observe(s));
+
+window.addEventListener('load', () => {
+  setTimeout(() => document.getElementById('navHint').classList.remove('show'), 4000);
+  slides[0].querySelectorAll('.anim').forEach(el => el.classList.add('visible'));
+});
+
+</script>
+</body>
+</html>

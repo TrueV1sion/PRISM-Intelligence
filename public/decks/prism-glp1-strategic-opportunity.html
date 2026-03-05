@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRISM Strategic Brief — GLP-1 Expanded Access: Strategic Opportunity Analysis</title>
+<style>
+:root {
+  --inov-navy: #003D79;
+  --inov-cerulean: #4E84C4;
+  --inov-sky: #59DDFD;
+  --inov-midnight: #001E3C;
+  --inov-jade: #00E49F;
+  --inov-sand: #F5E6BB;
+  --inov-violet: #6C6CFF;
+  --inov-cloud: #F4F0EA;
+  --bg-primary: #0a0b10;
+  --bg-secondary: #10121a;
+  --bg-tertiary: #181b26;
+  --bg-elevated: #1e2130;
+  --bg-card: rgba(30, 33, 48, 0.85);
+  --text-primary: #f0f2f8;
+  --text-secondary: #a0a8c0;
+  --text-tertiary: #5c6480;
+  --accent: #4E84C4;
+  --accent-bright: #59DDFD;
+  --accent-success: #00E49F;
+  --accent-warning: #F5E6BB;
+  --accent-error: #ff5c5c;
+  --accent-violet: #6C6CFF;
+  --border: rgba(78, 132, 196, 0.12);
+  --border-bright: rgba(89, 221, 253, 0.25);
+  --chart-1: #003D79; --chart-2: #4E84C4; --chart-3: #59DDFD;
+  --chart-4: #001E3C; --chart-5: #00E49F; --chart-6: #F5E6BB;
+  --chart-7: #6C6CFF; --chart-8: #F4F0EA;
+  --text-xs: clamp(0.65rem, 0.6rem + 0.2vw, 0.8rem);
+  --text-sm: clamp(0.8rem, 0.74rem + 0.3vw, 1rem);
+  --text-base: clamp(1rem, 0.92rem + 0.4vw, 1.2rem);
+  --text-lg: clamp(1.2rem, 1.1rem + 0.5vw, 1.5rem);
+  --text-xl: clamp(1.5rem, 1.35rem + 0.65vw, 1.9rem);
+  --text-2xl: clamp(1.9rem, 1.7rem + 0.85vw, 2.5rem);
+  --text-3xl: clamp(2.4rem, 2.1rem + 1.1vw, 3.2rem);
+  --text-hero: clamp(3.2rem, 2.8rem + 1.6vw, 4.5rem);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 200ms;
+  --dur-normal: 350ms;
+  --dur-slow: 600ms;
+  --dur-cinematic: 1000ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg-primary); color: var(--text-primary); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; line-height: 1.6; }
+html { scroll-snap-type: y mandatory; overflow-y: scroll; scroll-behavior: smooth; }
+.slide {
+  min-height: 100vh; scroll-snap-align: start;
+  display: flex; flex-direction: column; justify-content: center;
+  position: relative; padding: 3rem 5vw; overflow: hidden;
+}
+.slide-inner { max-width: 1200px; margin: 0 auto; width: 100%; position: relative; z-index: 2; }
+.slide-bg-glow {
+  position: absolute; width: 600px; height: 600px; border-radius: 50%;
+  filter: blur(120px); opacity: 0.08; z-index: 0; pointer-events: none;
+}
+/* Fixed UI */
+#slideProgress {
+  position: fixed; top: 0; left: 0; height: 3px;
+  background: linear-gradient(90deg, var(--inov-navy), var(--inov-cerulean), var(--inov-sky));
+  z-index: 100; transition: width 0.3s var(--ease-out-quart); width: 0%;
+}
+.prism-mark {
+  position: fixed; top: 1.5rem; left: 2rem;
+  font-size: var(--text-xs); font-weight: 700; letter-spacing: 0.25em;
+  color: var(--accent); z-index: 100; text-transform: uppercase;
+}
+.slide-counter {
+  position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
+  z-index: 1001; font-size: 11px; color: var(--text-tertiary);
+  letter-spacing: 2px; font-weight: 600;
+  background: rgba(10,11,16,0.85); padding: 4px 14px;
+  border-radius: 20px; border: 1px solid var(--border);
+  backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s;
+}
+.slide-counter.visible { opacity: 1; }
+.slide-nav-hint {
+  position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);
+  z-index: 1001; font-size: 10px; color: var(--text-tertiary);
+  letter-spacing: 1px; text-align: center; opacity: 0;
+  transition: opacity 1s; pointer-events: none;
+}
+.slide-nav-hint.show { opacity: 0.6; }
+/* Nav Panel */
+.nav-toggle {
+  position: fixed; top: 20px; right: 20px; z-index: 1000;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(78, 132, 196, 0.15); border: 1px solid rgba(78, 132, 196, 0.3);
+  color: var(--accent); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; backdrop-filter: blur(12px); transition: all 0.3s;
+}
+.nav-toggle:hover { background: rgba(78, 132, 196, 0.3); transform: scale(1.05); }
+.nav-panel {
+  position: fixed; top: 0; right: -340px; width: 320px; height: 100vh;
+  background: rgba(10, 11, 16, 0.97); border-left: 1px solid var(--border);
+  z-index: 999; transition: right 0.35s ease; overflow-y: auto;
+  padding: 70px 20px 30px; backdrop-filter: blur(20px);
+}
+.nav-panel.open { right: 0; }
+.nav-panel h3 {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 3px;
+  color: var(--accent); margin-bottom: 16px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--border);
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 8px; cursor: pointer;
+  transition: all 0.2s; text-decoration: none; margin-bottom: 2px;
+}
+.nav-item:hover { background: rgba(78, 132, 196, 0.1); }
+.nav-item .nav-num { font-size: 10px; color: var(--text-tertiary); min-width: 24px; font-weight: 700; }
+.nav-item .nav-label { font-size: 12.5px; color: var(--text-primary); font-weight: 500; }
+.nav-item .nav-tag { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-left: auto; }
+.nav-tag-key { color: var(--accent-warning); }
+.nav-tag-new { color: var(--accent-bright); }
+.nav-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 998; display: none; }
+.nav-overlay.open { display: block; }
+/* Animation */
+.anim {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity var(--dur-slow) var(--ease-out-expo), transform var(--dur-slow) var(--ease-out-expo);
+}
+.anim.visible { opacity: 1; transform: translateY(0); }
+.anim.d1 { transition-delay: 100ms; } .anim.d2 { transition-delay: 200ms; }
+.anim.d3 { transition-delay: 300ms; } .anim.d4 { transition-delay: 400ms; }
+.anim.d5 { transition-delay: 500ms; } .anim.d6 { transition-delay: 600ms; }
+.anim.d7 { transition-delay: 700ms; }
+/* Typography */
+.eyebrow { font-size: var(--text-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-tertiary); margin-bottom: 12px; }
+.slide-title {
+  font-size: var(--text-3xl); font-weight: 700; line-height: 1.15; margin-bottom: 16px;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-bright) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.slide-subtitle { font-size: var(--text-base); color: var(--text-secondary); max-width: 700px; margin-bottom: 28px; line-height: 1.7; }
+.section-intro { font-size: 13.5px; line-height: 1.7; max-width: 800px; margin-bottom: 20px; color: var(--text-secondary); }
+/* Tags */
+.tag {
+  display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 10px;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-right: 6px;
+}
+.tag.clinical { background: rgba(89,221,253,0.15); color: var(--accent-bright); }
+.tag.financial { background: rgba(0,228,159,0.15); color: var(--accent-success); }
+.tag.regulatory { background: rgba(255,92,92,0.15); color: var(--accent-error); }
+.tag.quality { background: rgba(108,108,255,0.15); color: var(--accent-violet); }
+.tag.strategic { background: rgba(78,132,196,0.15); color: var(--accent); }
+.tag.ma { background: rgba(249,115,22,0.15); color: #f97316; }
+.tag-red { background: rgba(255,92,92,0.15); color: var(--accent-error); }
+.tag-green { background: rgba(0,228,159,0.15); color: var(--accent-success); }
+.tag-blue { background: rgba(78,132,196,0.15); color: var(--accent); }
+.tag-orange { background: rgba(249,115,22,0.15); color: #f97316; }
+.tag-purple { background: rgba(108,108,255,0.15); color: var(--accent-violet); }
+.tag-gold { background: rgba(245,230,187,0.15); color: var(--accent-warning); }
+.tag-cyan { background: rgba(89,221,253,0.15); color: var(--accent-bright); }
+/* Stat Cards */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-top: 16px; }
+.stat-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px; text-align: center; transition: transform 0.2s;
+}
+.stat-card:hover { transform: translateY(-2px); }
+.stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-tertiary); margin-bottom: 6px; }
+.stat-value { font-size: 28px; font-weight: 800; color: var(--text-primary); }
+.stat-value.negative { color: var(--accent-error); }
+.stat-value.positive { color: var(--accent-success); }
+.stat-value.warn { color: var(--accent-warning); }
+.stat-context { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+/* Finding Cards */
+.finding-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+  border-radius: 0 12px 12px 0; padding: 16px 20px; margin: 10px 0;
+}
+.finding-card.emergent { border-left-color: var(--accent-bright); }
+.finding-card.risk { border-left-color: var(--accent-error); }
+.finding-card.opportunity { border-left-color: var(--accent-success); }
+.finding-title { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+.finding-body { font-size: 12.5px; color: var(--text-secondary); line-height: 1.65; }
+.confidence-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 9px;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 8px;
+}
+.confidence-badge.high { background: rgba(0,228,159,0.15); color: var(--accent-success); }
+.confidence-badge.medium { background: rgba(245,230,187,0.15); color: var(--accent-warning); }
+.confidence-badge.low { background: rgba(255,92,92,0.15); color: var(--accent-error); }
+/* Agent Chips */
+.agent-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(78,132,196,0.1); border: 1px solid rgba(78,132,196,0.25);
+  border-radius: 20px; padding: 4px 12px; font-size: 10.5px;
+  color: var(--text-secondary); margin: 3px;
+}
+.agent-chip .dot { width: 6px; height: 6px; border-radius: 50%; }
+/* Hero Stats */
+.hero-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; max-width: 1100px; margin: 0 auto; }
+.hero-stat {
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+  border-radius: 12px; padding: 22px 14px; text-align: center; transition: transform 0.2s;
+}
+.hero-stat:hover { transform: translateY(-2px); }
+.hero-stat .value { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
+.hero-stat .label { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1.5px; }
+/* Validation Box */
+.validation-box { display: flex; gap: 16px; max-width: 1100px; margin: 24px auto 0; text-align: left; }
+.validation-card {
+  flex: 1; background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px;
+}
+.validation-card h4 {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 2px;
+  color: var(--accent-success); margin-bottom: 8px; font-weight: 700;
+}
+.framework-card h4 { color: var(--accent-violet); }
+.val-row { display: flex; align-items: center; gap: 8px; margin: 4px 0; font-size: 11px; color: var(--text-secondary); }
+.val-icon { width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; }
+.val-icon.green { background: rgba(0,228,159,0.2); color: var(--accent-success); }
+.framework-visual { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.fw-node { background: rgba(108,108,255,0.1); border: 1px solid rgba(108,108,255,0.3); border-radius: 6px; padding: 3px 8px; font-size: 9px; color: var(--accent-violet); font-weight: 600; }
+.fw-arrow { color: var(--text-tertiary); font-size: 10px; }
+.fw-center { background: linear-gradient(135deg,rgba(108,108,255,0.2),rgba(78,132,196,0.2)); border: 1px solid rgba(108,108,255,0.4); border-radius: 8px; padding: 4px 12px; font-size: 10px; color: var(--text-primary); font-weight: 700; }
+/* Grids */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 16px; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-top: 16px; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+@media (max-width: 768px) { .two-col, .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } .hero-stats { grid-template-columns: repeat(2, 1fr); } }
+/* Tables */
+.prov-table { width: 100%; border-collapse: collapse; font-size: 11.5px; margin-top: 12px; }
+.prov-table th { text-align: left; padding: 8px 10px; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-tertiary); border-bottom: 1px solid var(--border); }
+.prov-table td { padding: 8px 10px; border-bottom: 1px solid rgba(78,132,196,0.06); color: var(--text-secondary); vertical-align: top; }
+.prov-table tr:hover td { background: rgba(78,132,196,0.04); }
+.compact-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; }
+.compact-table th { text-align: left; padding: 6px 8px; font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-tertiary); border-bottom: 1px solid var(--border); }
+.compact-table td { padding: 6px 8px; border-bottom: 1px solid rgba(78,132,196,0.06); color: var(--text-secondary); }
+/* Policy Box */
+.policy-box { background: rgba(255,92,92,0.05); border: 1px solid rgba(255,92,92,0.2); border-radius: 10px; padding: 12px 16px; margin: 6px 0; }
+.policy-box.positive { background: rgba(0,228,159,0.05); border-color: rgba(0,228,159,0.2); }
+.policy-box.neutral { background: rgba(78,132,196,0.05); border-color: rgba(78,132,196,0.2); }
+.policy-box h4 { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+.policy-box p { font-size: 11.5px; color: var(--text-secondary); line-height: 1.5; }
+.impact { display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600; margin-top: 5px; }
+.impact-severe { color: var(--accent-error); }
+.impact-moderate { color: var(--accent-warning); }
+.impact-positive { color: var(--accent-success); }
+.impact-neutral { color: var(--accent); }
+/* Emergence */
+.emergent-slide { background: linear-gradient(135deg, var(--bg-primary) 0%, rgba(108,108,255,0.04) 100%); }
+.emergent-number { font-size: 120px; font-weight: 900; color: rgba(89, 221, 253, 0.06); position: absolute; top: -20px; left: -10px; }
+.emergent-why { background: var(--bg-card); border: 1px solid var(--border-bright); border-radius: 12px; padding: 1.5rem; margin-top: 1.5rem; }
+.emergent-why-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-bright); margin-bottom: 8px; font-weight: 700; }
+.emergence-card { background: linear-gradient(135deg, rgba(108,108,255,0.08), rgba(78,132,196,0.08)); border: 1px solid rgba(108,108,255,0.3); border-radius: 14px; padding: 20px; margin: 8px 0; }
+.emergence-card h4 { color: var(--accent-violet); font-size: 15px; margin-bottom: 6px; }
+.emergence-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+/* Timeline */
+.timeline { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin-top: 20px; position: relative; }
+.timeline::before { content: ''; position: absolute; top: 15px; left: 5%; right: 5%; height: 3px; background: linear-gradient(90deg, var(--accent-error), var(--accent-warning), var(--accent-success)); border-radius: 2px; }
+.timeline-phase { text-align: center; padding: 0 12px; position: relative; z-index: 1; }
+.timeline-dot { width: 12px; height: 12px; border-radius: 50%; margin: 10px auto 12px; border: 2px solid var(--bg-primary); }
+.timeline-year { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+.timeline-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-tertiary); margin-bottom: 10px; }
+.timeline-items { font-size: 11.5px; color: var(--text-secondary); line-height: 1.8; text-align: left; padding: 0 6px; }
+.timeline-items div { margin-bottom: 4px; padding-left: 12px; position: relative; }
+.timeline-items div::before { content: '\2022'; position: absolute; left: 0; color: var(--text-tertiary); }
+/* Bars */
+.bar-row { margin: 8px 0; }
+.bar-label { font-size: 11px; color: var(--text-secondary); margin-bottom: 4px; display: flex; justify-content: space-between; }
+.bar-track { height: 24px; background: rgba(255,255,255,0.04); border-radius: 6px; overflow: hidden; position: relative; }
+.bar-fill { height: 100%; border-radius: 6px; transform-origin: left; transform: scaleX(0); transition: transform 0.8s var(--ease-out-expo); display: flex; align-items: center; padding-left: 8px; }
+.bar-fill.animate { transform: scaleX(1); }
+.bar-fill-value { font-size: 10px; font-weight: 700; color: white; white-space: nowrap; }
+/* Threat Meter */
+.threat-meter { display: flex; gap: 2px; align-items: center; }
+.threat-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.1); }
+.threat-dot.active-red { background: var(--accent-error); }
+.threat-dot.active-orange { background: #f97316; }
+.threat-dot.active-yellow { background: var(--accent-warning); }
+.threat-dot.active-green { background: var(--accent-success); }
+.threat-dot.active-blue { background: var(--accent); }
+/* Source */
+.source-unverified { color: var(--accent-warning); font-size: 0.75em; vertical-align: super; cursor: help; opacity: 0.85; }
+.dagger-footnote { position: absolute; bottom: 12px; left: 5vw; right: 5vw; font-size: 9px; color: var(--text-tertiary); font-style: italic; border-top: 1px solid var(--border); padding-top: 6px; }
+.source-list { margin-top: 8px; font-size: 9.5px; color: var(--text-tertiary); line-height: 1.8; }
+.source-list a { font-size: 9.5px; color: var(--accent); text-decoration: none; border-bottom: 1px dotted rgba(78,132,196,0.3); }
+/* Slide Footer */
+.slide-footer { position: absolute; bottom: 16px; left: 40px; right: 40px; display: flex; justify-content: space-between; font-size: 10px; color: var(--text-tertiary); border-top: 1px solid var(--border); padding-top: 8px; }
+/* Inovalon Header */
+.inovalon-header { background: linear-gradient(135deg, rgba(78,132,196,0.1), rgba(0,228,159,0.1)); border: 1px solid rgba(78,132,196,0.2); border-radius: 14px; padding: 20px; margin-bottom: 16px; text-align: center; }
+.inovalon-header h3 { color: var(--accent); margin-bottom: 4px; font-size: 18px; }
+.inovalon-header p { font-size: 12px; color: var(--text-secondary); }
+/* TOC */
+.toc-group-header { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); color: var(--text-tertiary); }
+.toc-item { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; }
+/* Misc */
+.highlight { color: var(--text-primary); font-weight: 600; }
+.red { color: var(--accent-error); } .green { color: var(--accent-success); } .blue { color: var(--accent); }
+.purple { color: var(--accent-violet); } .gold { color: var(--accent-warning); } .cyan { color: var(--accent-bright); }
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-bright); }
+/* Target row */
+.target-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin: 6px 0; }
+.target-card h4 { font-size: 13px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.target-card p { font-size: 11.5px; color: var(--text-secondary); line-height: 1.5; }
+.target-meta { display: flex; gap: 12px; margin-top: 6px; font-size: 10px; }
+.target-meta span { display: flex; align-items: center; gap: 4px; }
+/* Quote */
+.quote-block { border-left: 3px solid var(--accent-warning); padding: 10px 18px; margin: 10px 0; background: rgba(245,230,187,0.05); border-radius: 0 8px 8px 0; font-style: italic; color: var(--text-primary); font-size: 14px; }
+.quote-attr { font-style: normal; font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<!-- Fixed UI -->
+<div id="slideProgress"></div>
+<div class="prism-mark">PRISM Intelligence</div>
+<div class="slide-counter" id="slideCounter">01 / 18</div>
+<div class="slide-nav-hint show" id="navHint">&#8595; Arrow Down / Spacebar to navigate &#8595;</div>
+
+<!-- Nav Toggle -->
+<button class="nav-toggle" onclick="toggleNav()" id="navBtn" title="Table of Contents">&#9776;</button>
+<div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+<div class="nav-panel" id="navPanel">
+  <h3>Table of Contents</h3>
+  <a class="nav-item" href="#s1" onclick="toggleNav()"><span class="nav-num">01</span><span class="nav-label">Title</span></a>
+  <a class="nav-item" href="#s2" onclick="toggleNav()"><span class="nav-num">02</span><span class="nav-label">Intelligence Map</span></a>
+  <a class="nav-item" href="#s3" onclick="toggleNav()"><span class="nav-num">03</span><span class="nav-label">Executive Summary</span></a>
+  <a class="nav-item" href="#s4" onclick="toggleNav()"><span class="nav-num">04</span><span class="nav-label">Clinical Candidacy</span></a>
+  <a class="nav-item" href="#s5" onclick="toggleNav()"><span class="nav-num">05</span><span class="nav-label">Adherence Intelligence</span></a>
+  <a class="nav-item" href="#s6" onclick="toggleNav()"><span class="nav-num">06</span><span class="nav-label">Product-Market Fit</span></a>
+  <a class="nav-item" href="#s7" onclick="toggleNav()"><span class="nav-num">07</span><span class="nav-label">M&amp;A Targets</span></a>
+  <a class="nav-item" href="#s8" onclick="toggleNav()"><span class="nav-num">08</span><span class="nav-label">Disease Burden Cascade</span></a>
+  <a class="nav-item" href="#s9" onclick="toggleNav()"><span class="nav-num">09</span><span class="nav-label">Risk Score Compression</span><span class="nav-tag nav-tag-key">KEY</span></a>
+  <a class="nav-item" href="#s10" onclick="toggleNav()"><span class="nav-num">10</span><span class="nav-label">The GLP-1 Paradox</span><span class="nav-tag nav-tag-key">KEY</span></a>
+  <a class="nav-item" href="#s11" onclick="toggleNav()"><span class="nav-num">11</span><span class="nav-label">Emergent: Rebound Data Vacuum</span><span class="nav-tag nav-tag-new">NEW</span></a>
+  <a class="nav-item" href="#s12" onclick="toggleNav()"><span class="nav-num">12</span><span class="nav-label">Emergent: PDC-HCC Offset</span><span class="nav-tag nav-tag-new">NEW</span></a>
+  <a class="nav-item" href="#s13" onclick="toggleNav()"><span class="nav-num">13</span><span class="nav-label">Emergent: M&amp;A Window</span><span class="nav-tag nav-tag-new">NEW</span></a>
+  <a class="nav-item" href="#s14" onclick="toggleNav()"><span class="nav-num">14</span><span class="nav-label">Strategic Timeline</span></a>
+  <a class="nav-item" href="#s15" onclick="toggleNav()"><span class="nav-num">15</span><span class="nav-label">Inovalon Opportunity Map</span></a>
+  <a class="nav-item" href="#s16" onclick="toggleNav()"><span class="nav-num">16</span><span class="nav-label">Provenance &amp; Confidence</span></a>
+  <a class="nav-item" href="#s17" onclick="toggleNav()"><span class="nav-num">17</span><span class="nav-label">Gaps &amp; Next Steps</span></a>
+  <a class="nav-item" href="#s18" onclick="toggleNav()"><span class="nav-num">18</span><span class="nav-label">Appendix: M&amp;A Targets</span></a>
+</div>
+
+<!-- ============ SLIDE 1: TITLE ============ -->
+<section class="slide" id="s1" style="text-align:center;">
+  <div class="slide-bg-glow" style="background:var(--inov-cerulean);top:-200px;right:-200px;"></div>
+  <div class="slide-bg-glow" style="background:var(--inov-violet);bottom:-200px;left:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim">PRISM Multi-Agent Strategic Brief</div>
+    <h1 class="anim d1" style="font-size:var(--text-hero);font-weight:800;line-height:1.1;background:linear-gradient(135deg,var(--text-primary) 0%,var(--accent-bright) 50%,var(--accent-success) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px;">
+      GLP-1 Expanded Access<br>Strategic Opportunity Analysis
+    </h1>
+    <p class="anim d2" style="font-size:var(--text-lg);color:var(--text-secondary);max-width:800px;margin:0 auto 32px;">
+      Inovalon analytics positioning, M&amp;A targets, and downstream impact modeling<br>for the post-BALANCE Medicare landscape
+    </p>
+    <div class="anim d3" style="margin-bottom:28px;">
+      <span class="agent-chip"><span class="dot" style="background:var(--accent-bright)"></span> Clinical Intelligence</span>
+      <span class="agent-chip"><span class="dot" style="background:var(--accent-success)"></span> Product-Market Strategist</span>
+      <span class="agent-chip"><span class="dot" style="background:#f97316"></span> M&amp;A Scanner</span>
+      <span class="agent-chip"><span class="dot" style="background:var(--accent-error)"></span> Disease Burden Modeler</span>
+      <span class="agent-chip"><span class="dot" style="background:var(--accent-violet)"></span> Risk/Quality Analyst</span>
+      <span class="agent-chip"><span class="dot" style="background:var(--accent-warning)"></span> Factual Verifier</span>
+    </div>
+    <div class="hero-stats anim d4">
+      <div class="hero-stat"><div class="value green">$180-300M</div><div class="label">GLP-1 Analytics TAM<span class="source-unverified" title="Analyst projection, not published research">†</span></div></div>
+      <div class="hero-stat"><div class="value cyan">6</div><div class="label">Parallel Agents</div></div>
+      <div class="hero-stat"><div class="value purple">3</div><div class="label">Emergent Insights</div></div>
+      <div class="hero-stat"><div class="value gold">10</div><div class="label">M&amp;A Targets Profiled</div></div>
+      <div class="hero-stat"><div class="value red">July 2026</div><div class="label">BALANCE Demo Launch</div></div>
+    </div>
+    <div class="validation-box anim d5">
+      <div class="validation-card">
+        <h4>&#10003; Validation Methodology</h4>
+        <div class="val-row"><span class="val-icon green">&#10003;</span> 10 claims verified against primary sources</div>
+        <div class="val-row"><span class="val-icon green">&#10003;</span> 6/10 confirmed HIGH confidence (NEJM, CMS.gov)</div>
+        <div class="val-row"><span class="val-icon green">&#10003;</span> 4 claims flagged with dagger (&#8224;) notation</div>
+      </div>
+      <div class="validation-card framework-card">
+        <h4>&#9670; PRISM Processing Framework</h4>
+        <div class="framework-visual">
+          <span class="fw-node">Clinical Intel</span>
+          <span class="fw-node">Product-Mkt</span>
+          <span class="fw-node">M&amp;A Scanner</span>
+          <span class="fw-node">Burden Model</span>
+          <span class="fw-node">Risk/Quality</span>
+          <span class="fw-arrow">&#8594;</span>
+          <span class="fw-center">Cross-Agent Synthesis</span>
+          <span class="fw-arrow">&#8594;</span>
+          <span class="fw-node" style="border-color:rgba(0,228,159,0.4);color:var(--accent-success)">Emergence Detection</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>February 26, 2026 | PRISM v3.0 | STANDARD+ Tier</span><span>Complementary to SOTU Healthcare Impact Brief v5</span></div>
+</section>
+
+<!-- ============ SLIDE 2: TOC ============ -->
+<section class="slide" id="s2" style="background:linear-gradient(135deg,var(--bg-primary),var(--bg-secondary))">
+  <div class="slide-inner">
+    <h2 class="slide-title anim">Executive <span style="-webkit-text-fill-color:var(--accent)">Intelligence Map</span></h2>
+    <p class="section-intro anim d1">18-slide analysis spanning clinical candidacy, product-market fit, M&amp;A targets, disease burden modeling, risk score impact, and three emergent strategic insights.</p>
+    <div class="grid-3 anim d2">
+      <div>
+        <h3 class="toc-group-header" style="color:var(--accent-bright)">Clinical &amp; Market</h3>
+        <a class="nav-item toc-item" href="#s3"><span class="nav-num">03</span><span class="nav-label">Executive Summary</span></a>
+        <a class="nav-item toc-item" href="#s4"><span class="nav-num">04</span><span class="nav-label">Clinical Candidacy</span></a>
+        <a class="nav-item toc-item" href="#s5"><span class="nav-num">05</span><span class="nav-label">Adherence Intelligence</span></a>
+        <a class="nav-item toc-item" href="#s6"><span class="nav-num">06</span><span class="nav-label">Product-Market Fit</span></a>
+        <a class="nav-item toc-item" href="#s7"><span class="nav-num">07</span><span class="nav-label">M&amp;A Targets</span></a>
+      </div>
+      <div>
+        <h3 class="toc-group-header" style="color:var(--accent-error)">Impact Modeling</h3>
+        <a class="nav-item toc-item" href="#s8"><span class="nav-num">08</span><span class="nav-label">Disease Burden Cascade</span></a>
+        <a class="nav-item toc-item" href="#s9"><span class="nav-num">09</span><span class="nav-label">Risk Score Compression</span></a>
+        <a class="nav-item toc-item" href="#s10"><span class="nav-num">10</span><span class="nav-label">The GLP-1 Paradox</span></a>
+      </div>
+      <div>
+        <h3 class="toc-group-header" style="color:var(--accent-violet)">Synthesis &amp; Strategy</h3>
+        <a class="nav-item toc-item" href="#s11"><span class="nav-num">11</span><span class="nav-label">Emergent: Rebound Data Vacuum</span></a>
+        <a class="nav-item toc-item" href="#s12"><span class="nav-num">12</span><span class="nav-label">Emergent: PDC-HCC Offset</span></a>
+        <a class="nav-item toc-item" href="#s13"><span class="nav-num">13</span><span class="nav-label">Emergent: M&amp;A Window</span></a>
+        <a class="nav-item toc-item" href="#s14"><span class="nav-num">14</span><span class="nav-label">Strategic Timeline</span></a>
+        <a class="nav-item toc-item" href="#s15"><span class="nav-num">15</span><span class="nav-label">Inovalon Opportunity Map</span></a>
+        <a class="nav-item toc-item" href="#s16"><span class="nav-num">16</span><span class="nav-label">Provenance &amp; Confidence</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 3: EXECUTIVE SUMMARY ============ -->
+<section class="slide" id="s3">
+  <div class="slide-bg-glow" style="background:var(--accent-success);top:-150px;left:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag strategic">Synthesis</span> Executive Summary</div>
+    <h2 class="slide-title anim d1">Four Strategic Truths the Swarm Uncovered</h2>
+    <p class="slide-subtitle anim d2">Multi-agent convergence across clinical, financial, quality, and M&amp;A dimensions reveals a time-bounded strategic opportunity for Inovalon.</p>
+    <div class="stat-grid anim d3">
+      <div class="stat-card">
+        <div class="stat-label">Adherence = Control Lever</div>
+        <div class="stat-value warn">3.1%</div>
+        <div class="stat-context">Hazard reduction per 1% early weight loss. Adherence determines ALL downstream economics.</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">The GLP-1 Paradox</div>
+        <div class="stat-value negative">$200-400M</div>
+        <div class="stat-context">Annual HCC revenue loss for a 500K-member MA plan as diagnoses resolve.</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Quality Offset</div>
+        <div class="stat-value positive">$165-330M</div>
+        <div class="stat-context">Quality Bonus Payment from +0.5 to +2.0 Star Rating improvement via PDC gains.</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">M&amp;A Window</div>
+        <div class="stat-value cyan">3-6 Mo</div>
+        <div class="stat-context">Pre-BALANCE acquisition sweet spot before GLP-1 data assets reprice upward.</div>
+      </div>
+    </div>
+    <div class="finding-card emergent anim d4" style="margin-top:20px;">
+      <div class="finding-title">Convergent Emergence: Data is the Moat</div>
+      <div class="finding-body">Across all 5 analytical dimensions, the competitive advantage resolves to the same principle: <span class="highlight">whoever accumulates the best longitudinal GLP-1 patient data first wins the analytics market.</span> Inovalon's 454M-life dataset is the starting advantage. The question is whether they build the analytics layer fast enough, or acquire the specialty data gaps to extend the moat.</div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>6 Agents | 4 Emergence Algorithms | Source-Validated</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 4: CLINICAL CANDIDACY ============ -->
+<section class="slide" id="s4">
+  <div class="slide-bg-glow" style="background:var(--accent-bright);top:-100px;right:-300px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag clinical">Clinical</span> Dimension</div>
+    <h2 class="slide-title anim d1">GLP-1 Candidate Identification: The Analytics Opportunity</h2>
+    <p class="section-intro anim d2">Clinical trials define clear patient stratification criteria. The analytics gap is translating trial eligibility into claims-based identification algorithms that health plans can operationalize at scale.</p>
+    <div class="two-col anim d3">
+      <div>
+        <div class="finding-card opportunity">
+          <div class="finding-title">BALANCE Model Eligibility (July 2026)</div>
+          <div class="finding-body">Medicare Part D beneficiaries with BMI &#8805;30 (or &#8805;27 with comorbidity). $50/month copay cap. Medicaid coverage begins May 2026. Full BALANCE model January 2027.</div>
+          <span class="confidence-badge high">High &#8212; CMS.gov Primary</span>
+        </div>
+        <div class="finding-card opportunity">
+          <div class="finding-title">SELECT Trial Stratum: Cardiovascular</div>
+          <div class="finding-body">Age &#8805;45, BMI &#8805;27, established CVD, no diabetes. 20% MACE reduction with semaglutide 2.4mg (N=17,604, mean 33 months).</div>
+          <span class="confidence-badge high">High &#8212; NEJM</span>
+        </div>
+      </div>
+      <div>
+        <div class="finding-card opportunity">
+          <div class="finding-title">FLOW Trial Stratum: Renal</div>
+          <div class="finding-body">T2D + CKD (eGFR 25-75). 24% reduction in composite kidney endpoint. Trial stopped early for efficacy (N=3,533, median 3.4 years).</div>
+          <span class="confidence-badge high">High &#8212; NEJM</span>
+        </div>
+        <div class="finding-card">
+          <div class="finding-title">Weight-Loss-Dependent T2D Remission</div>
+          <div class="finding-body">Tirzepatide/semaglutide enable 15-25% weight loss. T2D remission rates are weight-loss dependent, with studies showing 27-46% achieving normoglycemia.<span class="source-unverified" title="Specific threshold percentages require primary source citation">&#8224;</span></div>
+          <span class="confidence-badge medium">Medium &#8212; Multiple clinical trials</span>
+        </div>
+      </div>
+    </div>
+    <div class="inovalon-header anim d4">
+      <h3>4 Priority Analytics Products Identified</h3>
+      <p>Candidate Stratification Engine &bull; Adherence Prediction Model &bull; Comorbidity Resolution Tracker &bull; Risk Score Impact Forecaster</p>
+    </div>
+  </div>
+  <div class="dagger-footnote">&#8224; Source: clinical trial data — specific remission rate thresholds (48.4%, 69.3%) require primary source verification</div>
+  <div class="slide-footer"><span>Clinical Intelligence Agent | 10 findings | Confidence: 0.87</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 5: ADHERENCE INTELLIGENCE ============ -->
+<section class="slide" id="s5">
+  <div class="slide-bg-glow" style="background:var(--accent-warning);bottom:-200px;left:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag clinical">Clinical</span> Adherence Analytics</div>
+    <h2 class="slide-title anim d1">Adherence Is the Control Lever for Everything</h2>
+    <p class="section-intro anim d2">Four independent agents converged on the same conclusion: GLP-1 adherence determines disease burden trajectory, risk score impact, Star Rating gains, AND Inovalon's product-market fit. This is the single most important variable.</p>
+    <div class="stat-grid anim d3">
+      <div class="stat-card">
+        <div class="stat-label">12-Month Discontinuation</div>
+        <div class="stat-value negative">45-68%<span class="source-unverified" title="Range varies by population and setting">&#8224;</span></div>
+        <div class="stat-context">Depending on population and insurance type</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Early Weight Loss Predictor</div>
+        <div class="stat-value positive">3.1%</div>
+        <div class="stat-context">Lower discontinuation hazard per 1% body weight loss in first 12 weeks</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">GI AE Discontinuation Risk</div>
+        <div class="stat-value warn">HR 1.38</div>
+        <div class="stat-context">Primary modifiable barrier to persistence</div>
+      </div>
+    </div>
+    <div class="grid-2 anim d4">
+      <div class="finding-card risk">
+        <div class="finding-title">Financial Barriers Dominate Real-World Adherence</div>
+        <div class="finding-body">Medicare/Medicaid beneficiaries show 1.2-1.4x higher discontinuation rates than commercially insured. BALANCE model's $50/mo copay cap may partially address this, but co-pay alone doesn't explain the gap. Prior authorization burden and pharmacy access contribute.</div>
+        <span class="confidence-badge high">High &#8212; JMCP, JAMA Network Open</span>
+      </div>
+      <div class="finding-card opportunity">
+        <div class="finding-title">Semaglutide Superior Real-World Persistence</div>
+        <div class="finding-body">12-month persistence: semaglutide 47.1% vs. liraglutide 19.2%. Once-weekly dosing convenience is a key driver. Tirzepatide showing strong early persistence signals but limited long-term real-world data.</div>
+        <span class="confidence-badge high">High &#8212; Real-world pharmacy claims</span>
+      </div>
+    </div>
+    <div class="quote-block anim d5">
+      "T2D patients paradoxically show BETTER adherence than obesity-only populations — metabolic monitoring and provider follow-up create structured touchpoints that improve persistence."
+      <div class="quote-attr">&#8212; Cross-agent finding: Clinical + Risk/Quality convergence</div>
+    </div>
+  </div>
+  <div class="dagger-footnote">&#8224; 12-month discontinuation rates range from 45% (T2D commercial) to 68% (obesity, mixed payer). Studies: JMCP 2024, JAMA Network Open 2024.</div>
+  <div class="slide-footer"><span>Clinical Intelligence + Risk/Quality Agents | Convergent finding</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 6: PRODUCT-MARKET FIT ============ -->
+<section class="slide" id="s6">
+  <div class="slide-bg-glow" style="background:var(--accent-success);top:-200px;left:-300px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag strategic">Strategic</span> Inovalon Positioning</div>
+    <h2 class="slide-title anim d1">Product-Market Fit: The GLP-1 Analytics Platform</h2>
+    <p class="section-intro anim d2">Inovalon's converged platform (454M lives, 97B medical events) provides architectural advantage. The product gap is stratification + adherence economics, not claims visibility.</p>
+    <div class="grid-2 anim d3">
+      <div>
+        <div class="finding-card opportunity">
+          <div class="finding-title">TAM: $180-300M at 12-24 Month Horizon<span class="source-unverified" title="Analyst projection">&#8224;</span></div>
+          <div class="finding-body">Based on ~600 MA plans needing GLP-1 analytics, average contract value $300K-500K/year. MA plans represent HIGHEST urgency buyer persona — they face simultaneous V28 compression + GLP-1 HCC resolution.</div>
+          <span class="confidence-badge low">Low &#8212; Modeled projection</span>
+        </div>
+        <div class="finding-card">
+          <div class="finding-title">Build Wins Over Buy</div>
+          <div class="finding-body">6-month MVP leveraging existing platform. 12-month full product. Inovalon's data breadth means the core analytics layer should be built internally. Acquisitions should target specialty data gaps, not core capabilities.</div>
+          <span class="confidence-badge medium">Medium &#8212; Strategic analysis</span>
+        </div>
+      </div>
+      <div>
+        <div class="finding-card">
+          <div class="finding-title">Buyer Persona Priority</div>
+          <div class="finding-body">
+            <strong style="color:var(--accent-error)">&#9679; MA Plans:</strong> Highest urgency (V28 + GLP-1 double compression)<br>
+            <strong style="color:var(--accent-warning)">&#9679; PBMs:</strong> Formulary optimization + UM analytics<br>
+            <strong style="color:var(--accent)">&#9679; Pharma:</strong> Real-world evidence for label expansion<br>
+            <strong style="color:var(--accent-success)">&#9679; IDNs/ACOs:</strong> Population health stratification
+          </div>
+          <span class="confidence-badge medium">Medium &#8212; Market analysis</span>
+        </div>
+        <div class="finding-card">
+          <div class="finding-title">Competitive Positioning</div>
+          <div class="finding-body">vs. Optum: Modularity and speed (Optum slower due to UHG integration complexity). vs. Cotiviti: Broader clinical data. vs. Point solutions: Platform convergence advantage.</div>
+          <span class="confidence-badge medium">Medium &#8212; Competitive intelligence</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="dagger-footnote">&#8224; TAM estimate is a directional projection based on MA plan counts and comparable analytics contract values. No published market sizing study found.</div>
+  <div class="slide-footer"><span>Product-Market Strategist Agent | 6 findings | Confidence: 0.72</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 7: M&A TARGETS ============ -->
+<section class="slide" id="s7">
+  <div class="slide-bg-glow" style="background:#f97316;top:-200px;right:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag ma">M&amp;A</span> Acquisition Intelligence</div>
+    <h2 class="slide-title anim d1">Priority M&amp;A Targets: Building the Data Moat</h2>
+    <p class="section-intro anim d2">10 targets profiled across 4 acquisition categories. The unifying thesis: every target is valued for its DATA asset, not its technology. Acquire the data gaps, build the analytics layer.</p>
+    <div class="grid-2 anim d3">
+      <div>
+        <div class="target-card" style="border-left:3px solid var(--accent-error);">
+          <h4><span class="tag-red tag" style="font-size:8px;">CRITICAL</span> HealthVerity</h4>
+          <p>330M+ de-identified patient records. RWE platform with HIPAA-compliant data linkage. Tier-1 priority for real-world evidence capabilities.<span class="source-unverified" title="Valuation unverified">&#8224;</span></p>
+          <div class="target-meta"><span class="red">&#9679; 3-6 months</span><span>Strategy: ACQUIRE</span><span>Category: RWE Platform</span></div>
+        </div>
+        <div class="target-card" style="border-left:3px solid var(--accent-error);">
+          <h4><span class="tag-red tag" style="font-size:8px;">CRITICAL</span> Claritas Rx</h4>
+          <p>Specialty pharmacy analytics with deep GLP-1 dispensing data. Immediate gap-fill for pharmacy claims depth.</p>
+          <div class="target-meta"><span class="red">&#9679; 3-6 months</span><span>Strategy: ACQUIRE</span><span>Category: Pharmacy Data</span></div>
+        </div>
+        <div class="target-card" style="border-left:3px solid var(--accent-error);">
+          <h4><span class="tag-red tag" style="font-size:8px;">CRITICAL</span> Truveta</h4>
+          <p>Health system consortium generating de-identified EHR data at scale. Partnership model preferred given consortium governance.</p>
+          <div class="target-meta"><span class="gold">&#9679; 6-12 months</span><span>Strategy: PARTNERSHIP</span><span>Category: EHR Data</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="target-card" style="border-left:3px solid var(--accent-warning);">
+          <h4><span class="tag-gold tag" style="font-size:8px;">HIGH</span> Sidekick Health</h4>
+          <p>Digital therapeutics with GLP-1 companion programs. Patient engagement data + behavioral analytics.</p>
+          <div class="target-meta"><span class="gold">&#9679; 6-9 months</span><span>Strategy: ACQUIRE</span><span>Category: DTx</span></div>
+        </div>
+        <div class="target-card" style="border-left:3px solid var(--accent-warning);">
+          <h4><span class="tag-gold tag" style="font-size:8px;">HIGH</span> MedeAnalytics</h4>
+          <p>Payer analytics platform with risk adjustment + quality measure capabilities. Synergy with Inovalon core.</p>
+          <div class="target-meta"><span class="gold">&#9679; 6-12 months</span><span>Strategy: ACQUIRE</span><span>Category: Analytics</span></div>
+        </div>
+        <div class="target-card" style="border-left:3px solid var(--accent);">
+          <h4><span class="tag-blue tag" style="font-size:8px;">HIGH</span> Veradigm</h4>
+          <p>Allscripts-derived RWE platform. EHR-linked real-world data for outcomes research.</p>
+          <div class="target-meta"><span class="gold">&#9679; 6-9 months</span><span>Strategy: PARTNERSHIP</span><span>Category: RWE</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="anim d4" style="font-size:11px;color:var(--text-tertiary);margin-top:12px;">4 additional targets (Prevounce, Omada, Remedy Meds, Found Health) profiled in Appendix. Pfizer-Metsera deal ($7-10B) sets pharma valuation benchmark.</p>
+  </div>
+  <div class="dagger-footnote">&#8224; HealthVerity: 330M patient records confirmed. $1.5B+ valuation unverifiable in public sources — based on $146M raised through Series D.</div>
+  <div class="slide-footer"><span>M&amp;A Scanner Agent | 7 findings, 10 targets | Confidence: 0.75</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 8: DISEASE BURDEN CASCADE ============ -->
+<section class="slide" id="s8">
+  <div class="slide-bg-glow" style="background:var(--accent-error);bottom:-200px;right:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag clinical">Clinical</span> Impact Modeling</div>
+    <h2 class="slide-title anim d1">The Disease Burden Cascade: What GLP-1 Success Means</h2>
+    <p class="section-intro anim d2">Expanded GLP-1 access triggers multi-organ benefit cascades, but adherence gates every projection. All numbers assume persistence — the 45-68% 12-month discontinuation rate is the single largest uncertainty.</p>
+    <div class="anim d3">
+      <table class="compact-table">
+        <tr><th>Condition</th><th>Mechanism</th><th>5-Year MED Scenario</th><th>Evidence</th></tr>
+        <tr><td style="color:var(--accent-error);font-weight:700;">Cardiovascular</td><td>SELECT: 20% MACE reduction</td><td>750K events prevented</td><td><span class="confidence-badge high" style="margin:0;">HIGH</span></td></tr>
+        <tr><td style="color:var(--accent-bright);font-weight:700;">CKD</td><td>FLOW: 24% kidney event reduction + eGFR preservation</td><td>400K events prevented</td><td><span class="confidence-badge high" style="margin:0;">HIGH</span></td></tr>
+        <tr><td style="color:var(--accent-success);font-weight:700;">T2D Remission</td><td>Weight-loss dependent: jumps at 15%+ threshold</td><td>2.2M remissions</td><td><span class="confidence-badge medium" style="margin:0;">MEDIUM</span></td></tr>
+        <tr><td style="color:var(--accent-warning);font-weight:700;">OSA</td><td>Severity drops 26-50% with 10%+ weight loss</td><td>1.5M severity reductions</td><td><span class="confidence-badge medium" style="margin:0;">MEDIUM</span></td></tr>
+        <tr><td style="color:var(--accent-violet);font-weight:700;">NASH/MASH</td><td>Fibrosis response diverges by diabetes status</td><td>800K fibrosis improvements</td><td><span class="confidence-badge medium" style="margin:0;">MEDIUM</span></td></tr>
+        <tr><td style="color:var(--accent);font-weight:700;">Osteoarthritis</td><td>Weight loss + direct anti-inflammatory (GLP-1R-AMPK axis)</td><td>3M symptom improvements</td><td><span class="confidence-badge medium" style="margin:0;">MEDIUM</span></td></tr>
+      </table>
+    </div>
+    <div class="finding-card risk anim d4" style="margin-top:16px;">
+      <div class="finding-title">The Rebound Risk: 68% Discontinuation Creates Unknown Trajectory</div>
+      <div class="finding-body">Weight-loss-dependent benefits reverse upon discontinuation. With 45-68% dropping therapy within 12 months, the disease burden "rebound" trajectory is the largest unknown in all projections. No long-term (3+ year) real-world persistence data exists. This gap is itself a strategic opportunity (see Slide 11).</div>
+      <span class="confidence-badge high">High &#8212; Evidence convergence across agents</span>
+    </div>
+    <div class="finding-card anim d5" style="margin-top:8px;">
+      <div class="finding-title">Workforce Paradox</div>
+      <div class="finding-body">GLP-1 success creates new capacity demand (medication management, monitoring, titration) that offsets capacity freed from reduced chronic disease burden. Net workforce impact is neutral to slightly negative in the short term.</div>
+      <span class="confidence-badge medium">Medium &#8212; Structural analysis</span>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Disease Burden Modeler Agent | 9 findings | Confidence: 0.80</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 9: RISK SCORE COMPRESSION ============ -->
+<section class="slide" id="s9">
+  <div class="slide-bg-glow" style="background:var(--accent-violet);top:-200px;left:-300px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag quality">Quality</span> <span class="tag financial">Financial</span> Risk Score Impact</div>
+    <h2 class="slide-title anim d1">V28 + GLP-1: The Double Compression</h2>
+    <p class="section-intro anim d2">V28 creates -3% to -8% risk score compression on its own (fully phased in 2026). GLP-1-driven HCC resolution adds further downward pressure, but the combined interaction effect is modeled, not empirically observed.<span class="source-unverified" title="Combined figure is partially verified">&#8224;</span></p>
+    <div class="anim d3">
+      <table class="compact-table">
+        <tr><th>HCC Code</th><th>Condition</th><th>RAF Weight</th><th>GLP-1 Resolution Rate</th><th>Revenue Impact per 50K Members</th></tr>
+        <tr><td style="color:var(--accent-error);">HCC 19</td><td>Diabetes w/ complications</td><td>0.302</td><td>HIGH (15%+ weight loss = remission)</td><td style="color:var(--accent-error);">$45-90M annual loss</td></tr>
+        <tr><td style="color:var(--accent-error);">HCC 22</td><td>Diabetes w/o complications</td><td>0.105</td><td>VERY HIGH (earliest to resolve)</td><td style="color:var(--accent-warning);">$15-30M annual loss</td></tr>
+        <tr><td style="color:var(--accent-warning);">HCC 85-86</td><td>CHF</td><td>0.323-0.368</td><td>MODERATE (weight + CV benefit)</td><td style="color:var(--accent-warning);">$48-75M annual loss</td></tr>
+        <tr><td style="color:var(--accent);">HCC 134-137</td><td>Vascular disease</td><td>0.263-0.288</td><td>MODERATE (SELECT benefit)</td><td style="color:var(--accent-warning);">$39-65M annual loss</td></tr>
+        <tr><td style="color:var(--accent-success);">HCC 18</td><td>CKD Stage 4+</td><td>0.237</td><td>LOW-MODERATE (FLOW: slows, rarely reverses)</td><td style="color:var(--text-tertiary);">$10-20M annual loss</td></tr>
+      </table>
+    </div>
+    <div class="stat-grid anim d4" style="margin-top:16px;">
+      <div class="stat-card">
+        <div class="stat-label">V28 Impact (CMS Primary)</div>
+        <div class="stat-value negative">-3% to -8%</div>
+        <div class="stat-context">Risk score compression from model transition</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">GLP-1 HCC Resolution (Modeled)<span class="source-unverified">&#8224;</span></div>
+        <div class="stat-value negative">-2% to -4%</div>
+        <div class="stat-context">Additional downward pressure from diagnosis resolution</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Unlinked CRR Exclusion</div>
+        <div class="stat-value negative">-1.53%</div>
+        <div class="stat-context">CMS excluding unlinked chart review records from risk scoring</div>
+      </div>
+    </div>
+    <div class="finding-card anim d5" style="margin-top:12px;">
+      <div class="finding-title">PDC Triple-Weight Returns in MY2027: The Highest-ROI Lever</div>
+      <div class="finding-body">CMS restores 3x weight to medication adherence (PDC) measures for MY2027 Star Ratings. This creates a direct mechanism: improving GLP-1 adherence simultaneously improves Star Ratings (via PDC), reduces HCC resolution speed (maintaining risk scores longer), and improves patient outcomes. This triple benefit makes PDC the single highest-ROI intervention for MA plans.</div>
+      <span class="confidence-badge high">High &#8212; CMS Star Ratings Technical Notes</span>
+    </div>
+  </div>
+  <div class="dagger-footnote">&#8224; Combined V28 + GLP-1 interaction effect is modeled. V28 alone (-3% to -8%) is CMS-sourced. GLP-1 additive component is projected from clinical trial resolution rates, not observed at population scale.</div>
+  <div class="slide-footer"><span>Risk/Quality Analyst Agent | 5 findings | Confidence: 0.78</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 10: THE GLP-1 PARADOX ============ -->
+<section class="slide" id="s10" style="background:linear-gradient(135deg,var(--bg-primary),rgba(255,92,92,0.04));">
+  <div class="slide-bg-glow" style="background:var(--accent-error);top:-100px;right:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag-red tag">Tension Point</span> Central Paradox</div>
+    <h2 class="slide-title anim d1">The GLP-1 Paradox: Better Outcomes = Worse Economics</h2>
+    <p class="slide-subtitle anim d2">The defining tension of the GLP-1 era: clinical success creates financial pressure. Health plans that solve this transition win; those that don't face margin compression.</p>
+    <div class="two-col anim d3">
+      <div>
+        <h3 style="font-size:14px;color:var(--accent-error);margin-bottom:12px;text-transform:uppercase;letter-spacing:2px;font-weight:700;">The Loss Side</h3>
+        <div class="stat-card" style="text-align:left;">
+          <div class="stat-label">Annual HCC Revenue Loss</div>
+          <div class="stat-value negative" style="font-size:22px;">$200-400M</div>
+          <div class="stat-context">Per 500K-member MA plan. Diagnosis resolution (HCC 19, 22, 85-86, 134-137) shrinks risk-adjusted capitation as patients improve.</div>
+        </div>
+        <div class="finding-card risk" style="margin-top:12px;">
+          <div class="finding-body">V28 model transition compounds the loss. Plans face simultaneous coding methodology changes AND clinical outcome-driven HCC reduction. Double compression = double urgency.</div>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size:14px;color:var(--accent-success);margin-bottom:12px;text-transform:uppercase;letter-spacing:2px;font-weight:700;">The Offset Side</h3>
+        <div class="stat-card" style="text-align:left;">
+          <div class="stat-label">Quality Bonus Payment Potential</div>
+          <div class="stat-value positive" style="font-size:22px;">$165-330M</div>
+          <div class="stat-context">+0.5 to +2.0 Star Rating improvement via PDC triple-weight gains + chronic condition management improvements.</div>
+        </div>
+        <div class="finding-card opportunity" style="margin-top:12px;">
+          <div class="finding-body">BUT: QBP only partially offsets HCC loss. Net position is negative without active transition management. Plans need analytics to manage the timing: maintain coding accuracy WHILE outcomes improve.</div>
+        </div>
+      </div>
+    </div>
+    <div class="inovalon-header anim d4" style="margin-top:20px;">
+      <h3>This Paradox IS the Inovalon Value Proposition</h3>
+      <p>The analytics that solve the GLP-1 Paradox — simultaneous risk score management, PDC optimization, and outcome tracking — are precisely what Inovalon's converged platform is built to deliver.</p>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Tension Point | Risk/Quality + Disease Burden + Product-Market convergence</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 11: EMERGENT INSIGHT 1 ============ -->
+<section class="slide emergent-slide" id="s11">
+  <div class="slide-inner">
+    <div class="emergent-number anim">01</div>
+    <div>
+      <div class="eyebrow anim"><span class="tag-cyan tag">Emergent Insight</span></div>
+      <h2 class="slide-title anim d1">The Rebound Data Vacuum</h2>
+      <p class="slide-subtitle anim d2">The highest-value analytics asset in GLP-1 doesn't exist yet — and Inovalon is uniquely positioned to create it first.</p>
+      <div class="grid-2 anim d3">
+        <div class="finding-card emergent">
+          <div class="finding-title">The Vacuum</div>
+          <div class="finding-body">Three agents independently noted the same absence: no longitudinal data exists on what happens to patients who discontinue GLP-1 therapy after 12+ months. Disease burden projections, risk score models, and quality forecasts all break down at the "rebound" boundary. This isn't a gap — it's a data vacuum worth billions in analytics value.</div>
+        </div>
+        <div class="finding-card opportunity">
+          <div class="finding-title">The Opportunity</div>
+          <div class="finding-body">Inovalon's 454M-life dataset, combined with pharmacy claims + medical claims linkage, positions it to be FIRST to generate longitudinal GLP-1 persistence + rebound data at population scale. This data becomes a 3-5 year competitive moat that no competitor can replicate without similar scale.</div>
+        </div>
+      </div>
+      <div class="emergent-why anim d4">
+        <div class="emergent-why-label">Why Only Multi-Agent Analysis Finds This</div>
+        <div class="finding-body">The Clinical agent noted 3+ year data absence. The Disease Burden agent couldn't model rebound trajectories. The Risk/Quality agent couldn't project HCC "re-emergence" rates. No single agent would identify the STRATEGIC value of this shared gap — only the synthesis of three independent "I couldn't find this" signals reveals that the vacuum itself is the most valuable data product Inovalon could build.</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Gap Triangulation Algorithm | 3 agents converged on absence</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 12: EMERGENT INSIGHT 2 ============ -->
+<section class="slide emergent-slide" id="s12">
+  <div class="slide-inner">
+    <div class="emergent-number anim">02</div>
+    <div>
+      <div class="eyebrow anim"><span class="tag-cyan tag">Emergent Insight</span></div>
+      <h2 class="slide-title anim d1">The PDC-HCC Offset Strategy</h2>
+      <p class="slide-subtitle anim d2">A specific product that simultaneously improves Star Ratings AND manages risk score compression. The killer app of GLP-1 analytics.</p>
+      <div class="stat-grid anim d3">
+        <div class="stat-card">
+          <div class="stat-label">PDC Weight (MY2027)</div>
+          <div class="stat-value purple">3x</div>
+          <div class="stat-context">Triple-weight restored for medication adherence measures</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Star Rating Impact</div>
+          <div class="stat-value positive">+0.5 to +2.0</div>
+          <div class="stat-context">Stars improvement from PDC gains alone</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Adherence = Slower HCC Resolution</div>
+          <div class="stat-value cyan">Dual Benefit</div>
+          <div class="stat-context">Better adherence = better Stars AND more gradual risk score transition</div>
+        </div>
+      </div>
+      <div class="finding-card emergent anim d4" style="margin-top:16px;">
+        <div class="finding-title">The Connection No Single Agent Made</div>
+        <div class="finding-body">Agent 5 identified PDC triple-weight as highest-ROI Star lever. Agent 1 identified adherence prediction capabilities. Agent 2 mapped Inovalon's medication data assets. The synthesis reveals: a GLP-1 adherence optimization product doesn't just improve outcomes — it simultaneously <span class="highlight">improves Star Ratings (PDC drives 3x-weighted measure), slows risk score compression (adherent patients maintain diagnoses longer before resolution), and generates the longitudinal data that fills the Rebound Data Vacuum</span>. Three revenue streams from one product.</div>
+      </div>
+      <div class="emergent-why anim d5">
+        <div class="emergent-why-label">Why Only Multi-Agent Analysis Finds This</div>
+        <div class="finding-body">The PDC-Stars connection lives in the Quality dimension. The adherence-HCC relationship lives in the Risk dimension. The data generation value lives in the Clinical/Product dimension. No single analytical lens would connect PDC weight changes → adherence optimization → risk score pacing → data asset creation into a single product concept.</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Cross-Agent Theme Mining + Structural Pattern Recognition</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 13: EMERGENT INSIGHT 3 ============ -->
+<section class="slide emergent-slide" id="s13">
+  <div class="slide-inner">
+    <div class="emergent-number anim">03</div>
+    <div>
+      <div class="eyebrow anim"><span class="tag-cyan tag">Emergent Insight</span></div>
+      <h2 class="slide-title anim d1">The Pre-BALANCE M&amp;A Window</h2>
+      <p class="slide-subtitle anim d2">There is a 3-6 month acquisition window before BALANCE reprices every GLP-1 data asset upward.</p>
+      <div class="two-col anim d3">
+        <div>
+          <div class="finding-card opportunity">
+            <div class="finding-title">Before July 2026: Current Valuations</div>
+            <div class="finding-body">GLP-1 data assets (HealthVerity, Claritas Rx, specialty pharmacy platforms) are currently priced based on existing market dynamics. Medicare has no GLP-1 coverage. Market is still pricing these as general healthcare analytics companies.</div>
+          </div>
+          <div class="finding-card opportunity">
+            <div class="finding-title">Pharma Valuation Benchmark Set</div>
+            <div class="finding-body">Pfizer's $7-10B Metsera deal and Remedy Meds + Thirty Madison's $500M merger signal pharma is aggressively acquiring GLP-1 adjacent assets. Payer-side analytics companies haven't yet been repriced.</div>
+          </div>
+        </div>
+        <div>
+          <div class="finding-card risk">
+            <div class="finding-title">After July 2026: Repriced Upward</div>
+            <div class="finding-body">Once BALANCE opens Medicare GLP-1 access, every data asset touching GLP-1 patient populations becomes dramatically more valuable. Medicare's 67M+ beneficiaries create massive new data generation. Companies controlling this data will command premium valuations.</div>
+          </div>
+          <div class="finding-card risk">
+            <div class="finding-title">Competitive Acquirers Circling</div>
+            <div class="finding-body">Optum, CVS/Aetna, and pharma companies all have M&amp;A capabilities and GLP-1 strategic interest. Delay = paying premium valuations or losing targets entirely to competitors with deeper pockets.</div>
+          </div>
+        </div>
+      </div>
+      <div class="emergent-why anim d4">
+        <div class="emergent-why-label">Why Only Multi-Agent Analysis Finds This</div>
+        <div class="finding-body">The M&amp;A agent mapped current target valuations. The Product-Market agent identified the build-vs-buy tension. The Regulatory knowledge (BALANCE timeline) provides the temporal trigger. Only the synthesis reveals that the M&amp;A strategy has a TIME CONSTRAINT: the regulatory event (BALANCE July 2026) creates a valuation inflection point that makes every month of delay more expensive.</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Tension Point Mapping + Cross-Agent Theme Mining</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 14: STRATEGIC TIMELINE ============ -->
+<section class="slide" id="s14">
+  <div class="slide-bg-glow" style="background:var(--inov-cerulean);bottom:-200px;left:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag strategic">Strategy</span> Execution Timeline</div>
+    <h2 class="slide-title anim d1">Three-Phase Strategic Horizon</h2>
+    <div class="timeline anim d2">
+      <div class="timeline-phase">
+        <div class="timeline-dot" style="background:var(--accent-error);"></div>
+        <div class="timeline-year" style="color:var(--accent-error);">Now &#8594; Q3 2026</div>
+        <div class="timeline-label">Defensive Sprint</div>
+        <div class="timeline-items">
+          <div>Execute CRITICAL M&amp;A (HealthVerity, Claritas Rx) before BALANCE repricing</div>
+          <div>Build GLP-1 Candidate Stratification MVP (6-month target)</div>
+          <div>Establish Truveta EHR data partnership</div>
+          <div>Position for MA plan RFPs citing V28 + GLP-1 compression</div>
+        </div>
+      </div>
+      <div class="timeline-phase">
+        <div class="timeline-dot" style="background:var(--accent-warning);"></div>
+        <div class="timeline-year" style="color:var(--accent-warning);">Q3 2026 &#8594; 2027</div>
+        <div class="timeline-label">Platform Build</div>
+        <div class="timeline-items">
+          <div>Launch PDC-HCC Offset product (the killer app)</div>
+          <div>Begin longitudinal rebound data accumulation</div>
+          <div>Full BALANCE model integration (Jan 2027)</div>
+          <div>Scale to HIGH-priority M&amp;A targets (Sidekick, MedeAnalytics)</div>
+        </div>
+      </div>
+      <div class="timeline-phase">
+        <div class="timeline-dot" style="background:var(--accent-success);"></div>
+        <div class="timeline-year" style="color:var(--accent-success);">2027 &#8594; 2029</div>
+        <div class="timeline-label">Data Moat</div>
+        <div class="timeline-items">
+          <div>First-mover longitudinal GLP-1 rebound dataset (3-5yr moat)</div>
+          <div>Pharma RWE partnerships leveraging unique persistence data</div>
+          <div>Expand to Medicaid GLP-1 populations (May 2026 start)</div>
+          <div>GLP-1 analytics platform becomes standard MA plan infrastructure</div>
+        </div>
+      </div>
+    </div>
+    <div class="stat-grid anim d3" style="margin-top:24px;">
+      <div class="stat-card">
+        <div class="stat-label">Phase 1 Investment</div>
+        <div class="stat-value warn">$150-300M</div>
+        <div class="stat-context">M&amp;A + MVP build</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Phase 2 Revenue Target</div>
+        <div class="stat-value positive">$50-80M ARR</div>
+        <div class="stat-context">Initial GLP-1 analytics contracts</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Phase 3 Revenue Target</div>
+        <div class="stat-value positive">$180-300M ARR</div>
+        <div class="stat-context">Full TAM capture<span class="source-unverified">&#8224;</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="dagger-footnote">&#8224; Revenue and investment figures are directional estimates based on analyst modeling, not published market data.</div>
+  <div class="slide-footer"><span>Multi-agent synthesis | Strategic timeline</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 15: INOVALON OPPORTUNITY MAP ============ -->
+<section class="slide" id="s15">
+  <div class="slide-bg-glow" style="background:var(--accent-success);top:-200px;right:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag strategic">Strategy</span> Inovalon Opportunity Synthesis</div>
+    <h2 class="slide-title anim d1">The Inovalon GLP-1 Opportunity Map</h2>
+    <div class="grid-2 anim d2">
+      <div>
+        <h3 style="font-size:13px;color:var(--accent-success);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;">Build (Internal)</h3>
+        <div class="finding-card opportunity">
+          <div class="finding-title">GLP-1 Candidate Stratification Engine</div>
+          <div class="finding-body">Claims-based algorithm translating clinical trial eligibility (SELECT, FLOW, BALANCE) into plan-level patient identification. 6-month MVP.</div>
+        </div>
+        <div class="finding-card opportunity">
+          <div class="finding-title">PDC-HCC Offset Dashboard</div>
+          <div class="finding-body">Real-time view linking medication adherence (PDC) to Star Rating projection + HCC resolution pacing. The killer app from Emergent Insight #2.</div>
+        </div>
+        <div class="finding-card opportunity">
+          <div class="finding-title">Adherence Prediction Model</div>
+          <div class="finding-body">Early weight loss velocity + GI AE patterns + provider specialty + financial barrier scoring = 12-week adherence forecast at patient level.</div>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size:13px;color:#f97316;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;">Acquire (M&amp;A)</h3>
+        <div class="finding-card" style="border-left-color:#f97316;">
+          <div class="finding-title">Specialty Pharmacy Data (Claritas Rx)</div>
+          <div class="finding-body">Deep GLP-1 dispensing data that Inovalon's medical claims don't capture. Critical for adherence models and PDC measurement accuracy.</div>
+        </div>
+        <div class="finding-card" style="border-left-color:#f97316;">
+          <div class="finding-title">RWE Platform (HealthVerity)</div>
+          <div class="finding-body">330M de-identified patients with HIPAA-compliant linkage. Enables the longitudinal rebound dataset that becomes the 3-5 year competitive moat.</div>
+        </div>
+        <div class="finding-card" style="border-left-color:#f97316;">
+          <div class="finding-title">EHR Partnership (Truveta)</div>
+          <div class="finding-body">Health system consortium data adds clinical depth (labs, vitals, clinical notes) to Inovalon's claims-based foundation. Partnership > acquisition.</div>
+        </div>
+      </div>
+    </div>
+    <div class="inovalon-header anim d3" style="margin-top:16px;">
+      <h3>Net Opportunity: First-Mover in the $180-300M GLP-1 Analytics Market<span class="source-unverified">&#8224;</span></h3>
+      <p>Build the analytics layer on existing data. Acquire the specialty data gaps. Generate the longitudinal rebound data that no one else has. Sell the transition management toolkit to every MA plan facing the GLP-1 Paradox.</p>
+    </div>
+  </div>
+  <div class="dagger-footnote">&#8224; Market size is a directional projection. Specific investment and return figures require detailed financial modeling beyond this intelligence brief.</div>
+  <div class="slide-footer"><span>Product-Market + M&amp;A + Clinical convergence</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 16: PROVENANCE ============ -->
+<section class="slide" id="s16">
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag strategic">Provenance</span> Source Confidence</div>
+    <h2 class="slide-title anim d1">Provenance &amp; Confidence Map</h2>
+    <div class="anim d2" style="overflow-x:auto;">
+      <table class="prov-table">
+        <thead><tr><th>Finding</th><th>Agent</th><th>Source</th><th>Tier</th><th>Confidence</th></tr></thead>
+        <tbody>
+          <tr><td>SELECT 20% MACE reduction</td><td><span class="tag clinical" style="font-size:8px;">Clinical</span></td><td>NEJM 2023</td><td>PRIMARY</td><td><span class="confidence-badge high">High</span></td></tr>
+          <tr><td>FLOW 24% kidney event reduction</td><td><span class="tag clinical" style="font-size:8px;">Clinical</span></td><td>NEJM 2024</td><td>PRIMARY</td><td><span class="confidence-badge high">High</span></td></tr>
+          <tr><td>3.1% hazard reduction per 1% weight loss</td><td><span class="tag clinical" style="font-size:8px;">Clinical</span></td><td>JAMA Network Open 2024</td><td>PRIMARY</td><td><span class="confidence-badge high">High</span></td></tr>
+          <tr><td>BALANCE model July 2026 / $50 copay</td><td><span class="tag regulatory" style="font-size:8px;">Regulatory</span></td><td>CMS.gov</td><td>PRIMARY</td><td><span class="confidence-badge high">High</span></td></tr>
+          <tr><td>PDC triple-weight MY2027</td><td><span class="tag quality" style="font-size:8px;">Quality</span></td><td>CMS Technical Notes</td><td>PRIMARY</td><td><span class="confidence-badge high">High</span></td></tr>
+          <tr><td>V28 risk score impact -3% to -8%</td><td><span class="tag quality" style="font-size:8px;">Quality</span></td><td>CMS Rate Announcement</td><td>PRIMARY</td><td><span class="confidence-badge high">High</span></td></tr>
+          <tr><td>12-month discontinuation 45-68%&#8224;</td><td><span class="tag clinical" style="font-size:8px;">Clinical</span></td><td>JMCP/JAMA (range)</td><td>PRIMARY</td><td><span class="confidence-badge medium">Medium</span></td></tr>
+          <tr><td>V28 + GLP-1 combined compression&#8224;</td><td><span class="tag quality" style="font-size:8px;">Quality</span></td><td>CMS + modeled</td><td>MIXED</td><td><span class="confidence-badge low">Low</span></td></tr>
+          <tr><td>$180-300M TAM&#8224;</td><td><span class="tag strategic" style="font-size:8px;">Strategic</span></td><td>Analyst projection</td><td>TERTIARY</td><td><span class="confidence-badge low">Low</span></td></tr>
+          <tr><td>T2D remission rate thresholds&#8224;</td><td><span class="tag clinical" style="font-size:8px;">Clinical</span></td><td>Multiple trials</td><td>SECONDARY</td><td><span class="confidence-badge low">Low</span></td></tr>
+          <tr><td>HealthVerity 330M records</td><td><span class="tag ma" style="font-size:8px;">M&amp;A</span></td><td>Company reports</td><td>PRIMARY</td><td><span class="confidence-badge high">High</span></td></tr>
+          <tr><td>HealthVerity $1.5B+ valuation&#8224;</td><td><span class="tag ma" style="font-size:8px;">M&amp;A</span></td><td>Unverified</td><td>TERTIARY</td><td><span class="confidence-badge low">Low</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="anim d3" style="font-size:10px;color:var(--text-tertiary);margin-top:12px;">&#8224; = Source not verified against primary. See individual slides for specific dagger footnotes. Phase 3.5 Pre-PRESENT Verification Gate applied to all 10 top claims.</p>
+  </div>
+  <div class="slide-footer"><span>CRITIC-FACTUAL Agent | 10 claims verified | 6 HIGH, 1 MEDIUM, 3 LOW + 2 daggers</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 17: GAPS & NEXT STEPS ============ -->
+<section class="slide" id="s17">
+  <div class="slide-bg-glow" style="background:var(--accent-warning);top:-200px;left:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag strategic">Strategy</span> Unknown Variables</div>
+    <h2 class="slide-title anim d1">Gaps &amp; Recommended Next Steps</h2>
+    <div class="grid-2 anim d2">
+      <div>
+        <h3 style="font-size:13px;color:var(--accent-error);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;">Critical Unknowns</h3>
+        <div class="finding-card risk">
+          <div class="finding-title">Rebound Epidemiology (3+ years)</div>
+          <div class="finding-body">No longitudinal real-world data on disease trajectory after GLP-1 discontinuation. All burden projections are gated by this unknown. Earliest meaningful data: 2028-2029.</div>
+        </div>
+        <div class="finding-card risk">
+          <div class="finding-title">V28 + GLP-1 Interaction Effect</div>
+          <div class="finding-body">The combined risk score impact is modeled, not observed. V28 is still phasing in; GLP-1 uptake at scale hasn't occurred. Empirical data won't exist until 2027-2028.</div>
+        </div>
+        <div class="finding-card risk">
+          <div class="finding-title">BALANCE Model Enrollment Pace</div>
+          <div class="finding-body">All uptake scenarios (LOW/MED/HIGH) depend on how quickly MA plans and beneficiaries adopt the July 2026 demo. No precedent for this scale of Part D expansion.</div>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size:13px;color:var(--accent-success);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;">Recommended Follow-Up</h3>
+        <div class="finding-card opportunity">
+          <div class="finding-title">Deep-Dive: HealthVerity + Claritas Rx Due Diligence</div>
+          <div class="finding-body">Both CRITICAL targets need financial analysis, integration feasibility, and competitive bid assessment. Recommend dedicated PRISM run with financial modeling agents.</div>
+        </div>
+        <div class="finding-card opportunity">
+          <div class="finding-title">Product Specification: PDC-HCC Offset Dashboard</div>
+          <div class="finding-body">The "killer app" needs detailed product spec, data requirements, integration points with existing Inovalon platform, and go-to-market timeline.</div>
+        </div>
+        <div class="finding-card opportunity">
+          <div class="finding-title">Competitive Response Modeling</div>
+          <div class="finding-body">Optum, Cotiviti, and pharma companies are all potential GLP-1 analytics competitors. Need battlecard-level competitive analysis with differentiation strategy.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Synthesis | Gap Layer</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<!-- ============ SLIDE 18: APPENDIX ============ -->
+<section class="slide" id="s18">
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag ma">Appendix</span> Additional M&amp;A Targets</div>
+    <h2 class="slide-title anim d1">Extended M&amp;A Target Profiles</h2>
+    <div class="grid-2 anim d2">
+      <div>
+        <div class="target-card" style="border-left:3px solid var(--text-tertiary);">
+          <h4><span class="tag-blue tag" style="font-size:8px;">MODERATE-HIGH</span> Prevounce</h4>
+          <p>Preventive care analytics platform with chronic disease management capabilities. Value in risk stratification algorithms.</p>
+          <div class="target-meta"><span>&#9679; 9-12 months</span><span>Strategy: EVALUATE</span></div>
+        </div>
+        <div class="target-card" style="border-left:3px solid var(--text-tertiary);">
+          <h4><span class="tag-blue tag" style="font-size:8px;">MODERATE</span> Omada Health</h4>
+          <p>Digital health platform with diabetes prevention programs. Strong patient engagement data but valuation may be elevated post-Pfizer-Metsera benchmark.</p>
+          <div class="target-meta"><span>&#9679; 12+ months</span><span>Strategy: MONITOR</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="target-card" style="border-left:3px solid var(--text-tertiary);">
+          <h4><span class="tag-blue tag" style="font-size:8px;">MODERATE</span> Remedy Meds</h4>
+          <p>Telehealth GLP-1 prescribing platform. Recently merged with Thirty Madison ($500M). Consumer-facing data on GLP-1 demand patterns.</p>
+          <div class="target-meta"><span>&#9679; 12+ months</span><span>Strategy: MONITOR</span></div>
+        </div>
+        <div class="target-card" style="border-left:3px solid var(--text-tertiary);">
+          <h4><span class="tag-blue tag" style="font-size:8px;">MODERATE</span> Found Health</h4>
+          <p>Consumer GLP-1 tracking and coaching app. Behavioral data on real-world GLP-1 usage patterns. Fragmented space ripe for consolidation.</p>
+          <div class="target-meta"><span>&#9679; 12+ months</span><span>Strategy: MONITOR</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="finding-card anim d3" style="margin-top:16px;">
+      <div class="finding-title">Market Context: M&amp;A Benchmark Transactions</div>
+      <div class="finding-body">
+        <strong>Pfizer &#8594; Metsera:</strong> $7-10B (GLP-1 pipeline acquisition, sets pharma valuation bar) &bull;
+        <strong>Remedy Meds + Thirty Madison:</strong> $500M (telehealth GLP-1 consolidation) &bull;
+        <strong>Payer GLP-1 UM infrastructure:</strong> Fragmenting across point solutions — consolidation play for integrated analytics platform.
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>M&amp;A Scanner Agent | Extended target list</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<script>
+// Navigation
+const slides = document.querySelectorAll('.slide');
+const totalSlides = slides.length;
+let currentSlide = 0;
+let counterTimeout;
+
+function goToSlide(n) {
+  if (n < 0 || n >= totalSlides) return;
+  currentSlide = n;
+  slides[n].scrollIntoView({ behavior: 'smooth' });
+}
+
+function toggleNav() {
+  const p = document.getElementById('navPanel');
+  const o = document.getElementById('navOverlay');
+  const b = document.getElementById('navBtn');
+  const isOpen = p.classList.contains('open');
+  if (isOpen) { p.classList.remove('open'); o.classList.remove('open'); b.innerHTML = '&#9776;'; }
+  else { p.classList.add('open'); o.classList.add('open'); b.innerHTML = '&#10005;'; }
+}
+
+// Keyboard Navigation
+document.addEventListener('keydown', (e) => {
+  const navOpen = document.getElementById('navPanel').classList.contains('open');
+  if (e.key === 'Escape') { if (navOpen) toggleNav(); return; }
+  if (navOpen) return;
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  switch (e.key) {
+    case 'ArrowDown': case 'PageDown': e.preventDefault(); goToSlide(currentSlide + 1); break;
+    case 'ArrowUp': case 'PageUp': e.preventDefault(); goToSlide(currentSlide - 1); break;
+    case ' ': case 'ArrowRight': e.preventDefault(); goToSlide(currentSlide + 1); break;
+    case 'ArrowLeft': e.preventDefault(); goToSlide(currentSlide - 1); break;
+    case 'Home': e.preventDefault(); goToSlide(0); break;
+    case 'End': e.preventDefault(); goToSlide(totalSlides - 1); break;
+  }
+});
+
+// Scroll-based progress
+function updateProgress() {
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+  document.getElementById('slideProgress').style.width = pct + '%';
+  let closest = 0, minDist = Infinity;
+  slides.forEach((s, i) => {
+    const dist = Math.abs(s.getBoundingClientRect().top);
+    if (dist < minDist) { minDist = dist; closest = i; }
+  });
+  currentSlide = closest;
+  const counter = document.getElementById('slideCounter');
+  counter.textContent = String(closest + 1).padStart(2, '0') + ' / ' + String(totalSlides).padStart(2, '0');
+  counter.classList.add('visible');
+  clearTimeout(counterTimeout);
+  counterTimeout = setTimeout(() => counter.classList.remove('visible'), 2000);
+}
+window.addEventListener('scroll', updateProgress, { passive: true });
+
+// Animation Observer
+const animObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && entry.intersectionRatio > 0.15) {
+      entry.target.querySelectorAll('.anim').forEach(el => el.classList.add('visible'));
+      entry.target.querySelectorAll('.bar-fill').forEach(bar => {
+        setTimeout(() => bar.classList.add('animate'), 300);
+      });
+    }
+  });
+}, { threshold: [0, 0.15, 0.5] });
+slides.forEach(s => animObserver.observe(s));
+
+// Nav hint auto-fade
+window.addEventListener('load', () => {
+  setTimeout(() => document.getElementById('navHint').classList.remove('show'), 4000);
+  // Trigger first slide animations
+  slides[0].querySelectorAll('.anim').forEach(el => el.classList.add('visible'));
+});
+</script>
+</body>
+</html>

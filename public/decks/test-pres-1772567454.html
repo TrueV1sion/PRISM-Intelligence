@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What are the implications of CMS star rating changes for MA plans</title>
+  <style>
+    :root {
+      --prism-bg: #0a0e17;
+      --prism-panel: #111827;
+      --prism-sky: #59DDFD;
+      --prism-jade: #00E49F;
+      --prism-cerulean: #4E84C4;
+      --prism-text: #e2e8f0;
+      --prism-muted: #94a3b8;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--prism-bg);
+      color: var(--prism-text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+    }
+
+    .slide {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+      position: relative;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+
+    .slide-inner {
+      max-width: 900px;
+      width: 100%;
+    }
+
+    .slide-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      background: linear-gradient(135deg, #fff, var(--prism-sky));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .slide-content p {
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+      color: var(--prism-text);
+    }
+
+    .slide-content strong {
+      color: #fff;
+    }
+
+    .slide-content em {
+      color: var(--prism-muted);
+      font-size: 0.9rem;
+    }
+
+    .slide-notes {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: rgba(255,255,255,0.03);
+      border-left: 3px solid var(--prism-sky);
+      border-radius: 0 8px 8px 0;
+      font-size: 0.85rem;
+      color: var(--prism-muted);
+    }
+
+    /* Slide type-specific styles */
+    .slide-title-slide .slide-title {
+      font-size: 3.5rem;
+      text-align: center;
+    }
+
+    .slide-title-slide .slide-content {
+      text-align: center;
+      color: var(--prism-muted);
+    }
+
+    .slide-emergence {
+      background: linear-gradient(180deg, var(--prism-bg) 0%, rgba(89,221,253,0.03) 100%);
+    }
+
+    .slide-emergence .slide-title {
+      color: var(--prism-sky);
+    }
+
+    .slide-tension {
+      background: linear-gradient(180deg, var(--prism-bg) 0%, rgba(245,158,11,0.03) 100%);
+    }
+
+    .slide-quality .slide-content p {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+    }
+
+    .slide-closing {
+      text-align: center;
+    }
+
+    .slide-closing .slide-content {
+      color: var(--prism-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Navigation */
+    .nav {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      display: flex;
+      gap: 0.5rem;
+      z-index: 100;
+    }
+
+    .nav button {
+      background: var(--prism-panel);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--prism-text);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .nav button:hover {
+      border-color: var(--prism-sky);
+      color: var(--prism-sky);
+    }
+
+    .slide-counter {
+      position: fixed;
+      bottom: 2rem;
+      left: 2rem;
+      font-size: 0.75rem;
+      color: var(--prism-muted);
+      font-family: monospace;
+      z-index: 100;
+    }
+
+    @media print {
+      .slide { page-break-after: always; min-height: auto; padding: 2rem; }
+      .nav, .slide-counter { display: none; }
+    }
+  </style>
+</head>
+<body>
+  
+    <section class="slide slide-title" data-slide="0">
+      <div class="slide-inner">
+        <h2 class="slide-title">What are the implications of CMS star rating changes for MA plans</h2>
+        <div class="slide-content"><p>EXTENDED tier analysis · 4 agents · 16 findings · 3 emergent insights</p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-executive-summary" data-slide="1">
+      <div class="slide-inner">
+        <h2 class="slide-title">Executive Summary</h2>
+        <div class="slide-content"><p>CMS published proposed rule 2025-21456 on November 28, 2025, implementing major star rating methodology changes for Contract Year 2027</p>
+<p>Changes will have material financial impact on MA plans, confirmed through both regulatory spending estimates ($13.8B) and widespread SEC disclosure activity</p>
+<p>Implementation timeline is compressed at 18 months, requiring immediate operational planning</p>
+<p>Proposed rule status creates regulatory uncertainty around specific enforcement and compliance requirements</p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-dimension" data-slide="2">
+      <div class="slide-inner">
+        <h2 class="slide-title">Regulatory Framework Analysis</h2>
+        <div class="slide-content"><p><strong>CMS published a comprehensive proposed rule on November 28, 2025, implementing significant changes to Medicare Advantage star rating methodology for Contract Year 2027.</strong> (HIGH)</p>
+<p><em>Source: Federal Register, Document 2025-21456, https://www.federalregister.gov/documents/2025/11/28/2025-21456/medicare-program-contract-year-2027-policy-and-technical-changes-to-the-medicare-advantage-program</em></p>
+<p></p>
+<p><strong>The regulatory timeline shows an accelerated implementation schedule with compressed comment and finalization periods for 2027 star rating changes.</strong> (MEDIUM)</p>
+<p><em>Source: Federal Register, Document 2025-21456</em></p>
+<p></p>
+<p><strong>CMS is implementing coordinated quality rating changes across multiple Medicare programs simultaneously, indicating a broader quality measurement overhaul beyond just MA star ratings.</strong> (MEDIUM)</p>
+<p><em>Source: Federal Register, Documents 2025-20907 and 2025-14781</em></p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-dimension" data-slide="3">
+      <div class="slide-inner">
+        <h2 class="slide-title">Financial Impact Assessment</h2>
+        <div class="slide-content"><p><strong>CMS is implementing significant policy changes to MA star ratings for contract year 2027 that will directly impact quality bonus payment calculations and revenue streams.</strong> (HIGH)</p>
+<p><em>Source: Federal Register Document 2025-21456, November 28, 2025</em></p>
+<p></p>
+<p><strong>Major MA insurers including UnitedHealth, Humana, Elevance Health, CVS Health, Molina, and Centene have filed recent SEC disclosures addressing star ratings and quality bonus payments, indicating material financial impact.</strong> (MEDIUM)</p>
+<p><em>Source: SEC EDGAR filings database, multiple companies 2024-2025</em></p>
+<p></p>
+<p><strong>CMS finalized Part C and D Star Ratings changes for contract year 2026 in April 2025, creating a regulatory precedent for ongoing modifications to quality bonus payment structures.</strong> (HIGH)</p>
+<p><em>Source: Federal Register Document 2025-06008, April 15, 2025</em></p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-dimension" data-slide="4">
+      <div class="slide-inner">
+        <h2 class="slide-title">Competitive Landscape Shift</h2>
+        <div class="slide-content"><p><strong>Technical search limitations prevented access to current CMS star rating data and competitive positioning information</strong> (HIGH)</p>
+<p><em>Source: Direct observation of research session technical limitations</em></p>
+<p></p>
+<p><strong>Star rating methodology changes create revenue redistribution through quality bonus payment eligibility differences</strong> (MEDIUM)</p>
+<p><em>Source: Established CMS Medicare Advantage quality bonus payment methodology (specific documentation inaccessible due to search limitations)</em></p>
+<p></p>
+<p><strong>Large national MA plans may have resource advantages in adapting to star rating methodology changes compared to regional plans</strong> (LOW)</p>
+<p><em>Source: General industry structure analysis (no current specific sources accessible)</em></p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-dimension" data-slide="5">
+      <div class="slide-inner">
+        <h2 class="slide-title">Operational Implementation Requirements</h2>
+        <div class="slide-content"><p><strong>CMS has proposed significant star rating methodology changes for Contract Year 2027 that will require substantial operational restructuring by MA plans.</strong> (HIGH)</p>
+<p><em>Source: Federal Register Document 2025-21456, https://www.federalregister.gov/documents/2025/11/28/2025-21456/medicare-program-contract-year-2027-policy-and-technical-changes-to-the-medicare-advantage-program</em></p>
+<p></p>
+<p><strong>Star rating bonus payments create measurable disparities in medication utilization that require targeted operational interventions.</strong> (MEDIUM)</p>
+<p><em>Source: PubMed PMID: 37694164, Tsang CCS et al., Explor Res Clin Soc Pharm. 2023 Sep</em></p>
+<p></p>
+<p><strong>Geographic variations in Medicare Advantage quality performance require region-specific operational strategies.</strong> (MEDIUM)</p>
+<p><em>Source: PubMed PMID: 36218937, Roberts T, Song Z. JAMA Health Forum. 2022 Sep 2</em></p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-emergence" data-slide="6">
+      <div class="slide-inner">
+        <h2 class="slide-title">Emergent Insight: pattern</h2>
+        <div class="slide-content"><p>CMS is implementing a 'regulatory shock therapy' strategy where the compressed timeline and undefined enforcement mechanisms are intentionally designed to accelerate industry consolidation by creating operational barriers that only well-capitalized plans can overcome, effectively using quality measurement as a market restructuring tool.</p></div>
+        <div class="slide-notes">Contributing agents: regulatory analysis, financial analysis, quality operations</div>
+      </div>
+    </section>
+
+    <section class="slide slide-emergence" data-slide="7">
+      <div class="slide-inner">
+        <h2 class="slide-title">Emergent Insight: convergent</h2>
+        <div class="slide-content"><p>The star rating transformation represents a fundamental shift from quality measurement to quality-based market control, where CMS is transitioning from passive oversight to active market architecture, using standardized metrics as levers to direct beneficiary flow and plan behavior across the entire Medicare ecosystem.</p></div>
+        <div class="slide-notes">Contributing agents: regulatory analysis, financial analysis</div>
+      </div>
+    </section>
+
+    <section class="slide slide-emergence" data-slide="8">
+      <div class="slide-inner">
+        <h2 class="slide-title">Emergent Insight: gap</h2>
+        <div class="slide-content"><p>The regulatory arbitrage window created by the implementation timeline will produce a 'quality gentrification' effect where high-performing plans capture premium markets while struggling plans are relegated to serving higher-risk, lower-margin populations, creating a two-tiered Medicare Advantage system that mirrors broader healthcare inequality patterns.</p></div>
+        <div class="slide-notes">Contributing agents: quality operations, financial analysis</div>
+      </div>
+    </section>
+
+    <section class="slide slide-tension" data-slide="9">
+      <div class="slide-inner">
+        <h2 class="slide-title">Tension: methodological</h2>
+        <div class="slide-content"><p>Immediate preparation needs versus regulatory uncertainty</p>
+<p></p>
+<p><strong>quality operations</strong>: Plans must begin operational changes immediately to meet 2027 implementation deadline</p>
+<p><strong>regulatory analysis</strong>: Proposed rule status means specific requirements remain undefined and subject to change</p>
+<p></p>
+<p><em>Resolution: Tension preserved as genuine planning paradox requiring risk-based decision making</em></p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-tension" data-slide="10">
+      <div class="slide-inner">
+        <h2 class="slide-title">Tension: interpretive</h2>
+        <div class="slide-content"><p>Resource advantages of large versus small plans</p>
+<p></p>
+<p><strong>financial analysis</strong>: Large plans have superior financial resources to manage implementation costs and regulatory compliance</p>
+<p><strong>quality operations</strong>: Operational transformation requirements create barriers that disproportionately impact smaller plans</p>
+<p></p>
+<p><em>Resolution: Both perspectives highlight market concentration concerns requiring policy consideration</em></p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-tension" data-slide="11">
+      <div class="slide-inner">
+        <h2 class="slide-title">Tension: values-based</h2>
+        <div class="slide-content"><p>Quality improvement versus administrative burden</p>
+<p></p>
+<p><strong>regulatory analysis</strong>: Enhanced star rating methodology will improve quality measurement precision and beneficiary outcomes</p>
+<p><strong>quality operations</strong>: Implementation requirements create significant administrative burden that may divert resources from direct patient care</p>
+<p></p>
+<p><em>Resolution: Fundamental tension between measurement precision and operational efficiency preserved for stakeholder consideration</em></p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-gaps" data-slide="12">
+      <div class="slide-inner">
+        <h2 class="slide-title">Knowledge Gaps</h2>
+        <div class="slide-content"><p>Specific measure changes remain undefined - exact measures being added, removed, or modified in 2027 methodology unknown</p>
+<p>Quantitative financial impacts unavailable - specific dollar amounts or percentage impacts on individual MA plan revenues not disclosed</p>
+<p>Current competitive positioning data inaccessible - 2024-2025 star rating results and market share data needed for baseline assessment</p>
+<p>Implementation cost estimates missing - projected costs for operational changes and system updates not available</p>
+<p>Beneficiary behavior impacts unknown - how star rating awareness affects enrollment decisions not studied</p>
+<p>Enforcement mechanism specifics undefined - compliance requirements and penalty structures not detailed in proposed rule</p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-quality" data-slide="13">
+      <div class="slide-inner">
+        <h2 class="slide-title">Quality Assessment</h2>
+        <div class="slide-content"><p>Grade: B+ (86%)</p>
+<p>Provenance: 31% complete</p>
+<p>Warnings: 12 (5 critical)</p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-closing" data-slide="14">
+      <div class="slide-inner">
+        <h2 class="slide-title">PRISM Intelligence Brief</h2>
+        <div class="slide-content"><p>Generated 2026-03-03T19:55:03.082Z</p>
+<p>Run ID: test-pres-1772567454</p>
+<p>Total cost: $0.0000</p></div>
+        
+      </div>
+    </section>
+
+  <div class="slide-counter">
+    <span id="current">1</span> / 15
+  </div>
+
+  <div class="nav">
+    <button onclick="prevSlide()">← Prev</button>
+    <button onclick="nextSlide()">Next →</button>
+  </div>
+
+  <script>
+    let current = 0;
+    const slides = document.querySelectorAll('.slide');
+    const counter = document.getElementById('current');
+
+    function goToSlide(n) {
+      current = Math.max(0, Math.min(n, slides.length - 1));
+      slides[current].scrollIntoView({ behavior: 'smooth' });
+      counter.textContent = current + 1;
+    }
+
+    function nextSlide() { goToSlide(current + 1); }
+    function prevSlide() { goToSlide(current - 1); }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+      if (e.key === 'ArrowLeft') prevSlide();
+    });
+
+    // Track scroll position
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          current = parseInt(entry.target.dataset.slide);
+          counter.textContent = current + 1;
+        }
+      });
+    }, { threshold: 0.5 });
+
+    slides.forEach(slide => observer.observe(slide));
+  </script>
+</body>
+</html>

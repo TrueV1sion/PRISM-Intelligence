@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRISM Strategic Brief — Analyze the competitive impact of the latest GLP-1 weight…</title>
+<style>
+:root {
+  --inov-navy:#003D79;--inov-cerulean:#4E84C4;--inov-sky:#59DDFD;
+  --inov-midnight:#001E3C;--inov-jade:#00E49F;--inov-sand:#F5E6BB;
+  --inov-violet:#6C6CFF;--inov-cloud:#F4F0EA;
+  --bg-primary:#0a0b10;--bg-secondary:#10121a;--bg-tertiary:#181b26;
+  --bg-elevated:#1e2130;--bg-card:rgba(30,33,48,0.85);
+  --text-primary:#f0f2f8;--text-secondary:#a0a8c0;--text-tertiary:#5c6480;
+  --accent:#4E84C4;--accent-bright:#59DDFD;--accent-success:#00E49F;
+  --accent-warning:#F5E6BB;--accent-error:#ff5c5c;--accent-violet:#6C6CFF;
+  --border:rgba(78,132,196,0.12);--border-bright:rgba(89,221,253,0.25);
+  --chart-1:#003D79;--chart-2:#4E84C4;--chart-3:#59DDFD;--chart-4:#001E3C;
+  --chart-5:#00E49F;--chart-6:#F5E6BB;--chart-7:#6C6CFF;--chart-8:#F4F0EA;
+  --text-xs:clamp(0.65rem,0.6rem + 0.2vw,0.8rem);
+  --text-sm:clamp(0.8rem,0.74rem + 0.3vw,1rem);
+  --text-base:clamp(1rem,0.92rem + 0.4vw,1.2rem);
+  --text-lg:clamp(1.2rem,1.1rem + 0.5vw,1.5rem);
+  --text-xl:clamp(1.5rem,1.35rem + 0.65vw,1.9rem);
+  --text-2xl:clamp(1.9rem,1.7rem + 0.85vw,2.5rem);
+  --text-3xl:clamp(2.4rem,2.1rem + 1.1vw,3.2rem);
+  --text-hero:clamp(3.2rem,2.8rem + 1.6vw,4.5rem);
+  --ease-out-expo:cubic-bezier(0.16,1,0.3,1);
+  --ease-out-quart:cubic-bezier(0.25,1,0.5,1);
+  --ease-spring:cubic-bezier(0.34,1.56,0.64,1);
+  --dur-fast:200ms;--dur-normal:350ms;--dur-slow:600ms;--dur-cinematic:1000ms;
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important;}}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg-primary);color:var(--text-primary);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+html{scroll-snap-type:y mandatory;overflow-y:scroll;scroll-behavior:smooth;}
+/* Slide framework */
+.slide{min-height:100vh;scroll-snap-align:start;display:flex;flex-direction:column;justify-content:center;position:relative;padding:3rem 5vw;overflow:hidden;}
+.slide-inner{max-width:1200px;margin:0 auto;width:100%;position:relative;z-index:2;}
+.slide-bg-glow{position:absolute;width:600px;height:600px;border-radius:50%;filter:blur(120px);opacity:0.08;z-index:0;pointer-events:none;}
+/* Fixed UI */
+#slideProgress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--inov-navy),var(--inov-cerulean),var(--inov-sky));z-index:100;transition:width 0.3s var(--ease-out-quart);width:0%;}
+.prism-mark{position:fixed;top:1.5rem;left:2rem;font-size:var(--text-xs);font-weight:700;letter-spacing:0.25em;color:var(--accent);z-index:100;text-transform:uppercase;}
+.slide-counter{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:1001;font-size:11px;color:var(--text-tertiary);letter-spacing:2px;font-weight:600;background:rgba(10,11,16,0.85);padding:4px 14px;border-radius:20px;border:1px solid var(--border);backdrop-filter:blur(8px);opacity:0;transition:opacity 0.3s;}
+.slide-counter.visible{opacity:1;}
+.slide-nav-hint{position:fixed;bottom:50px;left:50%;transform:translateX(-50%);z-index:1001;font-size:10px;color:var(--text-tertiary);letter-spacing:1px;text-align:center;opacity:0;transition:opacity 1s;pointer-events:none;}
+.slide-nav-hint.show{opacity:0.6;}
+/* Animation */
+.anim{opacity:0;transform:translateY(24px);transition:opacity var(--dur-slow) var(--ease-out-expo),transform var(--dur-slow) var(--ease-out-expo);}
+.anim.visible{opacity:1;transform:translateY(0);}
+.anim.d1{transition-delay:100ms;}.anim.d2{transition-delay:200ms;}.anim.d3{transition-delay:300ms;}
+.anim.d4{transition-delay:400ms;}.anim.d5{transition-delay:500ms;}.anim.d6{transition-delay:600ms;}.anim.d7{transition-delay:700ms;}
+/* Typography */
+.eyebrow{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.2em;color:var(--text-tertiary);margin-bottom:12px;}
+.slide-title{font-size:var(--text-3xl);font-weight:700;line-height:1.15;margin-bottom:16px;background:linear-gradient(135deg,var(--text-primary) 0%,var(--accent-bright) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.slide-subtitle{font-size:var(--text-base);color:var(--text-secondary);max-width:700px;margin-bottom:28px;line-height:1.7;}
+.section-intro{font-size:13.5px;line-height:1.7;max-width:800px;margin-bottom:20px;color:var(--text-secondary);}
+.hero-title{font-size:var(--text-hero);font-weight:800;line-height:1.1;background:linear-gradient(135deg,#fff 0%,var(--inov-sky) 60%,var(--inov-cerulean) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px;}
+.hero-sub{font-size:var(--text-lg);color:var(--text-secondary);max-width:800px;margin:0 auto 12px;}
+.hero-date{font-size:var(--text-sm);color:var(--text-tertiary);margin-bottom:28px;}
+.hero-badge{display:inline-block;padding:6px 18px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;background:rgba(78,132,196,0.15);border:1px solid rgba(78,132,196,0.3);color:var(--accent);margin-bottom:20px;}
+/* Tags */
+.tag{display:inline-block;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-right:6px;}
+.tag.clinical{background:rgba(89,221,253,0.15);color:var(--accent-bright);}
+.tag.financial{background:rgba(0,228,159,0.15);color:var(--accent-success);}
+.tag.regulatory{background:rgba(255,92,92,0.15);color:var(--accent-error);}
+.tag.quality{background:rgba(108,108,255,0.15);color:var(--accent-violet);}
+.tag.strategic{background:rgba(78,132,196,0.15);color:var(--accent);}
+.tag.competitive{background:rgba(249,115,22,0.15);color:#f97316;}
+.tag.emergent{background:rgba(89,221,253,0.15);color:var(--accent-bright);}
+.tag.ma{background:rgba(249,115,22,0.15);color:#f97316;}
+.tag-red{background:rgba(255,92,92,0.15);color:var(--accent-error);}
+.tag-green{background:rgba(0,228,159,0.15);color:var(--accent-success);}
+.tag-blue{background:rgba(78,132,196,0.15);color:var(--accent);}
+.tag-orange{background:rgba(249,115,22,0.15);color:#f97316;}
+.tag-purple{background:rgba(108,108,255,0.15);color:var(--accent-violet);}
+.tag-gold{background:rgba(245,230,187,0.15);color:var(--accent-warning);}
+.tag-cyan{background:rgba(89,221,253,0.15);color:var(--accent-bright);}
+/* Stat */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-top:16px;}
+.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center;transition:transform 0.2s;}
+.stat-card:hover{transform:translateY(-2px);}
+.stat-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-tertiary);margin-bottom:6px;}
+.stat-value{font-size:28px;font-weight:800;color:var(--text-primary);}
+.stat-value.negative{color:var(--accent-error);}.stat-value.positive{color:var(--accent-success);}.stat-value.warn{color:var(--accent-warning);}
+.stat-context{font-size:11px;color:var(--text-secondary);margin-top:4px;}
+.stat-block{text-align:center;padding:24px;}
+.stat-eyebrow{display:block;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-tertiary);margin-bottom:4px;}
+.stat-number{font-size:48px;font-weight:800;color:var(--accent-bright);line-height:1;}
+.stat-suffix{font-size:28px;font-weight:700;color:var(--accent-bright);}
+.stat-trend{display:inline-block;font-size:11px;padding:2px 8px;border-radius:4px;margin-top:8px;}
+.stat-trend.positive{background:rgba(0,228,159,0.15);color:var(--accent-success);}
+.stat-trend.negative{background:rgba(255,92,92,0.15);color:var(--accent-error);}
+/* Finding cards */
+.finding-card{background:var(--bg-card);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:0 12px 12px 0;padding:16px 20px;margin:10px 0;}
+.finding-card.emergent{border-left-color:var(--accent-bright);}
+.finding-card.risk{border-left-color:var(--accent-error);}
+.finding-card.opportunity{border-left-color:var(--accent-success);}
+.finding-title{font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:6px;}
+.finding-body{font-size:12.5px;color:var(--text-secondary);line-height:1.65;}
+.confidence-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-top:8px;}
+.confidence-badge.high{background:rgba(0,228,159,0.15);color:var(--accent-success);}
+.confidence-badge.medium{background:rgba(245,230,187,0.15);color:var(--accent-warning);}
+.confidence-badge.low{background:rgba(255,92,92,0.15);color:var(--accent-error);}
+/* Agent chips */
+.agent-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(78,132,196,0.1);border:1px solid rgba(78,132,196,0.25);border-radius:20px;padding:4px 12px;font-size:10.5px;color:var(--text-secondary);margin:3px;}
+.agent-chip .dot{width:6px;height:6px;border-radius:50%;}
+/* Hero stats */
+.hero-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:18px;max-width:1100px;margin:0 auto;}
+.hero-stat{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:22px 14px;text-align:center;transition:transform 0.2s;}
+.hero-stat:hover{transform:translateY(-2px);}
+.hero-stat .value{font-size:26px;font-weight:800;margin-bottom:4px;}
+.hero-stat .label{font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:1.5px;}
+/* Validation box */
+.validation-box{display:flex;gap:16px;max-width:1100px;margin:24px auto 0;text-align:left;}
+.validation-card{flex:1;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px;padding:14px 18px;}
+.validation-card h4{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--accent-success);margin-bottom:8px;font-weight:700;}
+.framework-card h4{color:var(--accent-violet);}
+.val-row{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:11px;color:var(--text-secondary);}
+.val-icon{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;}
+.val-icon.green{background:rgba(0,228,159,0.2);color:var(--accent-success);}
+.framework-visual{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px;}
+.fw-node{background:rgba(108,108,255,0.1);border:1px solid rgba(108,108,255,0.3);border-radius:6px;padding:3px 8px;font-size:9px;color:var(--accent-violet);font-weight:600;}
+.fw-arrow{color:var(--text-tertiary);font-size:10px;}
+.fw-center{background:linear-gradient(135deg,rgba(108,108,255,0.2),rgba(78,132,196,0.2));border:1px solid rgba(108,108,255,0.4);border-radius:8px;padding:4px 12px;font-size:10px;color:var(--text-primary);font-weight:700;}
+/* Grids */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:16px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:16px;}
+.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-top:16px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;}
+/* Tables */
+.prov-table{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:12px;}
+.prov-table th{text-align:left;padding:8px 10px;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-tertiary);border-bottom:1px solid var(--border);}
+.prov-table td{padding:8px 10px;border-bottom:1px solid rgba(78,132,196,0.06);color:var(--text-secondary);vertical-align:top;}
+.prov-table tr:hover td{background:rgba(78,132,196,0.04);}
+.compact-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px;}
+.compact-table th{text-align:left;padding:6px 8px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--text-tertiary);border-bottom:1px solid var(--border);}
+.compact-table td{padding:6px 8px;border-bottom:1px solid rgba(78,132,196,0.06);color:var(--text-secondary);}
+/* Policy box */
+.policy-box{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);border-radius:10px;padding:12px 16px;margin:6px 0;}
+.policy-box.positive{background:rgba(0,228,159,0.05);border-color:rgba(0,228,159,0.2);}
+.policy-box.neutral{background:rgba(78,132,196,0.05);border-color:rgba(78,132,196,0.2);}
+.policy-box h4{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:4px;}
+.policy-box p{font-size:11.5px;color:var(--text-secondary);line-height:1.5;}
+.impact{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;margin-top:5px;}
+.impact-severe{color:var(--accent-error);}.impact-moderate{color:var(--accent-warning);}.impact-positive{color:var(--accent-success);}.impact-neutral{color:var(--accent);}
+/* Emergence */
+.emergent-slide{background:linear-gradient(135deg,var(--bg-primary) 0%,rgba(108,108,255,0.04) 100%);}
+.emergent-number{font-size:120px;font-weight:900;color:rgba(89,221,253,0.06);position:absolute;top:-20px;left:-10px;}
+.emergent-why{background:var(--bg-card);border:1px solid var(--border-bright);border-radius:12px;padding:1.5rem;margin-top:1.5rem;}
+.emergent-why-label{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--accent-bright);margin-bottom:8px;font-weight:700;}
+.emergence-card{background:linear-gradient(135deg,rgba(108,108,255,0.08),rgba(78,132,196,0.08));border:1px solid rgba(108,108,255,0.3);border-radius:14px;padding:20px;margin:8px 0;}
+.emergence-card h4{color:var(--accent-violet);font-size:15px;margin-bottom:6px;}
+.emergence-card p{font-size:12px;color:var(--text-secondary);line-height:1.6;}
+/* Timeline */
+.timeline{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:20px;position:relative;}
+.timeline::before{content:'';position:absolute;top:15px;left:5%;right:5%;height:3px;background:linear-gradient(90deg,var(--accent-error),var(--accent-warning),var(--accent-success));border-radius:2px;}
+.timeline-phase{text-align:center;padding:0 12px;position:relative;z-index:1;}
+.timeline-dot{width:12px;height:12px;border-radius:50%;margin:10px auto 12px;border:2px solid var(--bg-primary);}
+.timeline-year{font-size:18px;font-weight:800;margin-bottom:4px;}
+.timeline-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-tertiary);margin-bottom:10px;}
+.timeline-items{font-size:11.5px;color:var(--text-secondary);line-height:1.8;text-align:left;padding:0 6px;}
+.timeline-items div{margin-bottom:4px;padding-left:12px;position:relative;}
+.timeline-items div::before{content:'\2022';position:absolute;left:0;color:var(--text-tertiary);}
+/* Bars */
+.bar-row{margin:8px 0;}
+.bar-label{font-size:11px;color:var(--text-secondary);margin-bottom:4px;display:flex;justify-content:space-between;}
+.bar-track{height:24px;background:rgba(255,255,255,0.04);border-radius:6px;overflow:hidden;position:relative;}
+.bar-fill{height:100%;border-radius:6px;transform-origin:left;transform:scaleX(0);transition:transform 0.8s var(--ease-out-expo);display:flex;align-items:center;padding-left:8px;}
+.bar-fill.animate{transform:scaleX(1);}
+.bar-fill-value{font-size:10px;font-weight:700;color:white;white-space:nowrap;}
+/* Threat meter */
+.threat-meter{display:flex;gap:2px;align-items:center;}
+.threat-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.1);}
+.threat-dot.active-red{background:var(--accent-error);}
+.threat-dot.active-orange{background:#f97316;}
+.threat-dot.active-yellow{background:var(--accent-warning);}
+.threat-dot.active-green{background:var(--accent-success);}
+.threat-dot.active-blue{background:var(--accent);}
+/* SVG charts */
+.chart-container{margin:16px 0;text-align:center;}
+.bar-chart .bar{transform-origin:bottom;transform:scaleY(0);transition:transform 0.6s var(--ease-out-expo),opacity 0.3s;}
+.bar-chart.is-visible .bar{transform:scaleY(1);}
+.bar-chart .bar:nth-child(1){transition-delay:0.1s;}.bar-chart .bar:nth-child(2){transition-delay:0.2s;}
+.bar-chart .bar:nth-child(3){transition-delay:0.3s;}.bar-chart .bar:nth-child(4){transition-delay:0.4s;}
+.bar-chart .bar:nth-child(5){transition-delay:0.5s;}.bar-chart .bar:nth-child(6){transition-delay:0.6s;}
+.bar-chart .bar:hover,.bar-chart .bar:focus{opacity:0.85;outline:2px solid var(--accent);outline-offset:2px;}
+.donut-chart .segment{transition:stroke-dashoffset 1s var(--ease-out-expo),opacity 0.2s;}
+.donut-chart .segment:hover{opacity:0.8;stroke-width:28;}
+.chart-legend{display:flex;flex-wrap:wrap;gap:12px;list-style:none;padding:0;margin-top:16px;}
+.legend-dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;}
+.donut-wrapper{display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+/* Quote */
+.quote-block{border-left:3px solid var(--accent-warning);padding:10px 18px;margin:10px 0;background:rgba(245,230,187,0.05);border-radius:0 8px 8px 0;font-style:italic;color:var(--text-primary);font-size:14px;}
+.quote-attr{font-style:normal;font-size:11px;color:var(--text-secondary);margin-top:4px;}
+/* Inovalon header */
+.inovalon-header{background:linear-gradient(135deg,rgba(78,132,196,0.1),rgba(0,228,159,0.1));border:1px solid rgba(78,132,196,0.2);border-radius:14px;padding:20px;margin-bottom:16px;text-align:center;}
+.inovalon-header h3{color:var(--accent);margin-bottom:4px;font-size:18px;}
+.inovalon-header p{font-size:12px;color:var(--text-secondary);}
+/* State grid */
+.state-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;}
+.state-item{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:10.5px;}
+.state-item .state-name{font-weight:600;color:var(--text-primary);}
+.state-item .state-impact{color:var(--accent);font-weight:700;}
+/* Timeline bar */
+.timeline-bar{display:flex;height:6px;border-radius:3px;overflow:hidden;margin-top:5px;background:rgba(255,255,255,0.05);}
+.timeline-segment{height:100%;}.tl-done{background:var(--accent-success);}.tl-active{background:var(--accent-warning);}.tl-pending{background:rgba(255,255,255,0.1);}
+.pipeline-caption{font-size:9.5px;color:var(--text-tertiary);margin:3px 0 0;}
+/* TOC */
+.toc-group-header{font-size:11px;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border);color:var(--text-tertiary);}
+.toc-item{border:1px solid var(--border);border-radius:8px;margin-bottom:6px;}
+/* Source */
+.source-list{margin-top:8px;font-size:9.5px;color:var(--text-tertiary);line-height:1.8;}
+.source-list a{font-size:9.5px;color:var(--accent);text-decoration:none;border-bottom:1px dotted rgba(78,132,196,0.3);}
+.source-unverified{color:var(--accent-warning);font-size:0.75em;vertical-align:super;cursor:help;opacity:0.85;}
+/* Slide footer */
+.slide-footer{position:absolute;bottom:16px;left:40px;right:40px;display:flex;justify-content:space-between;font-size:10px;color:var(--text-tertiary);border-top:1px solid var(--border);padding-top:8px;}
+/* Nav */
+.nav-toggle{position:fixed;top:20px;right:20px;z-index:1000;width:44px;height:44px;border-radius:50%;background:rgba(78,132,196,0.15);border:1px solid rgba(78,132,196,0.3);color:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;backdrop-filter:blur(12px);transition:all 0.3s;}
+.nav-toggle:hover{background:rgba(78,132,196,0.3);transform:scale(1.05);}
+.nav-panel{position:fixed;top:0;right:-340px;width:320px;height:100vh;background:rgba(10,11,16,0.97);border-left:1px solid var(--border);z-index:999;transition:right 0.35s ease;overflow-y:auto;padding:70px 20px 30px;backdrop-filter:blur(20px);}
+.nav-panel.open{right:0;}
+.nav-panel h3{font-size:11px;text-transform:uppercase;letter-spacing:3px;color:var(--accent);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:all 0.2s;text-decoration:none;margin-bottom:2px;}
+.nav-item:hover{background:rgba(78,132,196,0.1);}
+.nav-item .nav-num{font-size:10px;color:var(--text-tertiary);min-width:24px;font-weight:700;}
+.nav-item .nav-label{font-size:12.5px;color:var(--text-primary);font-weight:500;}
+.nav-item .nav-tag{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-left:auto;}
+.nav-tag-key{color:var(--accent-warning);}.nav-tag-new{color:var(--accent-bright);}
+.nav-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:998;display:none;}
+.nav-overlay.open{display:block;}
+/* Utility color */
+.highlight{color:var(--text-primary);font-weight:600;}
+.red{color:var(--accent-error);}.green{color:var(--accent-success);}.blue{color:var(--accent);}
+.purple{color:var(--accent-violet);}.gold{color:var(--accent-warning);}.cyan{color:var(--accent-bright);}
+.card-accent{border-left:3px solid var(--accent-error);}.card-blue{border-left:3px solid var(--accent);}
+.card-green{border-left:3px solid var(--accent-success);}.card-purple{border-left:3px solid var(--accent-violet);}
+a{color:var(--accent);text-decoration:none;}a:hover{color:var(--accent-bright);}
+/* Responsive */
+@media(max-width:1024px){.slide{padding:40px 30px;}.hero-stats{grid-template-columns:repeat(3,1fr);}.grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}.state-grid{grid-template-columns:1fr 1fr;}.validation-box{flex-direction:column;}.nav-toggle{top:12px;right:12px;}}
+@media(max-width:768px){.two-col{grid-template-columns:1fr;}.hero-stats{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+<div id="slideProgress"></div>
+<div class="prism-mark">PRISM Intelligence</div>
+<div class="slide-counter" id="slideCounter">01 / 19</div>
+<div class="slide-nav-hint show" id="navHint">&#8595; Arrow Down / Spacebar to navigate &#8595;</div>
+
+<button class="nav-toggle" onclick="toggleNav()" id="navBtn" title="Table of Contents">&#9776;</button>
+<div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+<div class="nav-panel" id="navPanel">
+  <h3>Table of Contents</h3>
+  <a class="nav-item" href="#s1" onclick="toggleNav()"><span class="nav-num">01</span><span class="nav-label">Title</span></a>
+  <a class="nav-item" href="#s2" onclick="toggleNav()"><span class="nav-num">02</span><span class="nav-label">Executive Summary</span></a>
+  <a class="nav-item" href="#s3" onclick="toggleNav()"><span class="nav-num">03</span><span class="nav-label">GLP-1 Drug Landscape</span></a>
+  <a class="nav-item" href="#s4" onclick="toggleNav()"><span class="nav-num">04</span><span class="nav-label">Bariatric Surgery Market Structure</span></a>
+  <a class="nav-item" href="#s5" onclick="toggleNav()"><span class="nav-num">05</span><span class="nav-label">Patient Journey &amp; Decision Dynamics</span></a>
+  <a class="nav-item" href="#s6" onclick="toggleNav()"><span class="nav-num">06</span><span class="nav-label">Payer Economics &amp; Coverage</span></a>
+  <a class="nav-item" href="#s7" onclick="toggleNav()"><span class="nav-num">07</span><span class="nav-label">Market Disruption Timeline</span></a>
+  <a class="nav-item" href="#s8" onclick="toggleNav()"><span class="nav-num">08</span><span class="nav-label">Tension Points</span><span class="nav-tag nav-tag-key">KEY</span></a>
+  <a class="nav-item" href="#s9" onclick="toggleNav()"><span class="nav-num">09</span><span class="nav-label">Emergent: The GLP-1 vs bariatric…</span><span class="nav-tag nav-tag-new">NEW</span></a>
+  <a class="nav-item" href="#s10" onclick="toggleNav()"><span class="nav-num">10</span><span class="nav-label">Emergent: The market is experiencing…</span><span class="nav-tag nav-tag-new">NEW</span></a>
+  <a class="nav-item" href="#s11" onclick="toggleNav()"><span class="nav-num">11</span><span class="nav-label">Emergent: The competitive disruption is…</span><span class="nav-tag nav-tag-new">NEW</span></a>
+  <a class="nav-item" href="#s12" onclick="toggleNav()"><span class="nav-num">12</span><span class="nav-label">Emergent: The market disruption is…</span><span class="nav-tag nav-tag-new">NEW</span></a>
+  <a class="nav-item" href="#s13" onclick="toggleNav()"><span class="nav-num">13</span><span class="nav-label">Emergent: The market disruption is…</span><span class="nav-tag nav-tag-new">NEW</span></a>
+  <a class="nav-item" href="#s14" onclick="toggleNav()"><span class="nav-num">14</span><span class="nav-label">Emergent: The emergence of endoscopic…</span><span class="nav-tag nav-tag-new">NEW</span></a>
+  <a class="nav-item" href="#s15" onclick="toggleNav()"><span class="nav-num">15</span><span class="nav-label">Emergent: The competitive disruption is…</span><span class="nav-tag nav-tag-new">NEW</span></a>
+  <a class="nav-item" href="#s16" onclick="toggleNav()"><span class="nav-num">16</span><span class="nav-label">Strategic Timeline</span></a>
+  <a class="nav-item" href="#s17" onclick="toggleNav()"><span class="nav-num">17</span><span class="nav-label">Provenance &amp; Confidence</span></a>
+  <a class="nav-item" href="#s18" onclick="toggleNav()"><span class="nav-num">18</span><span class="nav-label">Gaps &amp; Next Steps</span></a>
+  <a class="nav-item" href="#s19" onclick="toggleNav()"><span class="nav-num">19</span><span class="nav-label">Closing</span></a>
+</div>
+
+<section class="slide" id="s1" style="text-align:center;">
+  <div class="slide-bg-glow" style="background:var(--inov-cerulean);top:-200px;right:-200px;"></div>
+  <div class="slide-bg-glow" style="background:var(--inov-violet);bottom:-200px;left:-200px;"></div>
+  <div class="slide-inner">
+    <div class="anim"><div class="hero-badge">PRISM Multi-Source Validated</div></div>
+    <h1 class="hero-title anim d1">The GLP-1 vs bariatric surgery competition is fundamentally…</h1>
+    <p class="hero-sub anim d2">Analyze the competitive impact of the latest GLP-1 weight loss drug FDA approvals on the bariatric surgery market</p>
+    <p class="hero-date anim d3">March 2026 | 5-Agent Swarm | MEGA Validated Synthesis</p>
+    <div class="anim d4" style="margin-bottom:28px;"><span class="agent-chip"><span class="dot" style="background:var(--accent-bright)"></span>Pharmaceutical Intelligence Analyst</span>
+      <span class="agent-chip"><span class="dot" style="background:var(--accent-success)"></span>Surgical Market Analyst</span>
+      <span class="agent-chip"><span class="dot" style="background:#f97316"></span>Patient Journey Strategist</span>
+      <span class="agent-chip"><span class="dot" style="background:var(--accent-error)"></span>Health Economics Researcher</span>
+      <span class="agent-chip"><span class="dot" style="background:var(--accent-violet)"></span>Market Disruption Futurist</span></div>
+    <div class="hero-stats anim d5">
+      <div class="hero-stat"><div class="value cyan">$2100000000</div><div class="label">Market Value…</div></div>
+      <div class="hero-stat"><div class="value cyan">$2300000000</div><div class="label">Market Value…</div></div>
+      <div class="hero-stat"><div class="value green">8%</div><div class="label">Historical Growth…</div></div>
+      <div class="hero-stat"><div class="value cyan">5</div><div class="label">Parallel Agents</div></div>
+      <div class="hero-stat"><div class="value green">23</div><div class="label">Verified Findings</div></div>
+    </div>
+    <div class="validation-box anim d6">
+      <div class="validation-card">
+        <h4>&#10003; Validation</h4>
+        <div class="val-row"><span class="val-icon green">&#10003;</span>23 findings across 5 agents</div>
+        <div class="val-row"><span class="val-icon green">&#10003;</span>100% source coverage</div>
+        <div class="val-row"><span class="val-icon green">&#10003;</span>13 high-confidence findings</div>
+      </div>
+      <div class="validation-card framework-card">
+        <h4>&#9670; PRISM Framework</h4>
+        <div class="framework-visual">
+            <span class="fw-node">Pharmaceutical Intelligence</span>
+            <span class="fw-node">Surgical Market</span>
+            <span class="fw-node">Patient Journey</span>
+            <span class="fw-node">Health Economics</span>
+            <span class="fw-node">Market Disruption</span>
+            <span class="fw-arrow">&#8594;</span>
+            <span class="fw-center">Cross-Agent Synthesis</span>
+            <span class="fw-arrow">&#8594;</span>
+            <span class="fw-node" style="border-color:rgba(0,228,159,0.4);color:var(--accent-success)">7 Emergent</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s2">
+  <div class="slide-bg-glow" style="background:var(--inov-sky);top:-150px;left:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag emergent">Synthesis</span> Executive Summary</div>
+    <h2 class="slide-title anim d1">Strategic Intelligence Overview</h2>
+    <p class="slide-subtitle anim d2">5-agent convergence across 5 dimensions reveals 7 emergent insights and 4 strategic tension points.</p>
+    <div class="stat-grid anim d3"><div class="stat-card"><div class="stat-label">Active Clinical Trials</div><div class="stat-value ">18 trials</div><div class="stat-context">GLP-1 obesity studies</div></div>
+      <div class="stat-card"><div class="stat-label">Direct Surgery Comparison</div><div class="stat-value ">125 participants</div><div class="stat-context">NCT06803888 Cleveland Clinic</div></div>
+      <div class="stat-card"><div class="stat-label">CagriSema vs Tirzepatide</div><div class="stat-value ">1023 participants</div><div class="stat-context">NCT06534411 Novo Nordisk</div></div>
+      <div class="stat-card"><div class="stat-label">Market Value Range Low</div><div class="stat-value ">$2100000000</div><div class="stat-context">2023 estimate</div></div></div>
+    <div class="finding-card emergent anim d4" style="margin-top:16px;"><div class="finding-title">Convergent Intelligence</div><div class="finding-body">The 2-3 year timeframe represents a critical competitive decision window across cost, efficacy, and market dynamics</div></div>
+  </div>
+  <div class="slide-footer"><span>5 Agents | Source-Validated</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide" id="s3">
+  <div class="slide-bg-glow" style="background:var(--accent-bright);bottom:-200px;left:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag strategic">GLP-1 Drug</span> GLP-1 Drug Landscape</div>
+    <h2 class="slide-title anim d1">The GLP-1 drug landscape represents a formidable and rapidly evolving…</h2>
+    <p class="section-intro anim d2">The GLP-1 drug landscape represents a formidable and rapidly evolving competitive threat to bariatric surgery. Tirzepatide has demonstrated superior efficacy to semaglutide in head-to-head trials,…</p>
+    <div class="quote-block anim d3">Tirzepatide demonstrates superior weight loss efficacy compared to semaglutide, with head-to-head trial data showing enhanced competitive positioning…<div class="quote-attr">— PubMed database, multiple Phase 3…</div></div>
+    <div class="stat-grid anim d3"><div class="stat-card"><div class="stat-label">Active Clinical Trials</div><div class="stat-value ">18 trials</div><div class="stat-context">GLP-1 obesity studies</div></div>
+      <div class="stat-card"><div class="stat-label">Direct Surgery Comparison</div><div class="stat-value ">125 participants</div><div class="stat-context">NCT06803888 Cleveland Clinic</div></div>
+      <div class="stat-card"><div class="stat-label">CagriSema vs Tirzepatide</div><div class="stat-value ">1023 participants</div><div class="stat-context">NCT06534411 Novo Nordisk</div></div></div>
+    <div class="grid-2 anim d4">
+      <div><div class="finding-card opportunity">
+  <div class="finding-title">SURMOUNT-4 trial demonstrates that continued tirzepatide treatment maintains significant weight reduction, addressing a…</div>
+  <div class="finding-body">Addresses the durability question that has been bariatric surgery's key advantage, potentially shifting patient and physician preferences toward pharmaceutical intervention.</div>
+  <span class="confidence-badge high">HIGH &mdash; JAMA publications, SURMOUNT-4 trial data</span>
+</div>
+        <div class="finding-card ">
+  <div class="finding-title">Active clinical trials demonstrate expanding applications of GLP-1 agonists beyond weight loss, including direct…</div>
+  <div class="finding-body">The pipeline suggests pharmaceutical companies are directly targeting bariatric surgery's patient population with head-to-head studies, indicating strategic competitive positioning.</div>
+  <span class="confidence-badge medium">MEDIUM &mdash; ClinicalTrials.gov database</span>
+</div>
+        <div class="finding-card opportunity">
+  <div class="finding-title">Recent network meta-analyses position GLP-1 agonists within the broader obesity treatment landscape, providing…</div>
+  <div class="finding-body">Provides evidence-based treatment hierarchy that payers and clinicians can use for coverage decisions and treatment algorithms, potentially favoring pharmaceutical interventions based on risk-benefit profiles.</div>
+  <span class="confidence-badge high">HIGH &mdash; PubMed, systematic reviews and network…</span>
+</div></div>
+      <div><div class="policy-box neutral"><h4>Knowledge Gaps</h4><p>Long-term safety data beyond 2-3 years: While efficacy is well-established,…<br>Real-world adherence and persistence rates: Clinical trial adherence may not…</p></div></div>
+    </div>
+    <div class="source-list anim d5"><strong>Sources:</strong> <span style="color:var(--accent)">PubMed database, multiple Phase 3 clinical trials…</span> | <span style="color:var(--accent)">JAMA publications, SURMOUNT-4 trial data</span> | <span style="color:var(--accent)">ClinicalTrials.gov database</span> | <span style="color:var(--accent)">PubMed, systematic reviews and network…</span> | <span style="color:var(--accent)">OpenFDA drug labeling database</span> | <span style="color:var(--accent)">SURMOUNT-1 trial quality of life analysis</span></div>
+  </div>
+  <div class="slide-footer"><span>Pharmaceutical Intelligence Analyst | 6 findings | Confidence: 0.89</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide" id="s4">
+  <div class="slide-bg-glow" style="background:var(--accent-warning);top:-200px;right:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag competitive">Bariatric Surgery</span> Bariatric Surgery Market Structure</div>
+    <h2 class="slide-title anim d1">The bariatric surgery market structure analysis is fundamentally compromised by…</h2>
+    <p class="section-intro anim d2">The bariatric surgery market structure analysis is fundamentally compromised by complete technical search system failures that prevented access to any current market intelligence, procedure volumes,…</p>
+    <div class="stat-grid anim d3"><div class="stat-card"><div class="stat-label">Market Value Range Low</div><div class="stat-value ">$2100000000</div></div>
+      <div class="stat-card"><div class="stat-label">Market Value Range High</div><div class="stat-value ">$2300000000</div></div>
+      <div class="stat-card"><div class="stat-label">Historical Growth Rate Low</div><div class="stat-value positive">8%</div></div></div>
+    <div class="grid-2 anim d4">
+      <div><table class="compact-table anim d3">
+  <thead><tr><th>Entity</th><th>Category</th><th>Assessment</th></tr></thead>
+  <tbody><tr><td>Data Sources Accessible</td><td>Competitor</td><td>None</td></tr>
+<tr><td>Coverage Requirement</td><td>Competitor</td><td>Multidisciplinary Evaluation</td></tr></tbody>
+</table></div>
+      <div>
+        <div class="stat-card"><div class="stat-label">Threat Assessment</div><div style="display:flex;justify-content:space-between;align-items:center;margin:4px 0;font-size:11px;color:var(--text-secondary);"><span>Data Sources Accessible</span><span class="threat-meter"><span class="threat-dot active-orange"></span><span class="threat-dot active-orange"></span><span class="threat-dot active-orange"></span><span class="threat-dot active-orange"></span><span class="threat-dot"></span></span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin:4px 0;font-size:11px;color:var(--text-secondary);"><span>Coverage Requirement</span><span class="threat-meter"><span class="threat-dot active-green"></span><span class="threat-dot active-green"></span><span class="threat-dot"></span><span class="threat-dot"></span><span class="threat-dot"></span></span></div></div>
+        <div class="policy-box neutral"><h4>Intelligence Gaps</h4><p>Current procedure volumes and growth trends (2023-2024)<br>Market revenue and reimbursement rate changes</p></div>
+      </div>
+    </div>
+    <div class="source-list anim d5"><strong>Sources:</strong> <span style="color:var(--accent)">Research data technical status report</span> | <span style="color:var(--accent)">Domain knowledge - unable to verify with current…</span> | <span style="color:var(--accent)">Domain knowledge - verification sources…</span> | <span style="color:var(--accent)">Domain knowledge of Medicare policy framework</span> | <span style="color:var(--accent)">Domain knowledge - requires verification</span></div>
+  </div>
+  <div class="slide-footer"><span>Surgical Market Analyst | 5 findings | Confidence: 0.53</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide" id="s5">
+  <div class="slide-bg-glow" style="background:var(--accent-bright);bottom:-200px;left:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag strategic">Patient Journey</span> Patient Journey &amp; Decision Dynamics</div>
+    <h2 class="slide-title anim d1">The analysis of patient journey and decision dynamics between GLP-1 weight loss…</h2>
+    <p class="section-intro anim d2">The analysis of patient journey and decision dynamics between GLP-1 weight loss drugs and bariatric surgery faces severe data access constraints, with zero successful retrievals across multiple…</p>
+    <div class="quote-block anim d3">Current patient decision-making data between GLP-1 drugs and bariatric surgery is inaccessible through available research tools.<div class="quote-attr">— Web search tool results - multiple…</div></div>
+    <div class="stat-grid anim d3"><div class="stat-card"><div class="stat-label">Successful Data Queries</div><div class="stat-value negative">0 queries</div><div class="stat-context">out of 7 attempts</div></div></div>
+    <div class="grid-2 anim d4">
+      <div><div class="finding-card opportunity">
+  <div class="finding-title">Clinical decision criteria for treatment selection between pharmaceutical and surgical weight loss options could not be…</div>
+  <div class="finding-body">Without access to clinical decision criteria, it's impossible to predict which patient segments will be most likely to switch between treatment modalities or understand physician recommendation patterns.</div>
+  <span class="confidence-badge high">HIGH &mdash; Failed search attempts documented in…</span>
+</div>
+        <div class="finding-card ">
+  <div class="finding-title">Patient treatment switching patterns and migration data between GLP-1 medications and bariatric surgery are currently…</div>
+  <div class="finding-body">The inability to access switching patterns severely limits the ability to forecast market disruption timing and magnitude, as patient migration is a key driver of competitive impact.</div>
+  <span class="confidence-badge medium">MEDIUM &mdash; Research summary noting absence of…</span>
+</div>
+        <div class="finding-card opportunity">
+  <div class="finding-title">Demographic segmentation data for treatment preference between pharmaceutical and surgical weight loss options is not…</div>
+  <div class="finding-body">Without demographic segmentation data, it's impossible to identify which patient populations are most likely to choose GLP-1 drugs over surgery, limiting targeted market analysis and competitive positioning strategies.</div>
+  <span class="confidence-badge high">HIGH &mdash; Failed demographic segmentation…</span>
+</div></div>
+      <div><div class="policy-box neutral"><h4>Knowledge Gaps</h4><p>Patient preference studies comparing satisfaction between GLP-1 medications and…<br>Clinical decision criteria and updated guidelines for treatment selection</p></div></div>
+    </div>
+    <div class="source-list anim d5"><strong>Sources:</strong> <span style="color:var(--accent)">Web search tool results - multiple failed queries…</span> | <span style="color:var(--accent)">Failed search attempts documented in research…</span> | <span style="color:var(--accent)">Research summary noting absence of switching…</span> | <span style="color:var(--accent)">Failed demographic segmentation searches…</span></div>
+  </div>
+  <div class="slide-footer"><span>Patient Journey Strategist | 4 findings | Confidence: 0.92</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide" id="s6">
+  <div class="slide-bg-glow" style="background:var(--inov-jade);bottom:-200px;right:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag strategic">Payer Economics</span> Payer Economics &amp; Coverage</div>
+    <h2 class="slide-title anim d1">From a payer economics perspective, the competitive impact of GLP-1 drug…</h2>
+    <p class="section-intro anim d2">From a payer economics perspective, the competitive impact of GLP-1 drug approvals on bariatric surgery is creating a complex cost-effectiveness landscape with clear financial inflection points. The…</p>
+    <div class="stat-grid anim d3"><div class="stat-card"><div class="stat-label">Medications Analyzed</div><div class="stat-value ">5 drugs</div><div class="stat-context">Anti-obesity medications</div></div></div>
+    <div class="grid-2 anim d4">
+      <div><div class="finding-card opportunity">
+  <div class="finding-title">GLP-1 receptor agonists become more expensive than bariatric surgery after approximately 2-3 years of continuous…</div>
+  <div class="finding-body">Payers face significant long-term cost pressure from GLP-1 coverage, creating economic incentives to potentially favor bariatric surgery for appropriate candidates and driving need for time-limited coverage policies.</div>
+  <span class="confidence-badge high">HIGH &mdash; pubmed.ncbi.nlm.nih.gov</span>
+</div>
+        <div class="finding-card opportunity">
+  <div class="finding-title">Comprehensive microsimulation analysis shows varying cost-effectiveness profiles for endoscopic, surgical, and…</div>
+  <div class="finding-body">Payers need nuanced coverage policies that consider patient-specific factors rather than blanket coverage decisions, suggesting potential for value-based coverage arrangements and personalized treatment pathways.</div>
+  <span class="confidence-badge high">HIGH &mdash; pubmed.ncbi.nlm.nih.gov</span>
+</div></div>
+      <div><div class="stat-card"><div class="stat-label">Findings</div><div class="stat-value positive">5</div></div></div>
+    </div>
+    <div class="source-list anim d5"><strong>Sources:</strong> <a href="https://pubmed.ncbi.nlm.nih.gov/39285034/" target="_blank">pubmed.ncbi.nlm.nih.gov</a> | <a href="https://pubmed.ncbi.nlm.nih.gov/37524445/" target="_blank">pubmed.ncbi.nlm.nih.gov</a> | <a href="https://pubmed.ncbi.nlm.nih.gov/37088648/" target="_blank">pubmed.ncbi.nlm.nih.gov</a> | <a href="https://pubmed.ncbi.nlm.nih.gov/35869383/ and https://pubmed.ncbi.nlm.nih.gov/38144444/" target="_blank">pubmed.ncbi.nlm.nih.gov</a> | <a href="https://www.federalregister.gov/documents/2024/12/10/2024-27939/" target="_blank">federalregister.gov</a></div>
+  </div>
+  <div class="slide-footer"><span>Health Economics Researcher | 5 findings | Confidence: 0.93</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide" id="s7">
+  <div class="slide-bg-glow" style="background:var(--inov-cerulean);top:-200px;left:-200px;"></div>
+  <div class="slide-inner">
+    
+    <div class="eyebrow anim"><span class="tag competitive">Market Disruption</span> Market Disruption Timeline</div>
+    <h2 class="slide-title anim d1">The market disruption timeline between GLP-1 weight loss drugs and bariatric…</h2>
+    <p class="section-intro anim d2">The market disruption timeline between GLP-1 weight loss drugs and bariatric surgery cannot be accurately modeled based on publicly available data through standard search tools. This represents a…</p>
+    <div class="grid-2 anim d3">
+      <div><div class="finding-card opportunity">
+  <div class="finding-title">Multiple targeted searches across different query strategies and timeframes returned no accessible market data on GLP-1…</div>
+  <div class="finding-body">Timeline analysis must rely on scenario modeling rather than empirical trend data, creating significant uncertainty in disruption forecasts</div>
+  <span class="confidence-badge high">HIGH &mdash; DuckDuckGo search tool results across 8…</span>
+</div>
+        <div class="finding-card ">
+  <div class="finding-title">The absence of publicly accessible competitive market data suggests this disruption analysis requires proprietary…</div>
+  <div class="finding-body">Strategic planning must account for information asymmetries that may favor pharmaceutical companies and specialized research firms over public analysis</div>
+  <span class="confidence-badge medium">MEDIUM &mdash; Analysis of search result patterns and…</span>
+</div>
+        <div class="finding-card ">
+  <div class="finding-title">The data gap itself represents a critical finding that the GLP-1 vs bariatric surgery competitive dynamic is either too…</div>
+  <div class="finding-body">Timeline modeling must use scenario-based approaches with high uncertainty ranges rather than trend extrapolation</div>
+  <span class="confidence-badge medium">MEDIUM &mdash; Analytical inference from search result…</span>
+</div></div>
+      <div><div class="policy-box positive">
+  <h4>Multiple targeted searches across different query…</h4>
+  <p>Timeline analysis must rely on scenario modeling rather than empirical trend data, creating significant uncertainty in…</p>
+  
+</div>
+      <div class="policy-box neutral">
+  <h4>The absence of publicly accessible competitive market data…</h4>
+  <p>Strategic planning must account for information asymmetries that may favor pharmaceutical companies and specialized…</p>
+  
+</div>
+      <div class="policy-box neutral">
+  <h4>The data gap itself represents a critical finding that the…</h4>
+  <p>Timeline modeling must use scenario-based approaches with high uncertainty ranges rather than trend extrapolation</p>
+  
+</div></div>
+    </div>
+    <div class="source-list anim d5"><strong>Sources:</strong> <span style="color:var(--accent)">DuckDuckGo search tool results across 8 different…</span> | <span style="color:var(--accent)">Analysis of search result patterns and typical…</span> | <span style="color:var(--accent)">Analytical inference from search result patterns…</span></div>
+  </div>
+  <div class="slide-footer"><span>Market Disruption Futurist | 3 findings | Confidence: 0.77</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide" id="s8">
+  <div class="slide-bg-glow" style="background:var(--accent-warning);top:-200px;right:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag-gold tag">Tension</span> Synthesis</div>
+    <h2 class="slide-title anim d1">Strategic Tension Points</h2>
+    <p class="section-intro anim d2">Where analytical perspectives create productive disagreement — these tensions trace deeper structural complexity.</p>
+    <div class="anim d3">
+      <div class="policy-box neutral" style="margin:10px 0;">
+        <h4>Treatment philosophy: continuous pharmaceutical intervention vs. one-time…</h4>
+        <div class="two-col" style="gap:1rem;margin-top:8px;">
+          <div><div class="stat-label">Pharmaceutical Intelligence Analyst</div><p style="font-size:11.5px;color:var(--text-secondary);line-height:1.5;">GLP-1 drugs offer continuous, adjustable treatment with maintenance efficacy demonstrated in SURMOUNT-4 trials</p></div>
+          <div><div class="stat-label">Surgical Market Analyst</div><p style="font-size:11.5px;color:var(--text-secondary);line-height:1.5;">Bariatric surgery provides definitive anatomical intervention with superior long-term outcomes (60-80% excess weight…</p></div>
+        </div>
+        <div class="impact impact-neutral" style="margin-top:8px;">Resolution: Both approaches have merit depending on patient preferences, risk tolerance, and clinical…</div>
+      </div>
+    
+      <div class="policy-box neutral" style="margin:10px 0;">
+        <h4>Evidence accessibility vs. clinical superiority trade-off</h4>
+        <div class="two-col" style="gap:1rem;margin-top:8px;">
+          <div><div class="stat-label">Pharmaceutical Intelligence Analyst</div><p style="font-size:11.5px;color:var(--text-secondary);line-height:1.5;">Pharmaceutical evidence is readily accessible through FDA approvals, clinical trials, and peer-reviewed publications</p></div>
+          <div><div class="stat-label">Surgical Market Analyst</div><p style="font-size:11.5px;color:var(--text-secondary);line-height:1.5;">Surgical outcomes may be clinically superior but current market data is inaccessible through standard research tools</p></div>
+        </div>
+        <div class="impact impact-neutral" style="margin-top:8px;">Resolution: This tension reflects structural information asymmetries in healthcare markets rather than…</div>
+      </div>
+    
+      <div class="policy-box neutral" style="margin:10px 0;">
+        <h4>Market expansion vs. direct substitution interpretation</h4>
+        <div class="two-col" style="gap:1rem;margin-top:8px;">
+          <div><div class="stat-label">Health Economics Researcher</div><p style="font-size:11.5px;color:var(--text-secondary);line-height:1.5;">Cost-effectiveness analysis suggests GLP-1 drugs may expand overall obesity treatment market by treating earlier-stage…</p></div>
+          <div><div class="stat-label">Patient Journey Strategist</div><p style="font-size:11.5px;color:var(--text-secondary);line-height:1.5;">Patient journey data gaps prevent determination of whether GLP-1 drugs are expanding market or substituting for…</p></div>
+        </div>
+        <div class="impact impact-neutral" style="margin-top:8px;">Resolution: Insufficient data to resolve - both market expansion and substitution effects likely occurring…</div>
+      </div></div>
+  </div>
+  <div class="slide-footer"><span>Cross-Agent Synthesis | 3 tensions</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide emergent-slide" id="s9">
+  <div class="slide-inner" style="position:relative;">
+    <div class="emergent-number anim">01</div>
+    <div class="eyebrow anim">Emergent Insight</div>
+    <h2 class="slide-title anim d1">The GLP-1 vs bariatric surgery competition is fundamentally characterized by…</h2>
+    <p class="slide-subtitle anim d2">pattern emergence — 4 agents converged</p>
+    <div class="grid-2 anim d3">
+      <div>
+        <div class="emergence-card"><h4>Pharmaceutical Intelligence Analyst</h4><p>Pharmaceutical agent accessed 6 high-quality findings with multiple NEJM/JAMA publications and FDA labeling data</p></div>
+        <div class="emergence-card"><h4>Surgical Market Analyst</h4><p>Surgical agent experienced complete technical search failures preventing access to any current market data</p></div>
+        <div class="emergence-card"><h4>Health Economics Researcher</h4><p>Market disruption agent found systematic absence of publicly accessible competitive market data across 8 targeted searches</p></div>
+      </div>
+      <div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;">
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Novelty</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">5/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Grounding</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">5/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Actionability</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Depth</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">5/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Surprise</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+        </div>
+        <div class="policy-box positive"><h4>Recommended Action</h4><p>Surgical providers should immediately invest in proprietary market intelligence capabilities and form data-sharing consortiums to counter…</p></div>
+      </div>
+    </div>
+    <div class="emergent-why anim d4">
+      <div class="emergent-why-label">Why Only Multi-Agent Analysis Finds This</div>
+      <div class="finding-body">Pharmaceutical Intelligence Analyst, Surgical Market Analyst, Health Economics Researcher, Market Disruption Futurist each provided independent evidence from different analytical lenses. This pattern insight emerges only when these perspectives are synthesized — no single agent would surface this pattern.</div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Emergence Detection | 4 agents</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide emergent-slide" id="s10">
+  <div class="slide-inner" style="position:relative;">
+    <div class="emergent-number anim">02</div>
+    <div class="eyebrow anim">Emergent Insight</div>
+    <h2 class="slide-title anim d1">The market is experiencing 'temporal arbitrage dynamics' where the 2-3 year…</h2>
+    <p class="slide-subtitle anim d2">convergent emergence — 3 agents converged</p>
+    <div class="grid-2 anim d3">
+      <div>
+        <div class="emergence-card"><h4>Health Economics Researcher</h4><p>Health economics research shows GLP-1 drugs become more expensive than surgery after 2-3 years (PMID: 39285034)</p></div>
+        <div class="emergence-card"><h4>Pharmaceutical Intelligence Analyst</h4><p>Pharmaceutical trials demonstrate maintenance efficacy (SURMOUNT-4) addressing surgical durability advantage</p></div>
+        <div class="emergence-card"><h4>Surgical Market Analyst</h4><p>Surgical market shows superior long-term outcomes (60-80% excess weight loss) but lacks current competitive data access</p></div>
+      </div>
+      <div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;">
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Novelty</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Grounding</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">5/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Actionability</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">5/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Depth</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Surprise</div><div class="stat-value" style="font-size:20px;color:var(--accent-warning);">3/5</div></div>
+        </div>
+        <div class="policy-box positive"><h4>Recommended Action</h4><p>Payers should implement time-based coverage policies that account for the 2-3 year cost inflection point, while surgical providers should develop…</p></div>
+      </div>
+    </div>
+    <div class="emergent-why anim d4">
+      <div class="emergent-why-label">Why Only Multi-Agent Analysis Finds This</div>
+      <div class="finding-body">Health Economics Researcher, Pharmaceutical Intelligence Analyst, Surgical Market Analyst each provided independent evidence from different analytical lenses. This convergent insight emerges only when these perspectives are synthesized — no single agent would surface this pattern.</div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Emergence Detection | 3 agents</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide emergent-slide" id="s11">
+  <div class="slide-inner" style="position:relative;">
+    <div class="emergent-number anim">03</div>
+    <div class="eyebrow anim">Emergent Insight</div>
+    <h2 class="slide-title anim d1">The competitive disruption is creating 'treatment pathway restructuring' from…</h2>
+    <p class="slide-subtitle anim d2">pattern emergence — 3 agents converged</p>
+    <div class="grid-2 anim d3">
+      <div>
+        <div class="emergence-card"><h4>Health Economics Researcher</h4><p>Health economics analysis identifies endoscopic procedures as middle-ground option with varying cost-effectiveness profiles (PMID: 37524445)</p></div>
+        <div class="emergence-card"><h4>Pharmaceutical Intelligence Analyst</h4><p>Pharmaceutical trials show expanding applications beyond weight loss including cardiovascular benefits</p></div>
+        <div class="emergence-card"><h4>Patient Journey Strategist</h4><p>Patient journey analysis gaps reveal absence of switching pattern data, suggesting emerging sequential treatment pathways not yet documented</p></div>
+      </div>
+      <div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;">
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Novelty</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Grounding</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Actionability</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Depth</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Surprise</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+        </div>
+        <div class="policy-box positive"><h4>Recommended Action</h4><p>Healthcare systems should develop integrated treatment pathways with clear escalation criteria based on efficacy thresholds and cost-effectiveness…</p></div>
+      </div>
+    </div>
+    <div class="emergent-why anim d4">
+      <div class="emergent-why-label">Why Only Multi-Agent Analysis Finds This</div>
+      <div class="finding-body">Health Economics Researcher, Pharmaceutical Intelligence Analyst, Patient Journey Strategist each provided independent evidence from different analytical lenses. This pattern insight emerges only when these perspectives are synthesized — no single agent would surface this pattern.</div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Emergence Detection | 3 agents</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide emergent-slide" id="s12">
+  <div class="slide-inner" style="position:relative;">
+    <div class="emergent-number anim">04</div>
+    <div class="eyebrow anim">Emergent Insight</div>
+    <h2 class="slide-title anim d1">The market disruption is occurring within a 'regulatory-commercial intelligence…</h2>
+    <p class="slide-subtitle anim d2">gap emergence — 3 agents converged</p>
+    <div class="grid-2 anim d3">
+      <div>
+        <div class="emergence-card"><h4>Pharmaceutical Intelligence Analyst</h4><p>Pharmaceutical agent accessed comprehensive FDA labeling data and multiple Phase 3 trial publications</p></div>
+        <div class="emergence-card"><h4>Surgical Market Analyst</h4><p>Surgical market analyst experienced complete technical search system failures preventing any current data access</p></div>
+        <div class="emergence-card"><h4>Market Disruption Futurist</h4><p>Market disruption agent found systematic absence of publicly accessible competitive data suggesting proprietary concentration</p></div>
+      </div>
+      <div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;">
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Novelty</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Grounding</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">5/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Actionability</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Depth</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Surprise</div><div class="stat-value" style="font-size:20px;color:var(--accent-warning);">3/5</div></div>
+        </div>
+        <div class="policy-box positive"><h4>Recommended Action</h4><p>Regulatory bodies should mandate standardized comparative effectiveness reporting for all obesity treatments, while surgical professional societies…</p></div>
+      </div>
+    </div>
+    <div class="emergent-why anim d4">
+      <div class="emergent-why-label">Why Only Multi-Agent Analysis Finds This</div>
+      <div class="finding-body">Pharmaceutical Intelligence Analyst, Surgical Market Analyst, Market Disruption Futurist each provided independent evidence from different analytical lenses. This gap insight emerges only when these perspectives are synthesized — no single agent would surface this pattern.</div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Emergence Detection | 3 agents</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide emergent-slide" id="s13">
+  <div class="slide-inner" style="position:relative;">
+    <div class="emergent-number anim">05</div>
+    <div class="eyebrow anim">Emergent Insight</div>
+    <h2 class="slide-title anim d1">The market disruption is creating a 'strategic inversion' where the treatment…</h2>
+    <p class="slide-subtitle anim d2">pattern emergence — 3 agents converged</p>
+    <div class="grid-2 anim d3">
+      <div>
+        <div class="emergence-card"><h4>Bariatric Surgery Market Structure</h4><p>Bariatric surgery offers superior long-term weight loss outcomes but operates with incomplete competitive intelligence</p></div>
+        <div class="emergence-card"><h4>GLP-1 Drug Landscape</h4><p>GLP-1 drugs have robust, accessible efficacy data despite higher long-term costs</p></div>
+        <div class="emergence-card"><h4>Payer Economics &amp; Coverage</h4><p>Clinical evidence asymmetry drives payer and physician defaults to pharmaceutical options</p></div>
+      </div>
+      <div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;">
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Novelty</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">5/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Grounding</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Actionability</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Depth</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">5/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Surprise</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">5/5</div></div>
+        </div>
+        <div class="policy-box positive"><h4>Recommended Action</h4><p>Healthcare stakeholders should recognize that clinical superiority alone is insufficient for market success - evidence presentation and intelligence…</p></div>
+      </div>
+    </div>
+    <div class="emergent-why anim d4">
+      <div class="emergent-why-label">Why Only Multi-Agent Analysis Finds This</div>
+      <div class="finding-body">Bariatric Surgery Market Structure, GLP-1 Drug Landscape, Payer Economics &amp; Coverage each provided independent evidence from different analytical lenses. This pattern insight emerges only when these perspectives are synthesized — no single agent would surface this pattern.</div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Emergence Detection | 3 agents</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide emergent-slide" id="s14">
+  <div class="slide-inner" style="position:relative;">
+    <div class="emergent-number anim">06</div>
+    <div class="eyebrow anim">Emergent Insight</div>
+    <h2 class="slide-title anim d1">The emergence of endoscopic procedures as a 'Goldilocks option' combined with…</h2>
+    <p class="slide-subtitle anim d2">pattern emergence — 3 agents converged</p>
+    <div class="grid-2 anim d3">
+      <div>
+        <div class="emergence-card"><h4>Market Disruption Timeline</h4><p>Endoscopic procedures identified as third competitive option beyond binary GLP-1 vs surgery choice</p></div>
+        <div class="emergence-card"><h4>Patient Journey &amp; Decision Dynamics</h4><p>2-3 year timeframe critical for competitive dynamics and cost considerations</p></div>
+        <div class="emergence-card"><h4>Payer Economics &amp; Coverage</h4><p>Patient selection criteria (BMI, comorbidities) create natural progression pathways</p></div>
+      </div>
+      <div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;">
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Novelty</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Grounding</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Actionability</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">5/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Depth</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Surprise</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+        </div>
+        <div class="policy-box positive"><h4>Recommended Action</h4><p>Healthcare systems should develop integrated treatment pathways that position interventions as complementary stages rather than competing…</p></div>
+      </div>
+    </div>
+    <div class="emergent-why anim d4">
+      <div class="emergent-why-label">Why Only Multi-Agent Analysis Finds This</div>
+      <div class="finding-body">Market Disruption Timeline, Patient Journey &amp; Decision Dynamics, Payer Economics &amp; Coverage each provided independent evidence from different analytical lenses. This pattern insight emerges only when these perspectives are synthesized — no single agent would surface this pattern.</div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Emergence Detection | 3 agents</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide emergent-slide" id="s15">
+  <div class="slide-inner" style="position:relative;">
+    <div class="emergent-number anim">07</div>
+    <div class="eyebrow anim">Emergent Insight</div>
+    <h2 class="slide-title anim d1">The competitive disruption is occurring within a 'regulatory-commercial…</h2>
+    <p class="slide-subtitle anim d2">gap emergence — 4 agents converged</p>
+    <div class="grid-2 anim d3">
+      <div>
+        <div class="emergence-card"><h4>GLP-1 Drug Landscape</h4><p>FDA approval processes create accessible pharmaceutical efficacy data</p></div>
+        <div class="emergence-card"><h4>Bariatric Surgery Market Structure</h4><p>Surgical market intelligence concentrated in proprietary, inaccessible sources</p></div>
+        <div class="emergence-card"><h4>Payer Economics &amp; Coverage</h4><p>Systematic search failures across multiple market intelligence attempts</p></div>
+      </div>
+      <div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;">
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Novelty</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Grounding</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">5/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Actionability</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">5/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Depth</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Surprise</div><div class="stat-value" style="font-size:20px;color:var(--accent-warning);">3/5</div></div>
+        </div>
+        <div class="policy-box positive"><h4>Recommended Action</h4><p>Regulatory and industry stakeholders should establish standardized, publicly accessible surgical outcome and market performance reporting…</p></div>
+      </div>
+    </div>
+    <div class="emergent-why anim d4">
+      <div class="emergent-why-label">Why Only Multi-Agent Analysis Finds This</div>
+      <div class="finding-body">GLP-1 Drug Landscape, Bariatric Surgery Market Structure, Payer Economics &amp; Coverage, Market Disruption Timeline each provided independent evidence from different analytical lenses. This gap insight emerges only when these perspectives are synthesized — no single agent would surface this pattern.</div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Emergence Detection | 4 agents</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide" id="s16">
+  <div class="slide-bg-glow" style="background:var(--accent-success);bottom:-200px;left:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag strategic">Strategic</span> Timeline</div>
+    <h2 class="slide-title anim d1">Implementation Horizon</h2>
+    <p class="section-intro anim d2">Three-phase approach: defensive positioning, transitional investment, offensive expansion.</p>
+    <div class="timeline anim d3">
+      <div class="timeline-phase">
+        <div class="timeline-dot" style="background:var(--accent-error);"></div>
+        <div class="timeline-year" style="color:var(--accent-error);">Q1-Q2</div>
+        <div class="timeline-label">Defensive</div>
+        <div class="timeline-items">
+          <div>GLP-1 drugs represent a significant competitive threat to…</div>
+          <div>Tirzepatide demonstrates superior clinical efficacy…</div>
+          <div>Bariatric surgery offers superior long-term weight loss…</div>
+        </div>
+      </div>
+      <div class="timeline-phase">
+        <div class="timeline-dot" style="background:var(--accent-warning);"></div>
+        <div class="timeline-year" style="color:var(--accent-warning);">Q3-Q4</div>
+        <div class="timeline-label">Transitional</div>
+        <div class="timeline-items">
+          <div>The 2-3 year timeframe represents a critical competitive…</div>
+          <div>Maintenance and durability of weight loss outcomes…</div>
+          <div>Quality of life improvements are essential competitive…</div>
+        </div>
+      </div>
+      <div class="timeline-phase">
+        <div class="timeline-dot" style="background:var(--accent-success);"></div>
+        <div class="timeline-year" style="color:var(--accent-success);">2027+</div>
+        <div class="timeline-label">Offensive</div>
+        <div class="timeline-items">
+          <div>Intelligence asymmetry warfare where pharmaceutical…</div>
+          <div>Temporal arbitrage market dynamics where cost breakeven…</div>
+          <div>Sequential treatment pathway restructuring from competing…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Strategic Synthesis</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide" id="s17">
+  <div class="slide-bg-glow" style="background:var(--accent);top:-200px;left:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag quality">Quality</span> Provenance</div>
+    <h2 class="slide-title anim d1">Provenance &amp; Confidence</h2>
+    <div class="grid-2 anim d2">
+      <div>
+        <div class="chart-container donut-wrapper anim d3" role="img" aria-label="Distribution chart">
+  <svg viewBox="0 0 200 200" class="donut-chart" style="width:180px;height:180px;">
+    <g transform="translate(100,100)">
+      <circle r="80" fill="none" stroke="var(--bg-tertiary)" stroke-width="24"/>
+      <circle class="segment" r="80" fill="none" stroke="var(--accent-success)" stroke-width="24" stroke-dasharray="284.1 502.65" stroke-dashoffset="0" transform="rotate(-90)" tabindex="0" aria-label="High (13): 57%"><title>High (13): 13</title></circle>
+        <circle class="segment" r="80" fill="none" stroke="var(--accent-warning)" stroke-width="24" stroke-dasharray="153.0 502.65" stroke-dashoffset="-284.1065217391304" transform="rotate(-90)" tabindex="0" aria-label="Medium (7): 30%"><title>Medium (7): 7</title></circle>
+        <circle class="segment" r="80" fill="none" stroke="var(--accent-error)" stroke-width="24" stroke-dasharray="65.6 502.65" stroke-dashoffset="-437.0869565217391" transform="rotate(-90)" tabindex="0" aria-label="Low (3): 13%"><title>Low (3): 3</title></circle>
+    </g>
+    <text x="100" y="95" text-anchor="middle" fill="var(--text-primary)" font-size="28" font-weight="700">23</text>
+    <text x="100" y="115" text-anchor="middle" fill="var(--text-tertiary)" font-size="10">Total Findings</text>
+  </svg>
+  <ul class="chart-legend" role="list" style="flex-direction:column;"><li><span class="legend-dot" style="background:var(--accent-success)"></span>High (13)</li>
+      <li><span class="legend-dot" style="background:var(--accent-warning)"></span>Medium (7)</li>
+      <li><span class="legend-dot" style="background:var(--accent-error)"></span>Low (3)</li></ul>
+</div>
+        <div class="stat-card" style="margin-top:12px;">
+          <div class="stat-label">Quality Score</div>
+          <div class="stat-value positive">B (84%)</div>
+          <div class="stat-context">Chain completeness: 26%</div>
+        </div>
+      </div>
+      <div>
+        <table class="prov-table">
+          <thead><tr><th>Finding</th><th>Agent</th><th>Source</th><th>Confidence</th></tr></thead>
+          <tbody>
+    <tr>
+      <td>Tirzepatide demonstrates superior weight loss efficacy…</td>
+      <td><span class="tag strategic">Pharmaceutical Intelligence</span></td>
+      <td>PubMed database, multiple Phase 3…</td>
+      <td><span class="confidence-badge high">HIGH &mdash; </span></td>
+    </tr>
+    <tr>
+      <td>SURMOUNT-4 trial demonstrates that continued tirzepatide…</td>
+      <td><span class="tag strategic">Pharmaceutical Intelligence</span></td>
+      <td>JAMA publications, SURMOUNT-4 trial data</td>
+      <td><span class="confidence-badge high">HIGH &mdash; </span></td>
+    </tr>
+    <tr>
+      <td>Active clinical trials demonstrate expanding applications…</td>
+      <td><span class="tag strategic">Pharmaceutical Intelligence</span></td>
+      <td>ClinicalTrials.gov database</td>
+      <td><span class="confidence-badge medium">MEDIUM &mdash; </span></td>
+    </tr>
+    <tr>
+      <td>Recent network meta-analyses position GLP-1 agonists within…</td>
+      <td><span class="tag strategic">Pharmaceutical Intelligence</span></td>
+      <td>PubMed, systematic reviews and network…</td>
+      <td><span class="confidence-badge high">HIGH &mdash; </span></td>
+    </tr>
+    <tr>
+      <td>FDA labeling for semaglutide products shows expansion…</td>
+      <td><span class="tag strategic">Pharmaceutical Intelligence</span></td>
+      <td>OpenFDA drug labeling database</td>
+      <td><span class="confidence-badge high">HIGH &mdash; </span></td>
+    </tr>
+    <tr>
+      <td>SURMOUNT trial data demonstrates significant quality of…</td>
+      <td><span class="tag strategic">Pharmaceutical Intelligence</span></td>
+      <td>SURMOUNT-1 trial quality of life…</td>
+      <td><span class="confidence-badge medium">MEDIUM &mdash; </span></td>
+    </tr>
+    <tr>
+      <td>The bariatric surgery market analysis is severely…</td>
+      <td><span class="tag competitive">Surgical Market</span></td>
+      <td>Research data technical status report</td>
+      <td><span class="confidence-badge high">HIGH &mdash; </span></td>
+    </tr>
+    <tr>
+      <td>Historical U.S. bariatric surgery market was valued at…</td>
+      <td><span class="tag competitive">Surgical Market</span></td>
+      <td>Domain knowledge - unable to verify…</td>
+      <td><span class="confidence-badge low">LOW &mdash; </span></td>
+    </tr>
+    <tr>
+      <td>Bariatric surgery procedures are concentrated among…</td>
+      <td><span class="tag competitive">Surgical Market</span></td>
+      <td>Domain knowledge - verification sources…</td>
+      <td><span class="confidence-badge low">LOW &mdash; </span></td>
+    </tr>
+    <tr>
+      <td>Medicare covers bariatric surgery under specific criteria…</td>
+      <td><span class="tag competitive">Surgical Market</span></td>
+      <td>Domain knowledge of Medicare policy…</td>
+      <td><span class="confidence-badge medium">MEDIUM &mdash; </span></td>
+    </tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Quality Assurance System</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide" id="s18">
+  <div class="slide-bg-glow" style="background:var(--accent-warning);bottom:-200px;right:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag-gold tag">Gaps</span> Intelligence</div>
+    <h2 class="slide-title anim d1">Intelligence Gaps &amp; Next Steps</h2>
+    <p class="section-intro anim d2">What the swarm could not determine — and recommended follow-up investigations.</p>
+    <div class="two-col anim d3">
+      <div>
+        <h3 style="font-size:13px;color:var(--accent-error);margin-bottom:12px;font-weight:700;">&#9888; Unknown Variables</h3>
+        <div class="policy-box" style="margin-bottom:8px;"><p>Long-term safety data beyond 2-3 years: While efficacy is well-established, long-term safety profiles (5-10 years)…</p></div>
+        <div class="policy-box" style="margin-bottom:8px;"><p>Real-world adherence and persistence rates: Clinical trial adherence may not reflect real-world medication persistence,…</p></div>
+        <div class="policy-box" style="margin-bottom:8px;"><p>Cost-effectiveness analyses: Comprehensive pharmacoeconomic comparisons between GLP-1 agonists and bariatric surgery…</p></div>
+        <div class="policy-box" style="margin-bottom:8px;"><p>Insurance coverage patterns: Current payer coverage decisions and prior authorization requirements for weight loss…</p></div>
+        <div class="policy-box" style="margin-bottom:8px;"><p>Market penetration data: Prescription volume trends and market share data were not accessible through available…</p></div>
+        <div class="policy-box" style="margin-bottom:8px;"><p>Specific quantitative efficacy data: Weight loss percentages, statistical significance values, and comparative…</p></div>
+      </div>
+      <div>
+        <h3 style="font-size:13px;color:var(--accent-success);margin-bottom:12px;font-weight:700;">&#8594; Recommended Follow-Up</h3>
+        <div class="policy-box positive" style="margin-bottom:8px;"><h4>The GLP-1 vs bariatric surgery competition is…</h4><p>Surgical providers should immediately invest in proprietary market intelligence capabilities and…</p></div>
+        <div class="policy-box positive" style="margin-bottom:8px;"><h4>The market is experiencing 'temporal arbitrage…</h4><p>Payers should implement time-based coverage policies that account for the 2-3 year cost inflection…</p></div>
+        <div class="policy-box positive" style="margin-bottom:8px;"><h4>The competitive disruption is creating 'treatment…</h4><p>Healthcare systems should develop integrated treatment pathways with clear escalation criteria…</p></div>
+        <div class="policy-box positive" style="margin-bottom:8px;"><h4>The market disruption is occurring within a…</h4><p>Regulatory bodies should mandate standardized comparative effectiveness reporting for all obesity…</p></div>
+        <div class="policy-box neutral" style="margin-bottom:8px;"><p>⚠️ Source Coverage is weak (26%): 6/23 findings have verifiable sources (26%)</p></div>
+        <div class="policy-box neutral" style="margin-bottom:8px;"><p>⚠️ Provenance Completeness is weak (26%): 6/23 chains complete (26%)</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Gap Triangulation</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide" id="s19" style="text-align:center;">
+  <div class="slide-bg-glow" style="background:var(--inov-cerulean);top:-200px;left:-200px;"></div>
+  <div class="slide-bg-glow" style="background:var(--inov-jade);bottom:-200px;right:-200px;"></div>
+  <div class="slide-inner">
+    <div class="hero-badge anim">PRISM MEGA Analysis Complete</div>
+    <h2 class="hero-title anim d1" style="font-size:var(--text-3xl);">The GLP-1 vs bariatric surgery competition is fundamentally…</h2>
+    <p class="hero-sub anim d2">5 agents · 23 findings · 7 emergent insights</p>
+    <div class="anim d3" style="margin-top:28px;"><span class="agent-chip"><span class="dot" style="background:var(--accent-bright)"></span>Pharmaceutical Intelligence Analyst</span>
+      <span class="agent-chip"><span class="dot" style="background:var(--accent-success)"></span>Surgical Market Analyst</span>
+      <span class="agent-chip"><span class="dot" style="background:#f97316"></span>Patient Journey Strategist</span>
+      <span class="agent-chip"><span class="dot" style="background:var(--accent-error)"></span>Health Economics Researcher</span>
+      <span class="agent-chip"><span class="dot" style="background:var(--accent-violet)"></span>Market Disruption Futurist</span></div>
+    <p class="anim d4" style="margin-top:24px;font-size:var(--text-sm);color:var(--text-tertiary);">Generated March 2026 · Run ID: run-1772693033577</p>
+  </div>
+</section>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const totalSlides = slides.length;
+let currentSlide = 0;
+let counterTimeout;
+
+function goToSlide(n) {
+  n = Math.max(0, Math.min(n, totalSlides - 1));
+  currentSlide = n;
+  slides[n].scrollIntoView({ behavior: 'smooth' });
+}
+
+function toggleNav() {
+  const p = document.getElementById('navPanel');
+  const o = document.getElementById('navOverlay');
+  const b = document.getElementById('navBtn');
+  const isOpen = p.classList.contains('open');
+  if (isOpen) { p.classList.remove('open'); o.classList.remove('open'); b.innerHTML = '&#9776;'; }
+  else { p.classList.add('open'); o.classList.add('open'); b.innerHTML = '&#10005;'; }
+}
+
+function updateProgress() {
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+  document.getElementById('slideProgress').style.width = pct + '%';
+  let closest = 0, minDist = Infinity;
+  slides.forEach((s, i) => {
+    const d = Math.abs(s.getBoundingClientRect().top);
+    if (d < minDist) { minDist = d; closest = i; }
+  });
+  currentSlide = closest;
+  const counter = document.getElementById('slideCounter');
+  counter.textContent = String(closest + 1).padStart(2, '0') + ' / ' + String(totalSlides).padStart(2, '0');
+  counter.classList.add('visible');
+  clearTimeout(counterTimeout);
+  counterTimeout = setTimeout(() => counter.classList.remove('visible'), 2000);
+}
+
+function animateCounter(el) {
+  const target = parseInt(el.dataset.target);
+  if (isNaN(target)) return;
+  const start = performance.now();
+  const duration = 2000;
+  function update(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 4);
+    el.textContent = Math.round(target * eased);
+    if (progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+
+const animObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && entry.intersectionRatio > 0.15) {
+      entry.target.querySelectorAll('.anim').forEach(el => el.classList.add('visible'));
+      entry.target.querySelectorAll('.bar-fill').forEach(bar => {
+        setTimeout(() => bar.classList.add('animate'), 300);
+      });
+      entry.target.querySelectorAll('.bar-chart, .line-chart, .donut-chart, .sparkline, .comparison-bars')
+        .forEach(chart => chart.classList.add('is-visible'));
+      entry.target.querySelectorAll('.stat-number[data-target]').forEach(el => {
+        if (!el.dataset.animated) { el.dataset.animated = 'true'; animateCounter(el); }
+      });
+    }
+  });
+}, { threshold: [0, 0.15, 0.5] });
+slides.forEach(s => animObserver.observe(s));
+
+document.addEventListener('keydown', (e) => {
+  const navOpen = document.getElementById('navPanel').classList.contains('open');
+  if (e.key === 'Escape') { if (navOpen) toggleNav(); return; }
+  if (navOpen) return;
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  switch (e.key) {
+    case 'ArrowDown': case 'PageDown': e.preventDefault(); goToSlide(currentSlide + 1); break;
+    case 'ArrowUp': case 'PageUp': e.preventDefault(); goToSlide(currentSlide - 1); break;
+    case ' ': case 'ArrowRight': e.preventDefault(); goToSlide(currentSlide + 1); break;
+    case 'ArrowLeft': e.preventDefault(); goToSlide(currentSlide - 1); break;
+    case 'Home': e.preventDefault(); goToSlide(0); break;
+    case 'End': e.preventDefault(); goToSlide(totalSlides - 1); break;
+  }
+});
+
+window.addEventListener('scroll', updateProgress, { passive: true });
+window.addEventListener('load', () => {
+  setTimeout(() => { const h = document.getElementById('navHint'); if (h) h.classList.remove('show'); }, 4000);
+  updateProgress();
+});
+</script>
+</body>
+</html>

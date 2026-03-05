@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@theme {
+  --color-prism-navy: #003D79;
+  --color-prism-cerulean: #4E84C4;
+  --color-prism-sky: #59DDFD;
+  --color-prism-jade: #00E49F;
+  --color-prism-bg: #050a15;
+  --color-prism-panel: #0a1526;
+  --color-prism-text: #e2e8f0;
+  --color-prism-muted: #94a3b8;
+}
+
+:root {
+  --background: var(--color-prism-bg);
+  --foreground: var(--color-prism-text);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar for the panels */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.glass-panel {
+  background: rgba(10, 21, 38, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}

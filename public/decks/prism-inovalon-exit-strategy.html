@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRISM Strategic Intelligence: Inovalon Market Exit Analysis</title>
+<style>
+:root {
+  --bg-deep: #06090f;
+  --bg-card: #0f1420;
+  --bg-elevated: #161d2e;
+  --accent-1: #3b82f6;
+  --accent-2: #8b5cf6;
+  --accent-3: #06b6d4;
+  --accent-4: #f59e0b;
+  --accent-5: #10b981;
+  --accent-danger: #ef4444;
+  --text-1: #f1f5f9;
+  --text-2: #94a3b8;
+  --text-3: #64748b;
+  --border: rgba(255,255,255,0.07);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg-deep);color:var(--text-1);overflow:hidden;height:100vh}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:2.5rem 3.5rem;opacity:0;transform:translateY(24px);transition:opacity .5s ease,transform .5s ease;pointer-events:none;overflow-y:auto;padding-bottom:4rem}
+.slide.active{opacity:1;transform:translateY(0);pointer-events:all}
+.slide::-webkit-scrollbar{width:3px}
+.slide::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
+
+/* Nav */
+.nav{position:fixed;bottom:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:.6rem 2rem;background:rgba(6,9,15,.96);border-top:1px solid var(--border);z-index:100;backdrop-filter:blur(8px)}
+.nav-dots{display:flex;gap:5px}
+.nav-dot{width:7px;height:7px;border-radius:50%;background:var(--text-3);cursor:pointer;border:none;transition:.3s}
+.nav-dot.active{width:22px;border-radius:3px;background:var(--accent-1)}
+.nav-dot.visited{background:var(--text-2)}
+.nav-btn{background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-1);padding:.4rem 1rem;border-radius:5px;cursor:pointer;font-size:.8rem;transition:.2s}
+.nav-btn:hover{background:var(--accent-1);border-color:var(--accent-1)}
+.counter{color:var(--text-3);font-size:.75rem;font-variant-numeric:tabular-nums;min-width:50px;text-align:center}
+
+/* Tags */
+.tag{display:inline-block;font-size:.6rem;text-transform:uppercase;letter-spacing:.14em;padding:.2rem .6rem;border-radius:3px;font-weight:700;margin-bottom:.6rem}
+.t-prism{background:linear-gradient(135deg,rgba(59,130,246,.2),rgba(139,92,246,.2));color:#a5b4fc;border:1px solid rgba(99,102,241,.3)}
+.t-val{background:rgba(245,158,11,.12);color:#fbbf24;border:1px solid rgba(245,158,11,.25)}
+.t-buy{background:rgba(59,130,246,.12);color:#60a5fa;border:1px solid rgba(59,130,246,.25)}
+.t-time{background:rgba(16,185,129,.12);color:#34d399;border:1px solid rgba(16,185,129,.25)}
+.t-alt{background:rgba(139,92,246,.12);color:#a78bfa;border:1px solid rgba(139,92,246,.25)}
+.t-emerge{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.25)}
+.t-meta{background:rgba(255,255,255,.04);color:var(--text-2);border:1px solid var(--border)}
+
+/* Titles */
+.s-title{font-size:clamp(1.5rem,2.8vw,2.2rem);font-weight:700;line-height:1.2;margin-bottom:.4rem}
+.s-sub{font-size:clamp(.85rem,1.3vw,1rem);color:var(--text-2);line-height:1.5;max-width:700px}
+
+/* Grids */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;flex:1}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;flex:1}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;flex:1}
+.g22{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:1rem;flex:1}
+
+/* Cards */
+.c{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:1.25rem;transition:.3s}
+.c:hover{border-color:rgba(255,255,255,.12);transform:translateY(-1px)}
+.c-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-3);margin-bottom:.4rem}
+.c-val{font-size:clamp(1.6rem,2.8vw,2.2rem);font-weight:800;font-variant-numeric:tabular-nums;margin-bottom:.2rem}
+.c-detail{font-size:.8rem;color:var(--text-2);line-height:1.5}
+
+/* Colors */
+.gold{color:#fbbf24}.green{color:#34d399}.blue{color:#60a5fa}.purple{color:#a78bfa}.red{color:#f87171}.cyan{color:#22d3ee}.white{color:#f1f5f9}
+
+/* Bars */
+.bar-row{display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem}
+.bar-lbl{width:110px;font-size:.72rem;color:var(--text-2);text-align:right;flex-shrink:0}
+.bar-trk{flex:1;height:20px;background:rgba(255,255,255,.03);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:6px;font-size:.65rem;font-weight:600;color:rgba(255,255,255,.85)}
+.bar-v{font-size:.72rem;font-weight:700;width:55px;text-align:right;flex-shrink:0}
+
+/* Table */
+.rtbl{width:100%;border-collapse:separate;border-spacing:0 3px}
+.rtbl th{font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-3);text-align:left;padding:.4rem .6rem;border-bottom:1px solid var(--border)}
+.rtbl td{padding:.55rem .6rem;font-size:.78rem;background:var(--bg-card)}
+.rtbl tr td:first-child{border-radius:5px 0 0 5px}
+.rtbl tr td:last-child{border-radius:0 5px 5px 0}
+.v-win{color:#34d399;font-weight:700}.v-risk{color:#fbbf24;font-weight:700}.v-low{color:#f87171;font-weight:700}
+
+/* Emergence */
+.em-card{background:var(--bg-card);border:1px solid rgba(239,68,68,.15);border-radius:10px;padding:1.25rem;position:relative;overflow:hidden}
+.em-card::after{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(239,68,68,.03),transparent 60%);pointer-events:none}
+.em-num{font-size:.6rem;text-transform:uppercase;letter-spacing:.14em;color:var(--accent-danger);font-weight:700;margin-bottom:.4rem}
+.em-title{font-size:1rem;font-weight:700;margin-bottom:.35rem}
+.em-body{font-size:.78rem;color:var(--text-2);line-height:1.5}
+
+/* Timeline */
+.tl{position:relative;padding-left:1.8rem;flex:1}
+.tl::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--accent-1),var(--accent-2),var(--accent-3))}
+.tl-item{position:relative;margin-bottom:1rem;padding-left:.8rem}
+.tl-item::before{content:'';position:absolute;left:-1.45rem;top:.3rem;width:10px;height:10px;border-radius:50%;background:var(--bg-deep);border:2px solid var(--accent-1)}
+.tl-item.hot::before{border-color:var(--accent-danger);background:rgba(239,68,68,.25)}
+.tl-item.warm::before{border-color:var(--accent-4);background:rgba(245,158,11,.25)}
+.tl-item.cool::before{border-color:var(--accent-3);background:rgba(6,182,212,.25)}
+.tl-date{font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent-1);font-weight:600}
+.tl-title{font-size:.88rem;font-weight:600;margin:.1rem 0}
+.tl-desc{font-size:.75rem;color:var(--text-2);line-height:1.4}
+
+/* Hero */
+.hero{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;flex:1}
+.hero-title{font-size:clamp(2rem,4vw,3.4rem);font-weight:800;line-height:1.1;margin-bottom:.8rem;background:linear-gradient(135deg,#60a5fa,#a78bfa,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:clamp(.9rem,1.6vw,1.15rem);color:var(--text-2);max-width:660px;line-height:1.6;margin-bottom:1.5rem}
+.badges{display:flex;gap:.8rem;flex-wrap:wrap;justify-content:center}
+.badge{display:flex;flex-direction:column;align-items:center;padding:.8rem 1.2rem;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;min-width:115px}
+.badge-val{font-size:1.3rem;font-weight:800}
+.badge-lbl{font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-top:.15rem}
+
+/* Watermark */
+.wm{position:fixed;top:1.2rem;right:1.5rem;z-index:50;display:flex;align-items:center;gap:.4rem;opacity:.35}
+.wm-dot{width:14px;height:14px;border:2px solid var(--accent-2);border-radius:50%;position:relative}
+.wm-dot::after{content:'';position:absolute;top:2px;left:2px;width:6px;height:6px;background:var(--accent-2);border-radius:50%}
+.wm-txt{font-size:.55rem;text-transform:uppercase;letter-spacing:.18em;color:var(--text-3);font-weight:700}
+
+/* Pillar */
+.pillar{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:1.25rem;position:relative;overflow:hidden}
+.pillar::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.p1::before{background:linear-gradient(90deg,#3b82f6,#60a5fa)}
+.p2::before{background:linear-gradient(90deg,#10b981,#34d399)}
+.p3::before{background:linear-gradient(90deg,#8b5cf6,#a78bfa)}
+.p4::before{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+.pillar-n{font-size:2.2rem;font-weight:800;opacity:.08;position:absolute;top:.3rem;right:.8rem}
+.pillar-t{font-size:.92rem;font-weight:700;margin-bottom:.4rem}
+.pillar-b{font-size:.78rem;color:var(--text-2);line-height:1.5}
+.pillar-m{margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--border);font-size:.72rem}
+.pillar-m strong{color:var(--text-1)}
+
+@media(max-width:768px){.slide{padding:1.5rem 1rem}.g2,.g3,.g4,.g22{grid-template-columns:1fr}.bar-lbl{width:70px}}
+</style>
+</head>
+<body>
+
+<div class="wm"><div class="wm-dot"></div><span class="wm-txt">PRISM Strategic Intelligence</span></div>
+
+<div id="pres">
+
+<!-- SLIDE 1: TITLE -->
+<div class="slide active" data-s="0">
+<div class="hero">
+<div style="margin-bottom:1.2rem">
+<span class="tag t-prism">PRISM Enterprise Strategic Operating System</span>
+<span class="tag t-meta" style="margin-left:.4rem">4 Agents &bull; 68 Findings &bull; Swarm e4014804</span>
+</div>
+<div class="hero-title">Inovalon Market Exit<br>Strategic Intelligence Brief</div>
+<div class="hero-sub">Multi-agent analysis of valuation, buyer universe, market timing, and exit alternatives for Nordic Capital's $7.3B healthcare data platform investment. ARCHON swarm execution with cross-domain emergence detection.</div>
+<div class="badges">
+<div class="badge"><span class="badge-val gold">$7.3B</span><span class="badge-lbl">Entry Price (2022)</span></div>
+<div class="badge"><span class="badge-val green">$7.5-8.5B</span><span class="badge-lbl">Target Exit Value</span></div>
+<div class="badge"><span class="badge-val blue">65%</span><span class="badge-lbl">Blackstone Prob.</span></div>
+<div class="badge"><span class="badge-val purple">Q2 2026</span><span class="badge-lbl">Optimal Window</span></div>
+<div class="badge"><span class="badge-val cyan">68</span><span class="badge-lbl">Total Findings</span></div>
+</div>
+</div>
+</div>
+
+<!-- SLIDE 2: VALUATION -->
+<div class="slide" data-s="1">
+<div style="margin-bottom:1.5rem"><span class="tag t-val">Valuation Agent</span><span style="font-size:.65rem;color:var(--text-3);margin-left:.4rem">16 findings &bull; 0.82 confidence</span>
+<div class="s-title">What Is Inovalon Worth Today?</div>
+<div class="s-sub">Nordic Capital entered at $7.3B (31.3x EBITDA) during peak 2021 multiples. Current healthcare IT multiples have compressed, but Inovalon's fundamentals have strengthened significantly.</div>
+</div>
+<div class="g2">
+<div>
+<div class="c" style="margin-bottom:1rem">
+<div class="c-label">Valuation Scenarios (2026 Exit)</div>
+<div style="margin-top:.6rem">
+<div class="bar-row"><span class="bar-lbl">Bear Case</span><div class="bar-trk"><div class="bar-fill" style="width:42%;background:linear-gradient(90deg,#ef4444,#f87171)">13.3x EBITDA</div></div><span class="bar-v red">$4.2B</span></div>
+<div class="bar-row"><span class="bar-lbl">Base Case</span><div class="bar-trk"><div class="bar-fill" style="width:60%;background:linear-gradient(90deg,#f59e0b,#fbbf24)">19.0x EBITDA</div></div><span class="bar-v gold">$6.0B</span></div>
+<div class="bar-row"><span class="bar-lbl">Strategic Sale</span><div class="bar-trk"><div class="bar-fill" style="width:75%;background:linear-gradient(90deg,#3b82f6,#60a5fa)">20-24x EBITDA</div></div><span class="bar-v blue">$6.3-7.5B</span></div>
+<div class="bar-row"><span class="bar-lbl">Bull Case</span><div class="bar-trk"><div class="bar-fill" style="width:85%;background:linear-gradient(90deg,#10b981,#34d399)">24.8x EBITDA</div></div><span class="bar-v green">$7.8B</span></div>
+<div class="bar-row"><span class="bar-lbl" style="font-weight:600;color:var(--text-1)">Entry (2022)</span><div class="bar-trk"><div class="bar-fill" style="width:100%;background:linear-gradient(90deg,#8b5cf6,#a78bfa)">31.3x EBITDA</div></div><span class="bar-v purple">$7.3B</span></div>
+</div>
+</div>
+<div class="c">
+<div class="c-label">Current Financial Profile (Est. 2024-2025)</div>
+<div style="margin-top:.5rem;font-size:.8rem;color:var(--text-2);line-height:1.8">
+<strong class="white">Revenue:</strong> ~$900M-$950M (12-14% CAGR since 2021)<br>
+<strong class="white">Adj. EBITDA:</strong> ~$315M-$330M (35% margins maintained)<br>
+<strong class="white">Net Income:</strong> $242.7M in 2025 (20% YoY growth)<br>
+<strong class="white">Entry Multiple:</strong> 10.9x EV/Revenue, 31.3x EV/EBITDA<br>
+<strong class="white">Current Multiples:</strong> 10-14x EBITDA for healthcare data (compressed from 20-30x peak)
+</div>
+</div>
+</div>
+<div>
+<div class="c" style="margin-bottom:1rem;border-left:3px solid #fbbf24">
+<div class="c-label" style="color:#fbbf24">The Data Moat: MORE2 Registry</div>
+<div class="c-detail" style="line-height:1.6">
+<strong class="white">332M unique patients</strong> &bull; <strong class="white">61B medical events</strong><br><br>
+Spans Medicare FFS, MA, Part D, Managed Medicaid, and Commercial. Connected to 1.1M physicians, 717K clinical settings, 454M unique lives. This is one of the largest real-world healthcare datasets in the US.<br><br>
+<strong class="gold">Strategic value:</strong> The data moat supports a premium 15-20x EBITDA vs. 10-12x for software-only companies. It's the single biggest differentiator for strategic buyers.
+</div>
+</div>
+<div class="c" style="border-left:3px solid #34d399">
+<div class="c-label" style="color:#34d399">Market Position</div>
+<div class="c-detail" style="line-height:1.6">
+<strong class="white">15 of 15 top US health plans</strong> as customers (100% penetration). 50,000+ licensed customers. Mission-critical status creates high switching costs but also customer concentration risk.<br><br>
+<strong class="green">Life Sciences expansion:</strong> New high-margin segment (40%+ EBITDA), growing 15%+ annually, $500M+ TAM opportunity in clinical trials, RWE, and HEOR.
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- SLIDE 3: BUYER UNIVERSE -->
+<div class="slide" data-s="2">
+<div style="margin-bottom:1.5rem"><span class="tag t-buy">Buyer Universe Agent</span><span style="font-size:.65rem;color:var(--text-3);margin-left:.4rem">18 findings &bull; 0.73 confidence</span>
+<div class="s-title">Who Buys Inovalon? Ranked by Probability</div>
+<div class="s-sub">15+ potential acquirers across strategic payers, technology companies, competitors, and financial buyers. Antitrust risk is the dominant filter for strategic buyers.</div>
+</div>
+<div style="margin-bottom:1.25rem">
+<table class="rtbl">
+<thead><tr><th>Buyer</th><th>Type</th><th>Valuation</th><th>Probability</th><th>Antitrust</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td><strong>Blackstone</strong></td><td>PE / Secondary</td><td>$6.5-8.0B</td><td class="v-win">65%</td><td style="color:#34d399">Minimal</td><td class="v-win">MOST LIKELY</td></tr>
+<tr><td><strong>CVS / Aetna</strong></td><td>Strategic Payer</td><td>$6.5-7.5B</td><td style="color:#fbbf24">55%</td><td style="color:#fbbf24">Moderate</td><td class="v-win">BEST STRATEGIC</td></tr>
+<tr><td><strong>KKR</strong></td><td>PE / Secondary</td><td>$6.5-8.0B</td><td style="color:#fbbf24">50%</td><td style="color:#34d399">Minimal</td><td class="v-risk">STRONG</td></tr>
+<tr><td><strong>Elevance / Carelon</strong></td><td>Strategic Payer</td><td>$7.0-8.0B</td><td style="color:#fbbf24">45%</td><td style="color:#34d399">Low</td><td class="v-risk">PREMIUM BUYER</td></tr>
+<tr><td><strong>Thoma Bravo</strong></td><td>PE / Secondary</td><td>$6.5-8.0B</td><td style="color:#94a3b8">40%</td><td style="color:#34d399">Minimal</td><td class="v-risk">CAPABLE</td></tr>
+<tr><td><strong>Cigna / Evernorth</strong></td><td>Strategic Payer</td><td>$7.0-7.5B</td><td style="color:#94a3b8">35%</td><td style="color:#fbbf24">Moderate</td><td class="v-risk">POSSIBLE</td></tr>
+<tr><td><strong>Humana</strong></td><td>Strategic Payer</td><td>$6.0-7.0B</td><td style="color:#94a3b8">30%</td><td style="color:#fbbf24">Moderate</td><td class="v-low">NEEDS HELP</td></tr>
+<tr><td><strong>Palantir</strong></td><td>Strategic Tech</td><td style="color:#34d399">$7.5-8.5B</td><td style="color:#94a3b8">25-30%</td><td style="color:#34d399">Low</td><td class="v-risk">HIGHEST PRICE</td></tr>
+<tr><td><strong>UnitedHealth</strong></td><td>Strategic Payer</td><td>$8.0-9.0B</td><td style="color:#f87171">&lt;40%</td><td style="color:#ef4444">HIGH</td><td class="v-low">DOJ RISK</td></tr>
+</tbody>
+</table>
+</div>
+<div class="g3">
+<div class="c" style="border-top:3px solid #60a5fa">
+<div class="c-label">Why Blackstone Wins</div>
+<div class="c-detail">Proven healthcare IT playbook: HealthEdge acquired at $700M, exited to Bain for $2.6B (3.7x return). $150B+ AUM, no antitrust friction, familiar due diligence process. Would position Inovalon as anchor healthcare analytics asset with bolt-on acquisition strategy.</div>
+</div>
+<div class="c" style="border-top:3px solid #34d399">
+<div class="c-label">CVS Strategic Case</div>
+<div class="c-detail">Closed-loop ecosystem: Aetna insurance + Caremark PBM + MinuteClinic + Signify Health. 900+ data scientists. Inovalon completes the data layer. $200-300M+ annual synergies within 3-5 years. Signify Health acquisition ($3.2B) validates data strategy.</div>
+</div>
+<div class="c" style="border-top:3px solid #ef4444">
+<div class="c-label">UNH: Avoid</div>
+<div class="c-detail">Would pay the highest price ($8-9B) but active DOJ/FTC investigation creates &lt;40% antitrust clearance probability. Change Healthcare acquisition ($13B) drew 18-month regulatory fight. Not worth the deal risk for sellers.</div>
+</div>
+</div>
+</div>
+
+<!-- SLIDE 4: MARKET TIMING -->
+<div class="slide" data-s="3">
+<div style="margin-bottom:1.5rem"><span class="tag t-time">Timing Agent</span><span style="font-size:.65rem;color:var(--text-3);margin-left:.4rem">16 findings &bull; 0.90 confidence</span>
+<div class="s-title">Is 2026 the Right Time to Sell?</div>
+<div class="s-sub">Regulatory tailwinds peak in 2026, M&A market is at record levels, but headwinds accumulate in H2 2026-2027. The window is open now — and narrowing.</div>
+</div>
+<div class="g2">
+<div class="tl">
+<div class="tl-item hot">
+<div class="tl-date">Jan 2026</div>
+<div class="tl-title">V28 Risk Adjustment Full Implementation</div>
+<div class="tl-desc">HCC categories expand 86→115. Peak demand for Inovalon's risk adjustment products. This tailwind fades by 2028 as plans normalize.</div>
+</div>
+<div class="tl-item hot">
+<div class="tl-date">Q1 2026</div>
+<div class="tl-title">Healthcare PE at Record Levels</div>
+<div class="tl-desc">$191B disclosed deal value in 2025. 445 buyouts announced. PwC/Bain forecast "meaningful acceleration" in H1 2026.</div>
+</div>
+<div class="tl-item warm">
+<div class="tl-date">Q2-Q3 2026</div>
+<div class="tl-title">Optimal Exit Window</div>
+<div class="tl-desc">V28 demand + record M&A activity + favorable financing (borrowing costs ~850bp). This is the peak convergence of tailwinds.</div>
+</div>
+<div class="tl-item warm">
+<div class="tl-date">Jan 2027</div>
+<div class="tl-title">BALANCE Model / Part D Redesign</div>
+<div class="tl-desc">GLP-1 coverage expansion + Part D changes drive pharmacy analytics demand. But MA rate growth only 0.09% — plan budgets tighten.</div>
+</div>
+<div class="tl-item cool">
+<div class="tl-date">H2 2027+</div>
+<div class="tl-title">Headwinds Accumulate</div>
+<div class="tl-desc">V28 tailwind fades. Flat MA rates compress plan budgets. AI-native competitors emerge. Waiting risks 10-20% valuation decline.</div>
+</div>
+</div>
+<div>
+<div class="c" style="margin-bottom:1rem;border-left:3px solid #34d399">
+<div class="c-label" style="color:#34d399">Tailwinds (Sell Now)</div>
+<div class="c-detail" style="line-height:1.6">
+<strong class="white">V28 implementation</strong> creates peak demand for risk adjustment products<br>
+<strong class="white">Part D redesign</strong> drives pharmacy analytics demand<br>
+<strong class="white">CMS-0057-F</strong> prior auth automation mandates API/interoperability<br>
+<strong class="white">Record PE capital</strong> deployed in healthcare IT<br>
+<strong class="white">Leverage financing</strong> improving to 2018-2019 levels
+</div>
+</div>
+<div class="c" style="margin-bottom:1rem;border-left:3px solid #ef4444">
+<div class="c-label" style="color:#f87171">Headwinds (Risk of Waiting)</div>
+<div class="c-detail" style="line-height:1.6">
+<strong class="white">Flat MA rates</strong> (0.09% growth in 2027) squeeze plan budgets<br>
+<strong class="white">AI-native competitors</strong> capturing 85% of healthcare AI spend<br>
+<strong class="white">Trump administration</strong> policy uncertainty (Medicaid cuts, ACA changes)<br>
+<strong class="white">V28 normalization</strong> by 2028 reduces urgency for Inovalon products<br>
+<strong class="white">Multiple compression</strong> if growth slows below 10%
+</div>
+</div>
+<div class="c" style="border-left:3px solid #fbbf24">
+<div class="c-label" style="color:#fbbf24">Timing Verdict: 0.90 Confidence</div>
+<div class="c-detail"><strong class="gold">Exit in Q2-Q3 2026.</strong> Every quarter of delay after mid-2026 risks 5-10% valuation erosion as tailwinds fade and headwinds accumulate. Nordic Capital is 4 years into a typical 3-7 year hold — the window aligns with fund lifecycle.</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- SLIDE 5: EXIT ALTERNATIVES -->
+<div class="slide" data-s="4">
+<div style="margin-bottom:1.5rem"><span class="tag t-alt">Alternatives Agent</span><span style="font-size:.65rem;color:var(--text-3);margin-left:.4rem">18 findings &bull; 0.79 confidence</span>
+<div class="s-title">Seven Exit Paths — Ranked by Probability-Weighted Return</div>
+<div class="s-sub">Not all exits are created equal. The dual-track process maximizes competitive tension while the secondary PE buyout offers the fastest clean exit.</div>
+</div>
+<div style="margin-bottom:1.25rem">
+<div class="bar-row"><span class="bar-lbl" style="width:140px">Dual-Track (Rec.)</span><div class="bar-trk"><div class="bar-fill" style="width:92%;background:linear-gradient(90deg,#3b82f6,#60a5fa)">70% prob &bull; 12-15mo</div></div><span class="bar-v blue">$7.5-8.5B</span></div>
+<div class="bar-row"><span class="bar-lbl" style="width:140px">Secondary PE</span><div class="bar-trk"><div class="bar-fill" style="width:87%;background:linear-gradient(90deg,#10b981,#34d399)">75% prob &bull; 6-9mo</div></div><span class="bar-v green">$7.0-8.0B</span></div>
+<div class="bar-row"><span class="bar-lbl" style="width:140px">Strategic Sale</span><div class="bar-trk"><div class="bar-fill" style="width:72%;background:linear-gradient(90deg,#8b5cf6,#a78bfa)">35% prob &bull; 12-18mo</div></div><span class="bar-v purple">$6.5-7.5B</span></div>
+<div class="bar-row"><span class="bar-lbl" style="width:140px">Strategic Merger</span><div class="bar-trk"><div class="bar-fill" style="width:68%;background:linear-gradient(90deg,#f59e0b,#fbbf24)">20% prob &bull; 18-24mo</div></div><span class="bar-v gold">$9.0-10.5B</span></div>
+<div class="bar-row"><span class="bar-lbl" style="width:140px">Carve-Out</span><div class="bar-trk"><div class="bar-fill" style="width:55%;background:linear-gradient(90deg,#06b6d4,#22d3ee)">25% prob &bull; 18-24mo</div></div><span class="bar-v cyan">$6.0-7.8B</span></div>
+<div class="bar-row"><span class="bar-lbl" style="width:140px">IPO Only</span><div class="bar-trk"><div class="bar-fill" style="width:40%;background:linear-gradient(90deg,#94a3b8,#cbd5e1)">15% prob &bull; 18-24mo</div></div><span class="bar-v" style="color:var(--text-2)">$4.5-5.5B</span></div>
+<div class="bar-row"><span class="bar-lbl" style="width:140px">Dividend Recap</span><div class="bar-trk"><div class="bar-fill" style="width:20%;background:linear-gradient(90deg,#64748b,#94a3b8)">10% prob &bull; deferred</div></div><span class="bar-v" style="color:var(--text-3)">$300-400M</span></div>
+</div>
+<div class="g3">
+<div class="pillar p1"><div class="pillar-n">1</div>
+<div class="pillar-t blue">Dual-Track IPO + Auction (Recommended)</div>
+<div class="pillar-b">Run IPO prep and strategic auction simultaneously. IPO creates $4.5-5.5B valuation floor. Competitive tension among PE and strategic buyers drives 10-15% premium vs. single-track. Costs $15-22M in fees but justified by value uplift.</div>
+<div class="pillar-m"><strong>Expected:</strong> $7.5-8.5B &bull; <strong>Timeline:</strong> 12-15 months &bull; <strong>Winner:</strong> Secondary PE (Veritas + co-sponsor)</div>
+</div>
+<div class="pillar p2"><div class="pillar-n">2</div>
+<div class="pillar-t green">Secondary PE Buyout (Fastest)</div>
+<div class="pillar-b">150+ sponsor-to-sponsor deals in 2025 ($120B+ volume). Healthcare IT is the busiest PE category. Blackstone, KKR, Thoma Bravo, Vista all interested. 6-9 month timeline. Familiar process for Nordic Capital.</div>
+<div class="pillar-m"><strong>Expected:</strong> $7.0-8.0B &bull; <strong>Timeline:</strong> 6-9 months &bull; <strong>Best for:</strong> Speed + certainty</div>
+</div>
+<div class="pillar p3"><div class="pillar-n">3</div>
+<div class="pillar-t purple">Strategic Sale (Highest Ceiling)</div>
+<div class="pillar-b">CVS, Elevance, Cigna as primary targets. Synergy value ($200-300M annually for CVS) justifies premium. But antitrust risk is real (55-65% clearance) and timelines extend to 12-18 months. UNH pays the most but DOJ blocks it.</div>
+<div class="pillar-m"><strong>Expected:</strong> $6.5-7.5B &bull; <strong>Timeline:</strong> 12-18 months &bull; <strong>Risk:</strong> Antitrust</div>
+</div>
+</div>
+</div>
+
+<!-- SLIDE 6: CROSS-DOMAIN EMERGENCE -->
+<div class="slide" data-s="5">
+<div style="margin-bottom:1.5rem"><span class="tag t-emerge">Cross-Agent Emergence</span>
+<div class="s-title">What No Single Agent Could See</div>
+<div class="s-sub">When four independent analyses converge, they reveal structural dynamics invisible to any one domain. These are the insights that change the exit strategy.</div>
+</div>
+<div class="g22">
+<div class="em-card">
+<div class="em-num">Emergence #1</div>
+<div class="em-title">The Valuation Paradox</div>
+<div class="em-body">Valuation Agent shows $6.0-7.0B base case (below entry). Timing Agent shows peak tailwinds in 2026. Buyer Agent shows Blackstone at $6.5-8.0B. Alternatives Agent shows dual-track lifts value 10-15%. <strong class="white">The paradox: Inovalon is worth MORE to a competitive process than to any individual bidder.</strong> The dual-track structure is the difference between a loss and a gain on the $7.3B entry.</div>
+</div>
+<div class="em-card">
+<div class="em-num">Emergence #2</div>
+<div class="em-title">The Antitrust Filter Effect</div>
+<div class="em-body">Buyer Agent shows UNH would pay $8-9B (highest price) but has &lt;40% antitrust clearance. Timing Agent shows DOJ healthcare investigations intensifying. Alternatives Agent shows strategic sale probability at only 35%. <strong class="white">The highest-value buyers are systematically blocked,</strong> which compresses effective valuation by 15-20% vs. unconstrained market. PE buyers benefit from this constraint — they face less competition.</div>
+</div>
+<div class="em-card">
+<div class="em-num">Emergence #3</div>
+<div class="em-title">The Window Closes Faster Than Expected</div>
+<div class="em-body">Timing Agent shows V28 peak demand in 2026. Valuation Agent shows current multiples already 40% below entry. Buyer Agent shows AI-native competitors emerging. <strong class="white">Three independent forces create a closing window:</strong> regulatory tailwind fades (2028), multiple compression accelerates if growth slows, and AI disruption erodes the data moat over time. Delay is the biggest risk to return on entry.</div>
+</div>
+<div class="em-card">
+<div class="em-num">Emergence #4</div>
+<div class="em-title">The Data Moat Is the Exit</div>
+<div class="em-body">Valuation Agent shows the MORE2 Registry (332M patients, 61B events) commands 15-20x vs. 10-12x for software-only. Buyer Agent shows Palantir willing to pay 8-10x revenue for the data. Alternatives Agent shows carve-out potential. <strong class="white">The data asset is more valuable than the software business.</strong> A strategy that emphasizes data monetization over SaaS metrics could unlock $1-2B in additional value.</div>
+</div>
+</div>
+</div>
+
+<!-- SLIDE 7: RECOMMENDED STRATEGY -->
+<div class="slide" data-s="6">
+<div style="margin-bottom:1.5rem"><span class="tag t-prism">PRISM Strategic Synthesis</span>
+<div class="s-title">Recommended Exit Strategy: Four-Phase Playbook</div>
+<div class="s-sub">Integrating all four agent analyses into a unified execution plan. Optimized for maximum return within the 2026 exit window.</div>
+</div>
+<div class="g4" style="margin-bottom:1.25rem">
+<div class="pillar p1"><div class="pillar-n">1</div>
+<div class="pillar-t blue">Prepare (Now → Q2 2026)</div>
+<div class="pillar-b">Engage Goldman Sachs / JPMorgan for dual-track mandate. Prepare S-1 filing. Lock multi-year contract renewals with top 5 payers. Package life sciences growth story (15%+ CAGR). Complete V28 product positioning.</div>
+<div class="pillar-m"><strong>Critical:</strong> Secure renewals before process leaks</div>
+</div>
+<div class="pillar p2"><div class="pillar-n">2</div>
+<div class="pillar-t green">Launch (Q2-Q3 2026)</div>
+<div class="pillar-b">Simultaneously launch IPO roadshow and strategic auction. Approach 10-15 qualified buyers: Blackstone, KKR, Thoma Bravo, CVS, Elevance, Cigna, Palantir. IPO filing creates public valuation floor.</div>
+<div class="pillar-m"><strong>Target:</strong> 3-5 competitive bids above $7B</div>
+</div>
+<div class="pillar p3"><div class="pillar-n">3</div>
+<div class="pillar-t purple">Compete (Q3 2026)</div>
+<div class="pillar-b">Drive competitive tension between PE and strategic bidders. Use IPO pricing ($4.5-5.5B floor) to prevent bid compression. Emphasize data moat, V28 tailwind, and life sciences growth to justify premium.</div>
+<div class="pillar-m"><strong>Leverage:</strong> Dual-track adds 10-15% to bids</div>
+</div>
+<div class="pillar p4"><div class="pillar-n">4</div>
+<div class="pillar-t gold">Close (Q3-Q4 2026)</div>
+<div class="pillar-b">Select highest-probability path: Blackstone at $7.5-8B (most likely) or CVS at $6.5-7.5B (if antitrust clears). If all bids disappoint, pivot to IPO as fallback. Target definitive agreement by Q4 2026.</div>
+<div class="pillar-m"><strong>Expected MOIC:</strong> 1.0-1.2x on $7.3B entry</div>
+</div>
+</div>
+<div class="c" style="border:1px solid rgba(59,130,246,.2);background:rgba(59,130,246,.04)">
+<div style="font-size:.85rem;line-height:1.6;color:var(--text-2)">
+<strong class="blue">Bottom Line:</strong> Nordic Capital should initiate the dual-track process immediately. The convergence of V28 demand, record PE activity, and favorable financing creates a 6-month window (Q2-Q3 2026) where exit value peaks. The most likely outcome is a secondary PE buyout by Blackstone at $7.5-8.0B — roughly breaking even on the $7.3B entry after 4+ years. A strategic sale to CVS at premium would deliver modest return. Waiting past Q3 2026 risks 10-20% value erosion as regulatory tailwinds fade and AI competition intensifies. The data moat (MORE2 Registry) is Inovalon's strongest asset and should be the centerpiece of every buyer conversation.
+</div>
+</div>
+</div>
+
+<!-- SLIDE 8: COMPARABLE TRANSACTIONS -->
+<div class="slide" data-s="7">
+<div style="margin-bottom:1.5rem"><span class="tag t-val">Valuation + Alternatives</span>
+<div class="s-title">Precedent Transactions: Healthcare Data & Analytics</div>
+<div class="s-sub">Recent comparable deals provide the valuation framework. Multiples have compressed from 2021 peaks but premium assets still command significant premiums.</div>
+</div>
+<div style="margin-bottom:1.25rem">
+<table class="rtbl">
+<thead><tr><th>Transaction</th><th>Year</th><th>Value</th><th>Buyer Type</th><th>EV/EBITDA</th><th>Relevance</th></tr></thead>
+<tbody>
+<tr><td><strong>Change Healthcare → UNH</strong></td><td>2022</td><td class="gold">$13.0B</td><td>Strategic (Payer)</td><td>~25x</td><td class="v-win">Mega-deal validation</td></tr>
+<tr><td><strong>Cotiviti Recap (Veritas/KKR)</strong></td><td>2024</td><td class="blue">$10-11B</td><td>PE Secondary</td><td>~20x</td><td class="v-win">Direct competitor</td></tr>
+<tr><td><strong>Signify Health → CVS</strong></td><td>2023</td><td class="purple">$8.0B</td><td>Strategic (Payer)</td><td>~40x</td><td class="v-win">CVS data strategy</td></tr>
+<tr><td><strong>Inovalon (Nordic Entry)</strong></td><td>2022</td><td style="color:var(--text-1)">$7.3B</td><td>PE Primary</td><td>31.3x</td><td class="v-risk">Our baseline</td></tr>
+<tr><td><strong>Waystar IPO</strong></td><td>2024</td><td class="cyan">$3.5B</td><td>IPO</td><td>3.9x rev</td><td class="v-risk">IPO floor reference</td></tr>
+<tr><td><strong>HealthEdge (Bain exit)</strong></td><td>2025</td><td class="green">$2.6B</td><td>PE Secondary</td><td>43x</td><td class="v-win">Blackstone playbook</td></tr>
+<tr><td><strong>NextGen (Thoma Bravo)</strong></td><td>2023</td><td style="color:var(--text-2)">$1.8B</td><td>PE Primary</td><td>16.5x</td><td class="v-risk">PE healthcare IT</td></tr>
+</tbody>
+</table>
+</div>
+<div class="g2">
+<div class="c">
+<div class="c-label">What the Comps Tell Us</div>
+<div class="c-detail" style="line-height:1.6">
+The Cotiviti recap at $10-11B is the most direct comparable — similar products (risk adjustment, payment integrity), similar customer base (payers), PE-owned. It validates that healthcare data platforms can achieve 20x+ EBITDA in the current market. Change Healthcare at $13B validates the strategic premium ceiling. But Signify at $8B and HealthEdge at $2.6B show the range is wide depending on buyer and timing.
+</div>
+</div>
+<div class="c">
+<div class="c-label">Inovalon's Position in the Comp Set</div>
+<div class="c-detail" style="line-height:1.6">
+Inovalon sits between Cotiviti ($10-11B, more focused) and HealthEdge ($2.6B, smaller). The data moat (MORE2 Registry) is a differentiator Cotiviti doesn't match. But the entry price of $7.3B at peak-market 31.3x EBITDA means Nordic needs the market to value quality and data at a premium over pure software — which current multiples don't fully support.
+</div>
+</div>
+</div>
+</div>
+
+<!-- SLIDE 9: SWARM META -->
+<div class="slide" data-s="8">
+<div style="margin-bottom:1.5rem"><span class="tag t-meta">PRISM Swarm Performance</span>
+<div class="s-title">Swarm e4014804 — Performance Report</div>
+<div class="s-sub">4 agents, 68 findings, 0.0025 contribution variance. This is the PRISM operating system in action — parallel intelligence, cross-domain synthesis, operational output.</div>
+</div>
+<div class="g4" style="margin-bottom:1.25rem">
+<div class="c" style="text-align:center"><div class="c-label">Valuation Agent</div><div class="c-val gold">90%</div><div class="c-detail">16 findings &bull; 0.82 conf</div><div style="height:5px;background:rgba(255,255,255,.04);border-radius:3px;margin-top:.6rem;overflow:hidden"><div style="height:100%;width:90%;background:#fbbf24;border-radius:3px"></div></div></div>
+<div class="c" style="text-align:center"><div class="c-label">Buyers Agent</div><div class="c-val blue">100%</div><div class="c-detail">18 findings &bull; 0.73 conf</div><div style="height:5px;background:rgba(255,255,255,.04);border-radius:3px;margin-top:.6rem;overflow:hidden"><div style="height:100%;width:100%;background:#60a5fa;border-radius:3px"></div></div></div>
+<div class="c" style="text-align:center"><div class="c-label">Timing Agent</div><div class="c-val green">90%</div><div class="c-detail">16 findings &bull; 0.90 conf</div><div style="height:5px;background:rgba(255,255,255,.04);border-radius:3px;margin-top:.6rem;overflow:hidden"><div style="height:100%;width:90%;background:#34d399;border-radius:3px"></div></div></div>
+<div class="c" style="text-align:center"><div class="c-label">Alternatives Agent</div><div class="c-val purple">100%</div><div class="c-detail">18 findings &bull; 0.79 conf</div><div style="height:5px;background:rgba(255,255,255,.04);border-radius:3px;margin-top:.6rem;overflow:hidden"><div style="height:100%;width:100%;background:#a78bfa;border-radius:3px"></div></div></div>
+</div>
+<div class="g2">
+<div class="c">
+<div class="c-label">PRISM Architecture — This Demo</div>
+<div style="font-size:.78rem;color:var(--text-2);line-height:1.9;margin-top:.4rem">
+<strong class="white">SENTINEL Layer:</strong> Triggered by strategic question ("Inovalon exit strategy")<br>
+<strong class="white">ARCHON Kernel:</strong> Decomposed into 4 orthogonal dimensions, spawned parallel agents<br>
+<strong class="white">Domain Skills:</strong> payer-financial-decoder, prospect-research-accelerator, regulatory-radar, healthcare-ma-signal-hunter<br>
+<strong class="white">Emergence Engine:</strong> Cross-agent theme mining, tension mapping, gap triangulation, structural patterns<br>
+<strong class="white">FORGE Output:</strong> This 9-slide strategic intelligence brief with visual synthesis<br>
+<strong class="white">Contribution Variance:</strong> 0.0025 (near-perfect workload balance)
+</div>
+</div>
+<div class="c">
+<div class="c-label">What PRISM Demonstrated</div>
+<div style="font-size:.78rem;color:var(--text-2);line-height:1.7;margin-top:.4rem">
+<span class="gold">1.</span> A $7B+ exit strategy question was decomposed into 4 independent research tracks in seconds<br>
+<span class="green">2.</span> 4 parallel agents produced 68 evidence-based findings with source citations in ~5 minutes<br>
+<span class="blue">3.</span> Cross-domain emergence found 4 structural insights invisible to any single analysis<br>
+<span class="purple">4.</span> The output is a board-ready strategic intelligence brief, not a research report<br>
+<span class="cyan">5.</span> Total cost: ~$3-5 in API calls. Equivalent consulting engagement: $50-100K+<br>
+<span class="red">6.</span> The same system runs on ANY strategic question — prospects, regulatory response, competitive intelligence, M&A due diligence
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav">
+<button class="nav-btn" onclick="go(-1)">← Prev</button>
+<div class="nav-dots" id="dots"></div>
+<span class="counter" id="ctr">1 / 9</span>
+<button class="nav-btn" onclick="go(1)">Next →</button>
+</div>
+
+<script>
+let cur=0;const slides=document.querySelectorAll('.slide'),total=slides.length,dots=document.getElementById('dots'),ctr=document.getElementById('ctr'),vis=new Set([0]);
+for(let i=0;i<total;i++){const d=document.createElement('button');d.className='nav-dot'+(i===0?' active':'');d.onclick=()=>jump(i);dots.appendChild(d)}
+function jump(n){if(n<0||n>=total)return;slides[cur].classList.remove('active');cur=n;vis.add(n);slides[cur].classList.add('active');upd()}
+function go(d){jump(cur+d)}
+function upd(){dots.querySelectorAll('.nav-dot').forEach((d,i)=>{d.className='nav-dot';if(i===cur)d.classList.add('active');else if(vis.has(i))d.classList.add('visited')});ctr.textContent=`${cur+1} / ${total}`}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();go(1)}if(e.key==='ArrowLeft'){e.preventDefault();go(-1)}});
+let tx=0;document.addEventListener('touchstart',e=>{tx=e.changedTouches[0].screenX});document.addEventListener('touchend',e=>{const d=tx-e.changedTouches[0].screenX;if(Math.abs(d)>50)go(d>0?1:-1)});
+</script>
+</body>
+</html>

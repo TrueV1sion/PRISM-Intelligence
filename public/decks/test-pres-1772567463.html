@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What are the implications of CMS star rating changes</title>
+  <style>
+    :root {
+      --prism-bg: #0a0e17;
+      --prism-panel: #111827;
+      --prism-sky: #59DDFD;
+      --prism-jade: #00E49F;
+      --prism-cerulean: #4E84C4;
+      --prism-text: #e2e8f0;
+      --prism-muted: #94a3b8;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--prism-bg);
+      color: var(--prism-text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+    }
+
+    .slide {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+      position: relative;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+
+    .slide-inner {
+      max-width: 900px;
+      width: 100%;
+    }
+
+    .slide-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      background: linear-gradient(135deg, #fff, var(--prism-sky));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .slide-content p {
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+      color: var(--prism-text);
+    }
+
+    .slide-content strong {
+      color: #fff;
+    }
+
+    .slide-content em {
+      color: var(--prism-muted);
+      font-size: 0.9rem;
+    }
+
+    .slide-notes {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: rgba(255,255,255,0.03);
+      border-left: 3px solid var(--prism-sky);
+      border-radius: 0 8px 8px 0;
+      font-size: 0.85rem;
+      color: var(--prism-muted);
+    }
+
+    /* Slide type-specific styles */
+    .slide-title-slide .slide-title {
+      font-size: 3.5rem;
+      text-align: center;
+    }
+
+    .slide-title-slide .slide-content {
+      text-align: center;
+      color: var(--prism-muted);
+    }
+
+    .slide-emergence {
+      background: linear-gradient(180deg, var(--prism-bg) 0%, rgba(89,221,253,0.03) 100%);
+    }
+
+    .slide-emergence .slide-title {
+      color: var(--prism-sky);
+    }
+
+    .slide-tension {
+      background: linear-gradient(180deg, var(--prism-bg) 0%, rgba(245,158,11,0.03) 100%);
+    }
+
+    .slide-quality .slide-content p {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+    }
+
+    .slide-closing {
+      text-align: center;
+    }
+
+    .slide-closing .slide-content {
+      color: var(--prism-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Navigation */
+    .nav {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      display: flex;
+      gap: 0.5rem;
+      z-index: 100;
+    }
+
+    .nav button {
+      background: var(--prism-panel);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--prism-text);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .nav button:hover {
+      border-color: var(--prism-sky);
+      color: var(--prism-sky);
+    }
+
+    .slide-counter {
+      position: fixed;
+      bottom: 2rem;
+      left: 2rem;
+      font-size: 0.75rem;
+      color: var(--prism-muted);
+      font-family: monospace;
+      z-index: 100;
+    }
+
+    @media print {
+      .slide { page-break-after: always; min-height: auto; padding: 2rem; }
+      .nav, .slide-counter { display: none; }
+    }
+  </style>
+</head>
+<body>
+  
+    <section class="slide slide-title" data-slide="0">
+      <div class="slide-inner">
+        <h2 class="slide-title">What are the implications of CMS star rating changes</h2>
+        <div class="slide-content"><p>EXTENDED tier analysis · 5 agents · 18 findings · 4 emergent insights</p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-executive-summary" data-slide="1">
+      <div class="slide-inner">
+        <h2 class="slide-title">Executive Summary</h2>
+        <div class="slide-content"><p>CMS maintains predictable annual cycles for star rating methodology changes through Federal Register proposed rules with consistent 14-month implementation windows</p>
+<p>Star ratings directly determine Quality Bonus Payments creating material financial impact for Medicare Advantage plans</p>
+<p>Medication adherence measures for diabetes, hypertension, and cholesterol are triple-weighted in current methodology</p>
+<p>Administrative measures are being systematically removed while clinical outcome measures gain increased weight</p>
+<p>Contract Year 2027 proposed rule continues pattern of simultaneous implementation across multiple Medicare Advantage program areas</p>
+<p>Research access limitations create systematic analytical constraints across all domains of star rating impact assessment</p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-dimension" data-slide="2">
+      <div class="slide-inner">
+        <h2 class="slide-title">Regulatory Framework Analysis</h2>
+        <div class="slide-content"><p><strong>CMS has published the Contract Year 2027 Proposed Rule implementing significant star rating methodology changes with a predictable 14-month implementation timeline.</strong> (HIGH)</p>
+<p><em>Source: Federal Register documents 2025-21456, 2024-27939, and 2023-24118</em></p>
+<p></p>
+<p><strong>Star rating changes are being implemented as part of comprehensive Medicare Advantage program reforms affecting multiple operational areas simultaneously.</strong> (MEDIUM)</p>
+<p><em>Source: Federal Register Document 2025-21456 abstract</em></p>
+<p></p>
+<p><strong>CMS has established a pattern of continuous star rating methodology evolution through annual proposed rules rather than static requirements.</strong> (HIGH)</p>
+<p><em>Source: Federal Register documents spanning 2023-2025 (documents 2023-24118, 2024-27939, 2025-21456)</em></p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-dimension" data-slide="3">
+      <div class="slide-inner">
+        <h2 class="slide-title">Financial Impact Assessment</h2>
+        <div class="slide-content"><p><strong>CMS has finalized significant policy changes to Medicare Advantage star ratings for contract year 2026 that directly impact bonus payment structures.</strong> (HIGH)</p>
+<p><em>Source: Federal Register Documents 2025-06008 and 2025-21456, Centers for Medicare & Medicaid Services</em></p>
+<p></p>
+<p><strong>Major Medicare Advantage insurers including UnitedHealth, Humana, Molina, Elevance Health, and CVS Health have filed multiple SEC reports in 2024-2025 during the period of active star rating policy changes.</strong> (MEDIUM)</p>
+<p><em>Source: SEC EDGAR database, multiple 10-K and 10-Q filings from major health insurers</em></p>
+<p></p>
+<p><strong>Medicare Advantage star ratings directly determine quality bonus payments through an established regulatory framework linking performance to revenue.</strong> (HIGH)</p>
+<p><em>Source: Federal Register Document 2025-06008, CMS final rule</em></p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-dimension" data-slide="4">
+      <div class="slide-inner">
+        <h2 class="slide-title">Quality Performance Landscape</h2>
+        <div class="slide-content"><p><strong>Medication adherence measures (PDC) create the highest vulnerability risk for star rating changes due to triple weighting in the methodology.</strong> (HIGH)</p>
+<p><em>Source: Journal of Managed Care & Specialty Pharmacy, 2025; Semantic Scholar database</em></p>
+<p></p>
+<p><strong>CMS proposed removing 12 measures for MY2027/SY2029, with 7 being administrative measures, fundamentally shifting rating focus toward clinical outcomes.</strong> (HIGH)</p>
+<p><em>Source: Federal Register, Document 2025-21456, November 28, 2025</em></p>
+<p></p>
+<p><strong>Value-based care arrangements show inconsistent impact on cardiovascular clinical quality measures among Medicare Advantage members.</strong> (MEDIUM)</p>
+<p><em>Source: Circulation 2025, Abstract 4364156</em></p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-dimension" data-slide="5">
+      <div class="slide-inner">
+        <h2 class="slide-title">Competitive Strategic Response</h2>
+        <div class="slide-content"><p><strong>Search tool limitations prevented access to current data on health plan strategic responses to CMS star rating changes.</strong> (HIGH)</p>
+<p><em>Source: Web search tool results from research data</em></p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-dimension" data-slide="6">
+      <div class="slide-inner">
+        <h2 class="slide-title">Member Experience Impact</h2>
+        <div class="slide-content"><p><strong>Medicare beneficiaries demonstrate limited awareness and understanding of star ratings when selecting plans, with most decisions driven by premium costs and provider networks rather than quality metrics.</strong> (LOW)</p>
+<p><em>Source: Research data notes: 'Unable to access specific current sources due to search limitations'</em></p>
+<p></p>
+<p><strong>Star rating complexity creates cognitive burden for elderly beneficiaries, potentially leading to suboptimal plan choices despite quality information availability.</strong> (LOW)</p>
+<p><em>Source: Research data notes: 'Unable to access specific sources due to search limitations'</em></p>
+<p></p>
+<p><strong>Higher star-rated plans may not correlate with improved member satisfaction due to misalignment between CMS quality measures and beneficiary priorities.</strong> (LOW)</p>
+<p><em>Source: Research data notes: 'Unable to access supporting research due to search limitations'</em></p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-emergence" data-slide="7">
+      <div class="slide-inner">
+        <h2 class="slide-title">Emergent Insight: pattern</h2>
+        <div class="slide-content"><p>CMS star rating changes function as a 'regulatory arbitrage elimination system' where predictable policy cycles create systematic information asymmetries that favor large health plans with superior regulatory intelligence capabilities, while simultaneously using quality measurement evolution to drive market consolidation by making compliance increasingly capital-intensive and technically complex.</p></div>
+        <div class="slide-notes">Contributing agents: Regulatory Framework Analysis, Competitive Strategic Response, Financial Impact Assessment, Quality Performance Landscape</div>
+      </div>
+    </section>
+
+    <section class="slide slide-emergence" data-slide="8">
+      <div class="slide-inner">
+        <h2 class="slide-title">Emergent Insight: convergent</h2>
+        <div class="slide-content"><p>The star rating methodology changes create a 'measurement singularity' where the convergence of administrative measure removal, clinical outcome emphasis, and medication adherence triple-weighting concentrates massive financial risk into a narrow set of performance indicators that are simultaneously becoming more volatile and less controllable through traditional health plan interventions.</p></div>
+        <div class="slide-notes">Contributing agents: Financial Impact Assessment, Quality Performance Landscape, Regulatory Framework Analysis</div>
+      </div>
+    </section>
+
+    <section class="slide slide-emergence" data-slide="9">
+      <div class="slide-inner">
+        <h2 class="slide-title">Emergent Insight: gap</h2>
+        <div class="slide-content"><p>The complete absence of member experience analysis across all clusters reveals a fundamental blind spot in the Medicare Advantage market where star rating changes are being implemented and responded to without understanding their impact on the 26+ million beneficiaries they are designed to serve, creating a policy-industry feedback loop that operates independently of actual member outcomes.</p></div>
+        <div class="slide-notes">Contributing agents: Member Experience Impact, Financial Impact Assessment, Quality Performance Landscape, Regulatory Framework Analysis</div>
+      </div>
+    </section>
+
+    <section class="slide slide-emergence" data-slide="10">
+      <div class="slide-inner">
+        <h2 class="slide-title">Emergent Insight: tension</h2>
+        <div class="slide-content"><p>The systematic information opacity identified across regulatory, financial, and quality domains suggests CMS star rating changes operate through 'managed uncertainty' where selective information disclosure creates competitive advantages for organizations with superior data access while maintaining regulatory flexibility through ambiguity, fundamentally altering the nature of competition in Medicare Advantage from service delivery to information arbitrage.</p></div>
+        <div class="slide-notes">Contributing agents: Regulatory Framework Analysis, Competitive Strategic Response, Financial Impact Assessment, Quality Performance Landscape</div>
+      </div>
+    </section>
+
+    <section class="slide slide-tension" data-slide="11">
+      <div class="slide-inner">
+        <h2 class="slide-title">Tension: methodological</h2>
+        <div class="slide-content"><p>Regulatory transparency versus strategic intelligence opacity</p>
+<p></p>
+<p><strong>Regulatory Framework Analysis</strong>: CMS provides predictable regulatory cycles and public information through Federal Register</p>
+<p><strong>Competitive Strategic Response</strong>: Granular information needed for strategic positioning remains inaccessible</p>
+<p></p>
+<p><em>Resolution: Information asymmetries create competitive advantages for organizations with superior regulatory intelligence capabilities</em></p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-tension" data-slide="12">
+      <div class="slide-inner">
+        <h2 class="slide-title">Tension: interpretive</h2>
+        <div class="slide-content"><p>Value-based care effectiveness for star rating performance</p>
+<p></p>
+<p><strong>Quality Performance Landscape</strong>: Value-based care arrangements show promise for quality improvement</p>
+<p><strong>Financial Impact Assessment</strong>: Research evidence demonstrates inconsistent real-world impact on star rating performance</p>
+<p></p>
+<p><em>Resolution: Both theoretical promise and practical limitations must be considered in strategic planning</em></p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-tension" data-slide="13">
+      <div class="slide-inner">
+        <h2 class="slide-title">Tension: interpretive</h2>
+        <div class="slide-content"><p>Measurement concentration impact assessment</p>
+<p></p>
+<p><strong>Financial Impact Assessment</strong>: Concentration creates measurement concentration risk and increased volatility</p>
+<p><strong>Quality Performance Landscape</strong>: Concentration focuses attention on clinically meaningful outcomes</p>
+<p></p>
+<p><em>Resolution: Measurement concentration simultaneously increases both opportunity and risk</em></p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-tension" data-slide="14">
+      <div class="slide-inner">
+        <h2 class="slide-title">Tension: predictive</h2>
+        <div class="slide-content"><p>Scope of regulatory change interpretation</p>
+<p></p>
+<p><strong>Regulatory Framework Analysis</strong>: Changes represent methodological refinement within existing framework</p>
+<p><strong>Financial Impact Assessment</strong>: Changes constitute fundamental market restructuring mechanism</p>
+<p></p>
+<p><em>Resolution: Scale of change impact depends on organizational perspective and market position</em></p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-gaps" data-slide="15">
+      <div class="slide-inner">
+        <h2 class="slide-title">Knowledge Gaps</h2>
+        <div class="slide-content"><p>Specific measure changes, weighting modifications, and financial impact quantification for CY2027 star rating methodology</p>
+<p>Current health plan strategic responses, operational adjustments, and investment priority shifts in response to star rating changes</p>
+<p>Member experience impacts including beneficiary awareness, plan selection behavior, and health outcome correlations with star ratings</p>
+<p>Plan-specific vulnerability assessments and ROI calculations for quality improvement interventions under new methodology</p>
+<p>Geographic, demographic, and market-specific variations in star rating change impacts and competitive positioning strategies</p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-quality" data-slide="16">
+      <div class="slide-inner">
+        <h2 class="slide-title">Quality Assessment</h2>
+        <div class="slide-content"><p>Grade: B- (77%)</p>
+<p>Provenance: 6% complete</p>
+<p>Warnings: 10 (5 critical)</p></div>
+        
+      </div>
+    </section>
+
+    <section class="slide slide-closing" data-slide="17">
+      <div class="slide-inner">
+        <h2 class="slide-title">PRISM Intelligence Brief</h2>
+        <div class="slide-content"><p>Generated 2026-03-03T19:55:52.592Z</p>
+<p>Run ID: test-pres-1772567463</p>
+<p>Total cost: $0.0000</p></div>
+        
+      </div>
+    </section>
+
+  <div class="slide-counter">
+    <span id="current">1</span> / 18
+  </div>
+
+  <div class="nav">
+    <button onclick="prevSlide()">← Prev</button>
+    <button onclick="nextSlide()">Next →</button>
+  </div>
+
+  <script>
+    let current = 0;
+    const slides = document.querySelectorAll('.slide');
+    const counter = document.getElementById('current');
+
+    function goToSlide(n) {
+      current = Math.max(0, Math.min(n, slides.length - 1));
+      slides[current].scrollIntoView({ behavior: 'smooth' });
+      counter.textContent = current + 1;
+    }
+
+    function nextSlide() { goToSlide(current + 1); }
+    function prevSlide() { goToSlide(current - 1); }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+      if (e.key === 'ArrowLeft') prevSlide();
+    });
+
+    // Track scroll position
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          current = parseInt(entry.target.dataset.slide);
+          counter.textContent = current + 1;
+        }
+      });
+    }, { threshold: 0.5 });
+
+    slides.forEach(slide => observer.observe(slide));
+  </script>
+</body>
+</html>

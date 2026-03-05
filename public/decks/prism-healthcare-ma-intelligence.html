@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRISM Intelligence: Healthcare M&A, PE/VC & Design Analysis</title>
+<style>
+:root{--bg:#06090f;--card:#0f1420;--elev:#161d2e;--a1:#3b82f6;--a2:#8b5cf6;--a3:#06b6d4;--a4:#f59e0b;--a5:#10b981;--a6:#ec4899;--ar:#ef4444;--t1:#f1f5f9;--t2:#94a3b8;--t3:#64748b;--brd:rgba(255,255,255,0.07)}
+*{margin:0;padding:0;box-sizing:border-box}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--t1);overflow:hidden;height:100vh}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:2.5rem 3.5rem;opacity:0;transform:translateY(18px);transition:opacity .5s,transform .5s;pointer-events:none;overflow-y:auto;padding-bottom:4.5rem}
+.slide.active{opacity:1;transform:translateY(0);pointer-events:all}
+.slide::-webkit-scrollbar{width:3px}.slide::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:2px}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:0.7rem 2rem;background:rgba(6,9,15,0.92);backdrop-filter:blur(12px);border-top:1px solid var(--brd);z-index:100}
+.nb{background:none;border:1px solid var(--brd);color:var(--t2);padding:0.35rem 0.9rem;border-radius:6px;cursor:pointer;font-size:0.78rem;transition:all .2s}.nb:hover{border-color:var(--a1);color:var(--t1)}
+.dots{display:flex;gap:5px}.dot{width:7px;height:7px;border-radius:50%;background:var(--t3);cursor:pointer;transition:all .3s}.dot.on{background:var(--a1);box-shadow:0 0 8px var(--a1)}
+.ni{color:var(--t3);font-size:0.72rem;font-variant-numeric:tabular-nums}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:0.25rem 0.7rem;border-radius:999px;font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.9rem}
+.stit{font-size:clamp(1.4rem,2.5vw,2.1rem);font-weight:800;line-height:1.15;margin-bottom:0.35rem;letter-spacing:-0.02em}
+.ssub{font-size:0.9rem;color:var(--t2);margin-bottom:1.4rem;line-height:1.5}
+.grid{display:grid;gap:0.9rem}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.g23{grid-template-columns:2fr 3fr}.g32{grid-template-columns:3fr 2fr}
+@media(max-width:900px){.g2,.g3,.g4,.g23,.g32{grid-template-columns:1fr}}
+.c{background:var(--card);border:1px solid var(--brd);border-radius:11px;padding:1.15rem;transition:border-color .3s}.c:hover{border-color:rgba(255,255,255,0.1)}
+.c h3{font-size:0.82rem;font-weight:700;margin-bottom:0.6rem;line-height:1.3}
+.c p,.c li{font-size:0.77rem;color:var(--t2);line-height:1.55}
+.c ul{list-style:none;padding:0}.c li{padding:0.2rem 0 0.2rem 1rem;position:relative}.c li::before{content:'';position:absolute;left:0;top:0.55rem;width:4px;height:4px;border-radius:50%;background:var(--a1)}
+.sr{display:flex;gap:0.9rem;margin-bottom:1.2rem;flex-wrap:wrap}
+.sb{flex:1;min-width:120px;background:var(--card);border:1px solid var(--brd);border-radius:9px;padding:0.85rem 1rem;text-align:center}
+.sv{font-size:1.5rem;font-weight:800;letter-spacing:-0.02em;line-height:1.1}
+.sl{font-size:0.65rem;color:var(--t3);margin-top:0.25rem;text-transform:uppercase;letter-spacing:0.06em}
+.mt{width:100%;border-collapse:collapse;font-size:0.75rem}
+.mt th{text-align:left;padding:0.45rem 0.65rem;border-bottom:1px solid var(--brd);color:var(--t3);font-weight:600;font-size:0.67rem;text-transform:uppercase;letter-spacing:0.06em}
+.mt td{padding:0.45rem 0.65rem;border-bottom:1px solid rgba(255,255,255,0.025)}
+.mt tr:hover td{background:rgba(255,255,255,0.015)}
+.tag{display:inline-block;padding:0.12rem 0.45rem;border-radius:4px;font-size:0.62rem;font-weight:600;margin:1px}
+.tb{background:rgba(59,130,246,0.13);color:var(--a1)}.tp{background:rgba(139,92,246,0.13);color:var(--a2)}.tc{background:rgba(6,182,212,0.13);color:var(--a3)}.ta{background:rgba(245,158,11,0.13);color:var(--a4)}.tg{background:rgba(16,185,129,0.13);color:var(--a5)}.tk{background:rgba(236,72,153,0.13);color:var(--a6)}.tr{background:rgba(239,68,68,0.13);color:var(--ar)}
+.prog{height:5px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden;margin-top:0.4rem}.pf{height:100%;border-radius:3px;transition:width .6s}
+.ec{background:linear-gradient(135deg,var(--card),var(--elev));border:1px solid;border-radius:11px;padding:1.15rem;position:relative;overflow:hidden}
+.ec::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.en{font-size:1.8rem;font-weight:900;opacity:0.1;position:absolute;top:0.4rem;right:0.9rem}
+.pb{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:5px;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;background:linear-gradient(135deg,rgba(59,130,246,0.18),rgba(139,92,246,0.18));border:1px solid rgba(59,130,246,0.25);color:var(--a1)}
+/* Heat bar */
+.heat{display:flex;height:18px;border-radius:4px;overflow:hidden;margin:0.3rem 0}.heat div{transition:width .5s}
+</style>
+</head>
+<body>
+
+<!-- S1: Title -->
+<div class="slide active" id="s1">
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;max-width:900px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:2rem">
+      <span class="pb">PRISM Intelligence</span>
+      <span style="color:var(--t3);font-size:0.67rem">ARCHON Swarm 3408fe37 &bull; 4 Agents &bull; 64 Findings</span>
+    </div>
+    <h1 style="font-size:clamp(2rem,4vw,3.1rem);font-weight:900;line-height:1.08;letter-spacing:-0.03em;margin-bottom:1rem">
+      Healthcare M&A, Private Equity<br>&amp; Venture Capital<br><span style="color:var(--a3)">Intelligence Report 2026</span>
+    </h1>
+    <p style="font-size:1rem;color:var(--t2);line-height:1.6;max-width:680px;margin-bottom:2.5rem">
+      Deal landscape, capital dynamics, forward M&A signals, and UI/UX design patterns across PE/VC-acquired healthcare companies. Four dimensions analyzed in parallel.
+    </p>
+    <div class="sr">
+      <div class="sb" style="border-color:rgba(16,185,129,0.3)"><div class="sv" style="color:var(--a5)">$115B</div><div class="sl">2025 Deal Value</div></div>
+      <div class="sb" style="border-color:rgba(59,130,246,0.3)"><div class="sv" style="color:var(--a1)">$191B</div><div class="sl">PE Healthcare (Record)</div></div>
+      <div class="sb" style="border-color:rgba(139,92,246,0.3)"><div class="sv" style="color:var(--a2)">$14.2B</div><div class="sl">Digital Health VC</div></div>
+      <div class="sb" style="border-color:rgba(245,158,11,0.3)"><div class="sv" style="color:var(--a4)">62%</div><div class="sl">VC to AI Companies</div></div>
+      <div class="sb" style="border-color:rgba(6,182,212,0.3)"><div class="sv" style="color:var(--a3)">+30-45%</div><div class="sl">2026 Volume Signal</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- S2: M&A Landscape -->
+<div class="slide" id="s2">
+  <span class="badge" style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.2);color:var(--a1)">M&A Landscape</span>
+  <div class="stit">V-Shaped Recovery: $62B (2024) to $115B (2025)</div>
+  <div class="ssub">Record PE dominance with 11 mega-deals and 445 PE buyouts in 2025. 44% involved distressed parties.</div>
+
+  <div class="grid g2" style="margin-bottom:0.9rem">
+    <div class="c">
+      <h3>Deal Volume & Value Trajectory</h3>
+      <table class="mt">
+        <thead><tr><th>Year</th><th>Deal Value</th><th>Volume</th><th>PE Share</th><th>Trend</th></tr></thead>
+        <tbody>
+          <tr><td>2023</td><td style="font-weight:700">$87B</td><td>1,506</td><td>~30%</td><td><span class="tg">Peak</span></td></tr>
+          <tr><td>2024</td><td style="font-weight:700;color:var(--ar)">$62B</td><td>1,373</td><td>25%</td><td><span class="tr">-29%</span></td></tr>
+          <tr><td>2025</td><td style="font-weight:700;color:var(--a5)">$115B</td><td>~1,400</td><td style="color:var(--a5)">40%</td><td><span class="tg">+46%</span></td></tr>
+          <tr><td>2026E</td><td style="font-weight:700;color:var(--a1)">$130-160B</td><td>1,500+</td><td>42%+</td><td><span class="tb">+30-45%</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="c">
+      <h3>2025 Mega-Deals ($5B+)</h3>
+      <table class="mt">
+        <thead><tr><th>Deal</th><th>Value</th><th>Type</th></tr></thead>
+        <tbody>
+          <tr><td>Walgreens / Sycamore</td><td style="font-weight:700">$24B</td><td><span class="ta">Going-Private</span></td></tr>
+          <tr><td>Abbott / Exact Sciences</td><td style="font-weight:700">$23B</td><td><span class="tb">Strategic</span></td></tr>
+          <tr><td>Blackstone-TPG / Hologic</td><td style="font-weight:700">$18.3B</td><td><span class="tp">PE Co-Invest</span></td></tr>
+          <tr><td>R1 RCM / TowerBrook-CD&R</td><td style="font-weight:700">$8.9B</td><td><span class="tp">PE Buyout</span></td></tr>
+          <tr><td>Qualtrics-Press Ganey</td><td style="font-weight:700">$6.75B</td><td><span class="tb">Strategic</span></td></tr>
+          <tr><td>Cencora / OneOncology</td><td style="font-weight:700">$3.6B</td><td><span class="tb">Strategic</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="c">
+    <h3>Sector Heat Map: Deal Activity Rankings (2025)</h3>
+    <div style="display:grid;grid-template-columns:160px 1fr 60px;gap:4px;font-size:0.72rem;align-items:center">
+      <div style="font-weight:600">Healthcare IT</div><div class="heat"><div style="width:100%;background:linear-gradient(90deg,var(--a1),var(--a2))"></div></div><div style="color:var(--a1);font-weight:700;text-align:right">151 deals</div>
+      <div style="font-weight:600">Dental</div><div class="heat"><div style="width:98%;background:linear-gradient(90deg,var(--a3),var(--a1))"></div></div><div style="color:var(--a3);font-weight:700;text-align:right">149 deals</div>
+      <div style="font-weight:600">Outpatient/ASCs</div><div class="heat"><div style="width:97%;background:linear-gradient(90deg,var(--a5),var(--a3))"></div></div><div style="color:var(--a5);font-weight:700;text-align:right">148 deals</div>
+      <div style="font-weight:600">Medtech</div><div class="heat"><div style="width:77%;background:linear-gradient(90deg,var(--a4),var(--a5))"></div></div><div style="color:var(--a4);font-weight:700;text-align:right">117 deals</div>
+      <div style="font-weight:600">Behavioral Health</div><div class="heat"><div style="width:37%;background:linear-gradient(90deg,var(--a6),var(--a2))"></div></div><div style="color:var(--a6);font-weight:700;text-align:right">56 deals</div>
+      <div style="font-weight:600;color:var(--a4)">Ambient AI *</div><div class="heat"><div style="width:25%;background:linear-gradient(90deg,var(--a4),var(--ar))"></div></div><div style="color:var(--a4);font-weight:700;text-align:right">Breakout</div>
+    </div>
+    <div style="font-size:0.65rem;color:var(--t3);margin-top:0.5rem">* Ambient clinical AI: $975M+ funding, $600M revenue, +2.4x YoY. Abridge (30%), Nuance (33%), Ambience (13%)</div>
+  </div>
+</div>
+
+<!-- S3: PE/VC Capital Dynamics -->
+<div class="slide" id="s3">
+  <span class="badge" style="background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.2);color:var(--a2)">PE & VC Dynamics</span>
+  <div class="stit">$191B PE Record + $14.2B Digital Health VC</div>
+  <div class="ssub">AI captures 62% of healthcare VC. PE entry multiples compressing 21%. Secondary buyouts dominate exits (70%+).</div>
+
+  <div class="grid g2" style="margin-bottom:0.9rem">
+    <div class="c">
+      <h3>Top PE Firms in Healthcare (2025)</h3>
+      <table class="mt">
+        <thead><tr><th>Firm</th><th>Notable Deal</th><th>Thesis</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:600">Blackstone</td><td>Hologic ($18.3B)</td><td>Scale platforms, medtech</td></tr>
+          <tr><td style="font-weight:600">KKR</td><td>BrightSpring ($8B+)</td><td>Home/post-acute scale</td></tr>
+          <tr><td style="font-weight:600">Vista Equity</td><td>EngageSmart ($4B)</td><td>Healthcare SaaS roll-ups</td></tr>
+          <tr><td style="font-weight:600">Thoma Bravo</td><td>$34.4B fund raise</td><td>Software consolidation</td></tr>
+          <tr><td style="font-weight:600">TowerBrook/CD&R</td><td>R1 RCM ($8.9B)</td><td>RCM platform build</td></tr>
+          <tr><td style="font-weight:600">Warburg Pincus</td><td>Clearwater ($8.4B)</td><td>Data/analytics</td></tr>
+          <tr><td style="font-weight:600">Oak HC/FT</td><td>Reveleer, Ambience</td><td>Health IT early growth</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="c">
+      <h3>VC Mega-Rounds in Healthcare AI (2024-2025)</h3>
+      <table class="mt">
+        <thead><tr><th>Company</th><th>Raised</th><th>Category</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:600">OpenEvidence</td><td style="color:var(--a5);font-weight:700">$1.335B</td><td><span class="tg">Clinical AI</span></td></tr>
+          <tr><td style="font-weight:600">Xaira Therapeutics</td><td style="color:var(--a5);font-weight:700">$1.0B</td><td><span class="tc">Drug Discovery</span></td></tr>
+          <tr><td style="font-weight:600">Abridge</td><td style="color:var(--a1);font-weight:700">$550M</td><td><span class="ta">Ambient AI</span></td></tr>
+          <tr><td style="font-weight:600">Lila Sciences</td><td style="color:var(--a1);font-weight:700">$550M</td><td><span class="tc">Drug Discovery</span></td></tr>
+          <tr><td style="font-weight:600">MapLight</td><td style="color:var(--a2);font-weight:700">$372M</td><td><span class="tc">Neuroscience</span></td></tr>
+          <tr><td style="font-weight:600">Ambience</td><td style="color:var(--a2);font-weight:700">$243M</td><td><span class="ta">Ambient AI</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="grid g4">
+    <div class="c" style="text-align:center">
+      <div style="font-size:0.65rem;color:var(--t3);text-transform:uppercase;margin-bottom:0.35rem">PE Dry Powder</div>
+      <div style="font-size:1.5rem;font-weight:800;color:var(--a2)">$1.2T</div>
+      <div style="font-size:0.7rem;color:var(--t2)">24% held 4+ years</div>
+    </div>
+    <div class="c" style="text-align:center">
+      <div style="font-size:0.65rem;color:var(--t3);text-transform:uppercase;margin-bottom:0.35rem">Entry Multiples</div>
+      <div style="font-size:1.5rem;font-weight:800;color:var(--a4)">11.5x</div>
+      <div style="font-size:0.7rem;color:var(--ar)">-21% from 2024</div>
+    </div>
+    <div class="c" style="text-align:center">
+      <div style="font-size:0.65rem;color:var(--t3);text-transform:uppercase;margin-bottom:0.35rem">Exit Multiples</div>
+      <div style="font-size:1.5rem;font-weight:800;color:var(--a5)">18.3x</div>
+      <div style="font-size:0.7rem;color:var(--a5)">EBITDA avg</div>
+    </div>
+    <div class="c" style="text-align:center">
+      <div style="font-size:0.65rem;color:var(--t3);text-transform:uppercase;margin-bottom:0.35rem">AI Valuation Premium</div>
+      <div style="font-size:1.5rem;font-weight:800;color:var(--a3)">+20-30%</div>
+      <div style="font-size:0.7rem;color:var(--a3)">over non-AI peers</div>
+    </div>
+  </div>
+</div>
+
+<!-- S4: Forward M&A Signals -->
+<div class="slide" id="s4">
+  <span class="badge" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.2);color:var(--a4)">Signal Detection</span>
+  <div class="stit">M&A Signals: +30-45% Volume Increase Projected (2026-2028)</div>
+  <div class="ssub">Four converging forces: regulatory urgency (40%), financial distress (25%), buyer appetite (20%), tech disruption (15%)</div>
+
+  <div class="grid g2" style="margin-bottom:0.9rem">
+    <div class="c" style="border-left:3px solid var(--a4)">
+      <h3 style="color:var(--a4)">Regulatory M&A Triggers</h3>
+      <ul>
+        <li><strong>V28 HCC Model (Live Jan 2026)</strong> &mdash; 100% V28 requires real-time clinical documentation. Creates urgent demand for AI chart abstraction platforms. Targets: RAAPID, Reveleer, Vatica, Solventum. <span class="ta">0.78 prob</span></li>
+        <li><strong>Prior Auth Rules (CMS-0057-F, Jan 2027)</strong> &mdash; 72-hour expedited, 7-day standard. API-based ePA mandatory. $13B/yr industry spend. Targets: Cohere Health, prior auth AI startups. <span class="ta">0.74 prob</span></li>
+        <li><strong>MA Rate Freeze (2027)</strong> &mdash; +0.09% vs +5.06% in 2026. 700+ county exits predicted. Forces regional MA plan consolidation. <span class="ta">0.68 prob</span></li>
+        <li><strong>Interoperability Enforcement (Feb 2026)</strong> &mdash; 1,600 complaints filed, $1M penalties. Drives FHIR/data exchange acquisitions. <span class="ta">0.64 prob</span></li>
+      </ul>
+    </div>
+    <div class="c" style="border-left:3px solid var(--ar)">
+      <h3 style="color:var(--ar)">Financial Distress Signals</h3>
+      <ul>
+        <li><strong>VC Runway Depletion</strong> &mdash; Series B funding down 50%. Median growth-stage runway: 12 months. 50-70% of VC-backed digital health startups face consolidation in 2026-2027. <span class="tr">0.73 prob</span></li>
+        <li><strong>PE Debt Maturity Wall</strong> &mdash; Year 6-8 portfolio companies with low DPI ratios. Refinancing pressure + continuation vehicle activity. 3-5 major secondary buyouts expected. <span class="tr">0.68 prob</span></li>
+        <li><strong>Distressed Acquisitions</strong> &mdash; 44% of 2025 transactions involved distressed parties. Pattern expected to continue as VC-backed startups deplete reserves.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="c">
+    <h3>Highest-Probability M&A Predictions (2026-2028)</h3>
+    <table class="mt">
+      <thead><tr><th>Prediction</th><th>Prob.</th><th>Est. Value</th><th>Timeframe</th><th>Signal Type</th></tr></thead>
+      <tbody>
+        <tr><td>Major plan acquires AI HCC platform</td><td style="font-weight:700;color:var(--a5)">78%</td><td>$200-400M</td><td>H1 2026</td><td><span class="ta">Regulatory</span></td></tr>
+        <tr><td>Behavioral health roll-up wave (10-15 deals)</td><td style="font-weight:700;color:var(--a5)">76%</td><td>$50-300M each</td><td>2026</td><td><span class="tp">Consolidation</span></td></tr>
+        <tr><td>Humana acquires primary care group</td><td style="font-weight:700;color:var(--a5)">76%</td><td>~$1B</td><td>2026</td><td><span class="tb">Strategic</span></td></tr>
+        <tr><td>20-30 physician practices acquired</td><td style="font-weight:700;color:var(--a1)">75%</td><td>Various</td><td>2026</td><td><span class="tp">Consolidation</span></td></tr>
+        <tr><td>Prior auth AI startup acquired</td><td style="font-weight:700;color:var(--a1)">74%</td><td>$250-500M</td><td>2026-27</td><td><span class="ta">Tech</span></td></tr>
+        <tr><td>AI-powered RCM platform deal</td><td style="font-weight:700;color:var(--a1)">73%</td><td>$100-250M</td><td>2026-27</td><td><span class="ta">Tech</span></td></tr>
+        <tr><td>15-25 VC startups acquired at discount</td><td style="font-weight:700;color:var(--a1)">73%</td><td>Down-round</td><td>2026</td><td><span class="tr">Distress</span></td></tr>
+        <tr><td>ASC tuck-in wave (10-15 deals)</td><td style="font-weight:700;color:var(--a3)">71%</td><td>$50-200M each</td><td>2026-27</td><td><span class="tp">Consolidation</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S5: Strategic Buyer Signals -->
+<div class="slide" id="s5">
+  <span class="badge" style="background:rgba(6,182,212,0.12);border:1px solid rgba(6,182,212,0.2);color:var(--a3)">Strategic Buyers</span>
+  <div class="stit">Who's Acquiring: The Big 5 Strategic Buyer Playbooks</div>
+  <div class="ssub">Optum, CVS, Humana, Cigna/Evernorth, and Elevance each pursuing distinct acquisition strategies</div>
+
+  <div class="grid g3" style="margin-bottom:0.9rem">
+    <div class="c" style="border-top:3px solid var(--a1)">
+      <h3 style="color:var(--a1)">Optum / UnitedHealth</h3>
+      <p><strong>Thesis:</strong> Value-based care dominance. Consolidating from 18 to 3 EMR systems. $1B AI cost savings target (2026). Selectively acquiring high-quality physician groups.</p>
+      <p style="margin-top:0.4rem"><strong>Recent:</strong> Holston Medical (200+ providers), Amedisys ($3.3B home health)</p>
+      <div style="margin-top:0.4rem"><span class="tb">Physician Groups</span><span class="tb">Home Health</span><span class="tb">AI Platforms</span></div>
+    </div>
+    <div class="c" style="border-top:3px solid var(--a5)">
+      <h3 style="color:var(--a5)">CVS / Aetna</h3>
+      <p><strong>Thesis:</strong> Integrated retail-payer-provider ecosystem. Expanding Oak Street Health to 300+ locations by 2026. Leveraging 9,000+ pharmacy locations as care delivery points.</p>
+      <p style="margin-top:0.4rem"><strong>Target:</strong> $7M EBITDA per location at maturity</p>
+      <div style="margin-top:0.4rem"><span class="tg">Primary Care</span><span class="tg">Retail Health</span><span class="tg">Home Health</span></div>
+    </div>
+    <div class="c" style="border-top:3px solid var(--a4)">
+      <h3 style="color:var(--a4)">Humana</h3>
+      <p><strong>Thesis:</strong> Largest MA carrier by end of 2026. CEO signaling major primary care acquisition. In talks with MaxHealth (~$1B). Targeting 25%+ MA membership growth.</p>
+      <p style="margin-top:0.4rem"><strong>Focus:</strong> CenterWell expansion + new acquisitions</p>
+      <div style="margin-top:0.4rem"><span class="ta">Primary Care</span><span class="ta">Home Health</span><span class="ta">MA Plans</span></div>
+    </div>
+  </div>
+  <div class="grid g2">
+    <div class="c" style="border-top:3px solid var(--a2)">
+      <h3 style="color:var(--a2)">Cigna / Evernorth</h3>
+      <p><strong>Thesis:</strong> Divested Medicare business; refocusing on specialty pharmacy and GLP-1 market management. 11% earnings growth from GLP-1 programs (9M+ lives). $400B+ specialty pharmacy TAM.</p>
+      <div style="margin-top:0.4rem"><span class="tp">Specialty Pharma</span><span class="tp">PBM Tech</span><span class="tp">GLP-1 Services</span></div>
+    </div>
+    <div class="c" style="border-top:3px solid var(--a6)">
+      <h3 style="color:var(--a6)">Elevance Health</h3>
+      <p><strong>Thesis:</strong> Pure payer consolidation. Acquired IU Health Plans and BCBS Louisiana. Building Carelon as health services platform. Focus on data/analytics capabilities for Stars and risk adjustment.</p>
+      <div style="margin-top:0.4rem"><span class="tk">Payer M&A</span><span class="tk">Data Analytics</span><span class="tk">Health Services</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- S6: Consolidation-Ripe Sectors -->
+<div class="slide" id="s6">
+  <span class="badge" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.2);color:var(--a5)">Consolidation Targets</span>
+  <div class="stit">Fragmented Sectors Primed for Roll-Up (2026-2028)</div>
+  <div class="ssub">Six sectors with high fragmentation indices where platform economics drive M&A acceleration</div>
+
+  <div class="grid g3" style="margin-bottom:0.9rem">
+    <div class="c">
+      <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem"><h3>Behavioral Health</h3><span class="tg" style="font-size:0.6rem">9/10 Frag.</span></div>
+      <p>+47% M&A YoY through Q3 2025 (75 transactions). Spring Health + Alma merger: $6-7B valuation. High margins (40-50% EBITDA). Employer demand surging.</p>
+      <div style="margin-top:0.4rem"><span class="tag tg">10-15 deals expected</span><span class="tag tg">$50-300M each</span></div>
+    </div>
+    <div class="c">
+      <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem"><h3>Physician Practices</h3><span class="tg" style="font-size:0.6rem">9/10 Frag.</span></div>
+      <p>47% of physicians now employed by systems (up from 30% in 2012). Optum, CVS, Humana, Amazon all acquiring primary care groups. Value-based contracts accelerating consolidation.</p>
+      <div style="margin-top:0.4rem"><span class="tag tg">20-30 deals expected</span><span class="tag tg">Ongoing wave</span></div>
+    </div>
+    <div class="c">
+      <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem"><h3>Home Health</h3><span class="tag ta" style="font-size:0.6rem">8/10 Frag.</span></div>
+      <p>Aging population + site-of-care shift. Tech-enabled platforms command 8-12x EBITDA. UNH/Amedisys ($3.3B) sets benchmark. Telehealth + AI care coordination = premium multiples.</p>
+      <div style="margin-top:0.4rem"><span class="tag ta">5-10 platforms</span><span class="tag ta">$100-500M each</span></div>
+    </div>
+  </div>
+  <div class="grid g3">
+    <div class="c">
+      <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem"><h3>ASCs</h3><span class="tag ta" style="font-size:0.6rem">7/10 Frag.</span></div>
+      <p>2026 Medicare payment increase to $9.2B (+2.6%). Specialty ASC platforms (ortho, ophtho, pain) attracting PE. 10-15 tuck-ins expected.</p>
+    </div>
+    <div class="c">
+      <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem"><h3>Risk Adjustment</h3><span class="tag tb" style="font-size:0.6rem">6/10 Frag.</span></div>
+      <p>V28 creating urgent demand for AI-powered platforms. RAAPID, Reveleer, Vatica, Solventum as targets. 7-10x EBITDA for profitable AI platforms.</p>
+    </div>
+    <div class="c">
+      <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem"><h3>RCM / Denial Mgmt</h3><span class="tag tb" style="font-size:0.6rem">6/10 Frag.</span></div>
+      <p>$172B (2024) to $273B (2030) at 10-11.5% CAGR. Denial rates 30% to 41%. AI-native solutions disrupting legacy vendors. R1 RCM ($8.9B) sets platform standard.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S7: UI/UX Design Analysis -->
+<div class="slide" id="s7">
+  <span class="badge" style="background:rgba(236,72,153,0.12);border:1px solid rgba(236,72,153,0.2);color:var(--a6)">UX Design Analysis</span>
+  <div class="stit">Design Maturity of PE/VC-Acquired Healthcare Companies</div>
+  <div class="ssub">18 companies analyzed across 5-level design maturity spectrum. $8B in annual US healthcare losses attributed to UX.</div>
+
+  <div class="grid g23" style="margin-bottom:0.9rem">
+    <div class="c">
+      <h3>Design Maturity Spectrum</h3>
+      <div style="font-size:0.73rem">
+        <div style="padding:0.5rem;background:rgba(239,68,68,0.06);border-radius:6px;margin-bottom:0.4rem;border-left:3px solid var(--ar)">
+          <strong style="color:var(--ar)">Level 1: Legacy</strong> <span style="color:var(--t3)">&mdash; Table-heavy, modal dialogs, enterprise-gray</span><br>
+          <span style="color:var(--t2)">Athenahealth (pre-Oracle), legacy Cotiviti, Netsmart</span>
+        </div>
+        <div style="padding:0.5rem;background:rgba(245,158,11,0.06);border-radius:6px;margin-bottom:0.4rem;border-left:3px solid var(--a4)">
+          <strong style="color:var(--a4)">Level 2: Modernizing</strong> <span style="color:var(--t3)">&mdash; Partial redesign, inconsistent components</span><br>
+          <span style="color:var(--t2)">symplr, R1 RCM, Apixio</span>
+        </div>
+        <div style="padding:0.5rem;background:rgba(59,130,246,0.06);border-radius:6px;margin-bottom:0.4rem;border-left:3px solid var(--a1)">
+          <strong style="color:var(--a1)">Level 3: Contemporary</strong> <span style="color:var(--t3)">&mdash; Design system, responsive, cohesive</span><br>
+          <span style="color:var(--t2)">Zelis, Signify Health, Availity, Cedar</span>
+        </div>
+        <div style="padding:0.5rem;background:rgba(139,92,246,0.06);border-radius:6px;margin-bottom:0.4rem;border-left:3px solid var(--a2)">
+          <strong style="color:var(--a2)">Level 4: Leading</strong> <span style="color:var(--t3)">&mdash; Animation, micro-interactions, delightful</span><br>
+          <span style="color:var(--t2)">Waystar, HealthEdge, Aledade, Particle Health</span>
+        </div>
+        <div style="padding:0.5rem;background:rgba(16,185,129,0.06);border-radius:6px;border-left:3px solid var(--a5)">
+          <strong style="color:var(--a5)">Level 5: Visionary</strong> <span style="color:var(--t3)">&mdash; AI-native UI, conversational, predictive</span><br>
+          <span style="color:var(--t2)">NextGen Healthcare ("No UI is New UI"), Abridge, Ambience</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="c" style="margin-bottom:0.9rem">
+        <h3>Design as Valuation Driver</h3>
+        <table class="mt">
+          <thead><tr><th>Metric</th><th>Legacy UX</th><th>Modern UX</th><th>Delta</th></tr></thead>
+          <tbody>
+            <tr><td>EV/Revenue Multiple</td><td>3.7x</td><td style="font-weight:700;color:var(--a5)">6.1x</td><td style="color:var(--a5)">+65%</td></tr>
+            <tr><td>Design Iteration Speed</td><td>Quarterly</td><td style="font-weight:700;color:var(--a5)">Weekly</td><td style="color:var(--a5)">12x</td></tr>
+            <tr><td>SaaS Platform Pricing</td><td>Per-seat</td><td style="font-weight:700;color:var(--a5)">Value-based</td><td style="color:var(--a5)">Premium</td></tr>
+            <tr><td>Design System ROI</td><td>N/A</td><td style="font-weight:700;color:var(--a5)">-46% cost</td><td style="color:var(--a5)">+22% speed</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="c">
+        <h3>PE Firms That Invest in Design</h3>
+        <ul>
+          <li><strong style="color:var(--a1)">Bain Capital</strong> &mdash; Explicit product design investment thesis. Waystar redesign post-acquisition.</li>
+          <li><strong style="color:var(--a2)">Veritas Capital</strong> &mdash; Cotiviti platform modernization. $11B exit driven by cloud + UX.</li>
+          <li><strong style="color:var(--a3)">Clearlake Capital</strong> &mdash; symplr platform unification across 10+ acquired products.</li>
+          <li><strong style="color:var(--a4)">Vista Equity</strong> &mdash; Operational playbook includes UX standardization. Athenahealth redesign.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- S8: Emerging Design Trends -->
+<div class="slide" id="s8">
+  <span class="badge" style="background:rgba(6,182,212,0.12);border:1px solid rgba(6,182,212,0.2);color:var(--a3)">Design Trends</span>
+  <div class="stit">The Shift to AI-Native Healthcare Interfaces</div>
+  <div class="ssub">Healthcare UX is moving from "dashboards of data" to "ambient intelligence with zero clicks"</div>
+
+  <div class="grid g3" style="margin-bottom:0.9rem">
+    <div class="c" style="border-top:3px solid var(--a5)">
+      <h3 style="color:var(--a5)">AI-Native / Conversational</h3>
+      <p>NextGen "No UI is the New UI" saves clinicians 2.5 hrs/day. Abridge ambient documentation. Hyro/Luma Spark automating 40% of contact center calls. Chat-first interfaces replacing forms.</p>
+      <div style="margin-top:0.5rem"><span class="tg">Trend: Rising fast</span></div>
+    </div>
+    <div class="c" style="border-top:3px solid var(--a1)">
+      <h3 style="color:var(--a1)">Embedded Analytics</h3>
+      <p>Dashboards moving from standalone to embedded in workflows. Real-time KPI tiles, sparkline trends, in-context data visualization. HealthEdge and Waystar leading this pattern.</p>
+      <div style="margin-top:0.5rem"><span class="tb">Trend: Mainstream</span></div>
+    </div>
+    <div class="c" style="border-top:3px solid var(--a2)">
+      <h3 style="color:var(--a2)">Workflow Automation</h3>
+      <p>Wizard-based guided workflows replacing free-form interfaces. Smart routing, confidence scoring, exception-only review. Cedar and Zelis pioneering patient-facing workflow design.</p>
+      <div style="margin-top:0.5rem"><span class="tp">Trend: Accelerating</span></div>
+    </div>
+  </div>
+  <div class="grid g2">
+    <div class="c">
+      <h3>Common UX Anti-Patterns in Healthcare IT</h3>
+      <ul>
+        <li><strong style="color:var(--ar)">Click fatigue</strong> &mdash; Average clinician: 4,000 clicks/day in EHR. Multiple logins, redundant confirmations, unnecessary navigation.</li>
+        <li><strong style="color:var(--ar)">Data density failure</strong> &mdash; Either too little (empty dashboards) or too much (wall of tables). Poor information hierarchy forces cognitive overload.</li>
+        <li><strong style="color:var(--ar)">Fragmented multi-product</strong> &mdash; PE roll-ups create 5-10 product UIs under one brand. Users must context-switch between completely different interfaces.</li>
+        <li><strong style="color:var(--ar)">Mobile neglect</strong> &mdash; &lt;30% of healthcare IT products have functional mobile experience. Provider workflows increasingly mobile-first, but tools aren't.</li>
+        <li><strong style="color:var(--ar)">Onboarding void</strong> &mdash; Complex clinical software with zero guided onboarding. Training costs = 2-3x license fees for enterprise deployments.</li>
+      </ul>
+    </div>
+    <div class="c">
+      <h3>Architecture Patterns Driving Better UX</h3>
+      <ul>
+        <li><strong style="color:var(--a5)">Cloud-native SaaS</strong> &mdash; 2-3x faster design iteration than on-prem. Weekly deploys vs quarterly. HealthEdge GuidingCare as exemplar.</li>
+        <li><strong style="color:var(--a5)">API-first + FHIR</strong> &mdash; Decoupled front-end enables rapid UX evolution. Particle Health pioneering interop-first design.</li>
+        <li><strong style="color:var(--a5)">Microservices</strong> &mdash; Feature-flag driven progressive disclosure. A/B testing UX at component level. Enables personalization.</li>
+        <li><strong style="color:var(--a5)">Platform + marketplace</strong> &mdash; Extensible UX where partners build on top. Athenahealth marketplace model. Reduces feature bloat.</li>
+        <li><strong style="color:var(--a5)">Design system standardization</strong> &mdash; 46% cost reduction, 22% faster delivery. PE firms using as post-acquisition integration lever.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- S9: Emergent Intelligence -->
+<div class="slide" id="s9">
+  <span class="badge" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.2);color:var(--a4)">Cross-Domain Emergence</span>
+  <div class="stit">What No Single Agent Saw: 5 Emergent Insights</div>
+  <div class="ssub">Cross-domain synthesis from M&A landscape + PE/VC dynamics + signal detection + UX design analysis</div>
+
+  <div class="grid g2" style="gap:1rem;margin-bottom:0.9rem">
+    <div class="ec" style="border-color:rgba(59,130,246,0.2)">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--a1),var(--a3))"></div>
+      <div class="en" style="color:var(--a1)">01</div>
+      <h3 style="color:var(--a1);margin-bottom:0.4rem">The AI Premium Creates a Two-Tier Market</h3>
+      <p style="font-size:0.77rem;color:var(--t2);line-height:1.55">The PE/VC agent found AI companies command 20-30% valuation premiums. The M&A agent found 62% of VC now flows to AI. The UX agent found AI-native interfaces correlate with 65% higher EV/Revenue multiples. <strong style="color:var(--t1)">Cross-domain: Healthcare IT is bifurcating into AI-haves (premium multiples, VC access, talent magnetism) and AI-have-nots (compressed multiples, acquisition targets, talent drain). The gap is widening faster than companies can adapt.</strong></p>
+    </div>
+    <div class="ec" style="border-color:rgba(139,92,246,0.2)">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--a2),var(--a6))"></div>
+      <div class="en" style="color:var(--a2)">02</div>
+      <h3 style="color:var(--a2);margin-bottom:0.4rem">Design Debt Is the Hidden PE Value Lever</h3>
+      <p style="font-size:0.77rem;color:var(--t2);line-height:1.55">The UX agent found $8B in annual losses from healthcare UX inefficiency. The PE agent found design-focused PE firms achieve higher exit multiples. The signal agent found clinician burnout driving adoption requirements. <strong style="color:var(--t1)">Cross-domain: PE firms that invest in UX post-acquisition are creating measurable valuation uplift, but most healthcare PE playbooks still prioritize financial engineering over product design. The firms that crack this (Bain Capital, Vista) will systematically outperform.</strong></p>
+    </div>
+    <div class="ec" style="border-color:rgba(16,185,129,0.2)">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--a5),var(--a3))"></div>
+      <div class="en" style="color:var(--a5)">03</div>
+      <h3 style="color:var(--a5);margin-bottom:0.4rem">The Regulatory-Distress-Consolidation Flywheel</h3>
+      <p style="font-size:0.77rem;color:var(--t2);line-height:1.55">The signal agent found V28 + prior auth + rate freezes creating urgent demand. The PE agent found $1.2T in dry powder seeking deployment. The M&A agent found 44% distressed transactions. <strong style="color:var(--t1)">These three forces form a self-reinforcing cycle: regulatory mandates force technology upgrades, cash-strapped companies can't invest, PE firms acquire them at discount, upgrade the technology, and exit at premium. The flywheel accelerates as each CMS rule adds pressure.</strong></p>
+    </div>
+    <div class="ec" style="border-color:rgba(245,158,11,0.2)">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--a4),var(--ar))"></div>
+      <div class="en" style="color:var(--a4)">04</div>
+      <h3 style="color:var(--a4);margin-bottom:0.4rem">The Payer-Provider Convergence Is Dead; Data Convergence Isn't</h3>
+      <p style="font-size:0.77rem;color:var(--t2);line-height:1.55">The M&A agent found zero payer-provider merged deals in 2025-2026 and rising antagonism. But the signal agent found interoperability enforcement accelerating data exchange. The UX agent found the best products bridging payer-provider workflows digitally. <strong style="color:var(--t1)">The physical convergence thesis (payers buying providers) is dead. The data convergence thesis (shared clinical intelligence across the care continuum) is alive and is where the next $10B+ platforms will be built.</strong></p>
+    </div>
+  </div>
+  <div class="ec" style="border-color:rgba(236,72,153,0.2)">
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--a6),var(--a2))"></div>
+    <div class="en" style="color:var(--a6)">05</div>
+    <h3 style="color:var(--a6);margin-bottom:0.4rem">Ambient AI Is Healthcare's iPhone Moment</h3>
+    <p style="font-size:0.77rem;color:var(--t2);line-height:1.55">The PE/VC agent found ambient AI as the breakout category ($975M funding, $600M revenue, 2.4x YoY). The UX agent found "No UI is the New UI" as the design frontier. The signal agent found clinician burnout as the adoption accelerant. The M&A agent found Nuance/Microsoft (33% share) and Abridge (30%) dominating. <strong style="color:var(--t1)">Ambient clinical AI is the first healthcare technology category where the product genuinely disappears into the workflow. This isn't incremental UX improvement &mdash; it's a paradigm shift that will restructure how every other healthcare IT product is designed, sold, and valued.</strong></p>
+  </div>
+</div>
+
+<!-- S10: 3-Year Outlook -->
+<div class="slide" id="s10">
+  <span class="badge" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.2);color:var(--a5)">3-Year Forecast</span>
+  <div class="stit">Healthcare M&A Outlook: 2026-2028</div>
+  <div class="ssub">475-625 announced deals, $260-390B aggregate value projected across three years</div>
+
+  <div class="grid g3" style="margin-bottom:0.9rem">
+    <div class="c" style="border-top:3px solid var(--a1);text-align:center">
+      <div style="font-size:0.7rem;color:var(--a1);font-weight:700;margin-bottom:0.5rem">2026</div>
+      <div style="font-size:1.6rem;font-weight:800;color:var(--a1)">$80-120B</div>
+      <div style="font-size:0.75rem;color:var(--t2);margin-bottom:0.5rem">150-200 deals</div>
+      <p style="font-size:0.73rem">V28 demand peak. Prior auth preparation. VC distress wave. PE dry powder deployment accelerates. FTC favorable.</p>
+    </div>
+    <div class="c" style="border-top:3px solid var(--a5);text-align:center">
+      <div style="font-size:0.7rem;color:var(--a5);font-weight:700;margin-bottom:0.5rem">2027</div>
+      <div style="font-size:1.6rem;font-weight:800;color:var(--a5)">$100-150B</div>
+      <div style="font-size:0.75rem;color:var(--t2);margin-bottom:0.5rem">175-225 deals</div>
+      <p style="font-size:0.73rem">Prior auth mandate live. MA rate freeze impact. Regional system consolidation wave. PE exit cycle peak. IPO window opens.</p>
+    </div>
+    <div class="c" style="border-top:3px solid var(--a2);text-align:center">
+      <div style="font-size:0.7rem;color:var(--a2);font-weight:700;margin-bottom:0.5rem">2028</div>
+      <div style="font-size:1.6rem;font-weight:800;color:var(--a2)">$80-120B</div>
+      <div style="font-size:0.75rem;color:var(--t2);margin-bottom:0.5rem">150-200 deals</div>
+      <p style="font-size:0.73rem">Normalization. AI platforms mature. Post-V28 steady state. Second-wave PE exits. Platform consolidation complete in key sectors.</p>
+    </div>
+  </div>
+
+  <div class="grid g2">
+    <div class="c">
+      <h3>What to Watch</h3>
+      <ul>
+        <li><strong style="color:var(--a5)">AI as table stakes</strong> &mdash; By 2028, AI-powered clinical decision support becomes non-negotiable for any healthcare IT acquisition</li>
+        <li><strong style="color:var(--a1)">Value-based care readiness</strong> &mdash; VBC-ready practices command premium multiples; fee-for-service faces discount. Capitation doubled since 2021</li>
+        <li><strong style="color:var(--a2)">Design as competitive moat</strong> &mdash; PE firms investing in UX post-acquisition systematically achieve higher exit multiples</li>
+        <li><strong style="color:var(--a4)">Ambient AI category formation</strong> &mdash; $600M revenue today; projected $2-3B by 2028. Will drive restructuring of clinical workflow design</li>
+        <li><strong style="color:var(--a6)">Data convergence platforms</strong> &mdash; The next $10B+ companies will bridge payer-provider data, not payer-provider ownership</li>
+      </ul>
+    </div>
+    <div class="c">
+      <h3>Anti-Signals (What Could Suppress M&A)</h3>
+      <ul>
+        <li style="color:var(--ar)"><strong>"Break Up Big Medicine" legislation</strong> &mdash; Bipartisan effort targeting PBM-insurer-provider vertical integration. Could block mega-deals.</li>
+        <li style="color:var(--ar)"><strong>FTC leadership change</strong> &mdash; Current favorable posture could reverse with political shifts. Healthcare remains priority area.</li>
+        <li style="color:var(--ar)"><strong>Economic recession risk (40% prob)</strong> &mdash; Would compress valuations, reduce buyer appetite, and extend PE hold periods.</li>
+        <li style="color:var(--ar)"><strong>Interest rate spike (35% prob)</strong> &mdash; Would restrict leveraged buyout financing and increase cost of capital for PE.</li>
+        <li style="color:var(--ar)"><strong>AI hype correction</strong> &mdash; If AI fails to deliver measurable clinical outcomes, premium multiples could compress rapidly.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- S11: Swarm Performance -->
+<div class="slide" id="s11">
+  <span class="badge" style="background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.2);color:var(--a1)">ARCHON Swarm Meta</span>
+  <div class="stit">Intelligence Production Summary</div>
+  <div class="ssub">ARCHON swarm 3408fe37 &bull; 4 parallel agents &bull; dimensional split &bull; cross-domain emergence synthesis</div>
+
+  <div class="sr">
+    <div class="sb"><div class="sv" style="color:var(--a1)">64</div><div class="sl">Total Findings</div></div>
+    <div class="sb"><div class="sv" style="color:var(--a5)">4/4</div><div class="sl">Agents Complete</div></div>
+    <div class="sb"><div class="sv" style="color:var(--a2)">0.84</div><div class="sl">Avg Confidence</div></div>
+    <div class="sb"><div class="sv" style="color:var(--a4)">5</div><div class="sl">Emergence Signals</div></div>
+    <div class="sb"><div class="sv" style="color:var(--a3)">141</div><div class="sl">Sources Analyzed</div></div>
+  </div>
+
+  <div class="grid g2">
+    <div class="c">
+      <h3 style="margin-bottom:0.75rem">Agent Performance</h3>
+      <div style="margin-bottom:0.8rem">
+        <div style="display:flex;justify-content:space-between;font-size:0.75rem;margin-bottom:0.3rem"><span><strong>ma-landscape</strong></span><span>12 findings &bull; 0.92 confidence</span></div>
+        <div class="prog"><div class="pf" style="width:48%;background:var(--a1)"></div></div>
+      </div>
+      <div style="margin-bottom:0.8rem">
+        <div style="display:flex;justify-content:space-between;font-size:0.75rem;margin-bottom:0.3rem"><span><strong>pe-vc-dynamics</strong></span><span>20 findings &bull; 0.85 confidence</span></div>
+        <div class="prog"><div class="pf" style="width:80%;background:var(--a2)"></div></div>
+      </div>
+      <div style="margin-bottom:0.8rem">
+        <div style="display:flex;justify-content:space-between;font-size:0.75rem;margin-bottom:0.3rem"><span><strong>signal-detection</strong></span><span>17 findings &bull; 0.82 confidence</span></div>
+        <div class="prog"><div class="pf" style="width:68%;background:var(--a4)"></div></div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:0.75rem;margin-bottom:0.3rem"><span><strong>ux-design-analysis</strong></span><span>15 findings &bull; 0.78 confidence</span></div>
+        <div class="prog"><div class="pf" style="width:60%;background:var(--a6)"></div></div>
+      </div>
+    </div>
+    <div class="c">
+      <h3 style="margin-bottom:0.75rem">PRISM Architecture</h3>
+      <div style="font-size:0.75rem;color:var(--t2);line-height:1.6">
+        <div style="padding:0.4rem;background:rgba(255,255,255,0.02);border-radius:5px;margin-bottom:0.35rem;border-left:3px solid var(--a4)"><strong style="color:var(--a4)">SENTINEL</strong> &mdash; Signal monitoring &amp; trigger detection</div>
+        <div style="padding:0.4rem;background:rgba(59,130,246,0.04);border-radius:5px;margin-bottom:0.35rem;border-left:3px solid var(--a1)"><strong style="color:var(--a1)">ARCHON</strong> &mdash; Multi-agent swarm intelligence kernel</div>
+        <div style="padding:0.4rem;background:rgba(139,92,246,0.04);border-radius:5px;margin-bottom:0.35rem;border-left:3px solid var(--a2)"><strong style="color:var(--a2)">Domain Skills</strong> &mdash; Financial, competitive, regulatory, design</div>
+        <div style="padding:0.4rem;background:rgba(6,182,212,0.04);border-radius:5px;margin-bottom:0.35rem;border-left:3px solid var(--a3)"><strong style="color:var(--a3)">FORGE</strong> &mdash; Visual intelligence brief generation</div>
+        <div style="padding:0.4rem;background:rgba(16,185,129,0.04);border-radius:5px;border-left:3px solid var(--a5)"><strong style="color:var(--a5)">MEMORY</strong> &mdash; Cross-session pattern persistence</div>
+      </div>
+      <div style="margin-top:0.65rem;padding:0.6rem;background:var(--elev);border-radius:6px;font-size:0.7rem;color:var(--t3);text-align:center">
+        ARCHON/1.0 &bull; Dimensional Split &bull; 4 Agents &bull; Emergence Detection<br>
+        <span style="color:var(--t2)">141 sources &bull; 64 findings &bull; 5 cross-domain insights</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav>
+  <button class="nb" onclick="go(-1)">&larr; Prev</button>
+  <div class="dots" id="dots"></div>
+  <div class="ni"><span id="cur">1</span> / <span id="tot">11</span></div>
+  <button class="nb" onclick="go(1)">Next &rarr;</button>
+</nav>
+
+<script>
+const S=document.querySelectorAll('.slide'),T=S.length;let C=0;
+document.getElementById('tot').textContent=T;
+function rd(){const d=document.getElementById('dots');d.innerHTML='';for(let i=0;i<T;i++){const e=document.createElement('div');e.className='dot'+(i===C?' on':'');e.onclick=()=>gt(i);d.appendChild(e)}}
+function gt(n){S[C].classList.remove('active');C=Math.max(0,Math.min(T-1,n));S[C].classList.add('active');document.getElementById('cur').textContent=C+1;rd()}
+function go(d){gt(C+d)}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowDown')go(1);if(e.key==='ArrowLeft'||e.key==='ArrowUp')go(-1)});
+let tx=0;document.addEventListener('touchstart',e=>tx=e.touches[0].clientX);
+document.addEventListener('touchend',e=>{const d=tx-e.changedTouches[0].clientX;if(Math.abs(d)>50)go(d>0?1:-1)});
+rd();
+</script>
+</body>
+</html>

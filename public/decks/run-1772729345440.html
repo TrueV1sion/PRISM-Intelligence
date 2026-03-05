@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRISM Strategic Brief — Analyze the strategic impact of CMS 2027 Star Ratings…</title>
+<style>
+:root {
+  --inov-navy:#003D79;--inov-cerulean:#4E84C4;--inov-sky:#59DDFD;
+  --inov-midnight:#001E3C;--inov-jade:#00E49F;--inov-sand:#F5E6BB;
+  --inov-violet:#6C6CFF;--inov-cloud:#F4F0EA;
+  --bg-primary:#0a0b10;--bg-secondary:#10121a;--bg-tertiary:#181b26;
+  --bg-elevated:#1e2130;--bg-card:rgba(30,33,48,0.85);
+  --text-primary:#f0f2f8;--text-secondary:#a0a8c0;--text-tertiary:#5c6480;
+  --accent:#4E84C4;--accent-bright:#59DDFD;--accent-success:#00E49F;
+  --accent-warning:#F5E6BB;--accent-error:#ff5c5c;--accent-violet:#6C6CFF;
+  --border:rgba(78,132,196,0.12);--border-bright:rgba(89,221,253,0.25);
+  --chart-1:#003D79;--chart-2:#4E84C4;--chart-3:#59DDFD;--chart-4:#001E3C;
+  --chart-5:#00E49F;--chart-6:#F5E6BB;--chart-7:#6C6CFF;--chart-8:#F4F0EA;
+  --text-xs:clamp(0.65rem,0.6rem + 0.2vw,0.8rem);
+  --text-sm:clamp(0.8rem,0.74rem + 0.3vw,1rem);
+  --text-base:clamp(1rem,0.92rem + 0.4vw,1.2rem);
+  --text-lg:clamp(1.2rem,1.1rem + 0.5vw,1.5rem);
+  --text-xl:clamp(1.5rem,1.35rem + 0.65vw,1.9rem);
+  --text-2xl:clamp(1.9rem,1.7rem + 0.85vw,2.5rem);
+  --text-3xl:clamp(2.4rem,2.1rem + 1.1vw,3.2rem);
+  --text-hero:clamp(3.2rem,2.8rem + 1.6vw,4.5rem);
+  --ease-out-expo:cubic-bezier(0.16,1,0.3,1);
+  --ease-out-quart:cubic-bezier(0.25,1,0.5,1);
+  --ease-spring:cubic-bezier(0.34,1.56,0.64,1);
+  --dur-fast:200ms;--dur-normal:350ms;--dur-slow:600ms;--dur-cinematic:1000ms;
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important;}}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg-primary);color:var(--text-primary);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+html{scroll-snap-type:y mandatory;overflow-y:scroll;scroll-behavior:smooth;}
+/* Slide framework */
+.slide{min-height:100vh;scroll-snap-align:start;display:flex;flex-direction:column;justify-content:center;position:relative;padding:3rem 5vw;overflow:hidden;}
+.slide-inner{max-width:1200px;margin:0 auto;width:100%;position:relative;z-index:2;}
+.slide-bg-glow{position:absolute;width:600px;height:600px;border-radius:50%;filter:blur(120px);opacity:0.08;z-index:0;pointer-events:none;}
+/* Fixed UI */
+#slideProgress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--inov-navy),var(--inov-cerulean),var(--inov-sky));z-index:100;transition:width 0.3s var(--ease-out-quart);width:0%;}
+.prism-mark{position:fixed;top:1.5rem;left:2rem;font-size:var(--text-xs);font-weight:700;letter-spacing:0.25em;color:var(--accent);z-index:100;text-transform:uppercase;}
+.slide-counter{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:1001;font-size:11px;color:var(--text-tertiary);letter-spacing:2px;font-weight:600;background:rgba(10,11,16,0.85);padding:4px 14px;border-radius:20px;border:1px solid var(--border);backdrop-filter:blur(8px);opacity:0;transition:opacity 0.3s;}
+.slide-counter.visible{opacity:1;}
+.slide-nav-hint{position:fixed;bottom:50px;left:50%;transform:translateX(-50%);z-index:1001;font-size:10px;color:var(--text-tertiary);letter-spacing:1px;text-align:center;opacity:0;transition:opacity 1s;pointer-events:none;}
+.slide-nav-hint.show{opacity:0.6;}
+/* Animation */
+.anim{opacity:0;transform:translateY(24px);transition:opacity var(--dur-slow) var(--ease-out-expo),transform var(--dur-slow) var(--ease-out-expo);}
+.anim.visible{opacity:1;transform:translateY(0);}
+.anim.d1{transition-delay:100ms;}.anim.d2{transition-delay:200ms;}.anim.d3{transition-delay:300ms;}
+.anim.d4{transition-delay:400ms;}.anim.d5{transition-delay:500ms;}.anim.d6{transition-delay:600ms;}.anim.d7{transition-delay:700ms;}
+/* Typography */
+.eyebrow{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.2em;color:var(--text-tertiary);margin-bottom:12px;}
+.slide-title{font-size:var(--text-3xl);font-weight:700;line-height:1.15;margin-bottom:16px;background:linear-gradient(135deg,var(--text-primary) 0%,var(--accent-bright) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.slide-subtitle{font-size:var(--text-base);color:var(--text-secondary);max-width:700px;margin-bottom:28px;line-height:1.7;}
+.section-intro{font-size:13.5px;line-height:1.7;max-width:800px;margin-bottom:20px;color:var(--text-secondary);}
+.hero-title{font-size:var(--text-hero);font-weight:800;line-height:1.1;background:linear-gradient(135deg,#fff 0%,var(--inov-sky) 60%,var(--inov-cerulean) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px;}
+.hero-sub{font-size:var(--text-lg);color:var(--text-secondary);max-width:800px;margin:0 auto 12px;}
+.hero-date{font-size:var(--text-sm);color:var(--text-tertiary);margin-bottom:28px;}
+.hero-badge{display:inline-block;padding:6px 18px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;background:rgba(78,132,196,0.15);border:1px solid rgba(78,132,196,0.3);color:var(--accent);margin-bottom:20px;}
+/* Tags */
+.tag{display:inline-block;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-right:6px;}
+.tag.clinical{background:rgba(89,221,253,0.15);color:var(--accent-bright);}
+.tag.financial{background:rgba(0,228,159,0.15);color:var(--accent-success);}
+.tag.regulatory{background:rgba(255,92,92,0.15);color:var(--accent-error);}
+.tag.quality{background:rgba(108,108,255,0.15);color:var(--accent-violet);}
+.tag.strategic{background:rgba(78,132,196,0.15);color:var(--accent);}
+.tag.competitive{background:rgba(249,115,22,0.15);color:#f97316;}
+.tag.emergent{background:rgba(89,221,253,0.15);color:var(--accent-bright);}
+.tag.ma{background:rgba(249,115,22,0.15);color:#f97316;}
+.tag-red{background:rgba(255,92,92,0.15);color:var(--accent-error);}
+.tag-green{background:rgba(0,228,159,0.15);color:var(--accent-success);}
+.tag-blue{background:rgba(78,132,196,0.15);color:var(--accent);}
+.tag-orange{background:rgba(249,115,22,0.15);color:#f97316;}
+.tag-purple{background:rgba(108,108,255,0.15);color:var(--accent-violet);}
+.tag-gold{background:rgba(245,230,187,0.15);color:var(--accent-warning);}
+.tag-cyan{background:rgba(89,221,253,0.15);color:var(--accent-bright);}
+/* Stat */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-top:16px;}
+.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center;transition:transform 0.2s;}
+.stat-card:hover{transform:translateY(-2px);}
+.stat-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-tertiary);margin-bottom:6px;}
+.stat-value{font-size:28px;font-weight:800;color:var(--text-primary);}
+.stat-value.negative{color:var(--accent-error);}.stat-value.positive{color:var(--accent-success);}.stat-value.warn{color:var(--accent-warning);}
+.stat-context{font-size:11px;color:var(--text-secondary);margin-top:4px;}
+.stat-block{text-align:center;padding:24px;}
+.stat-eyebrow{display:block;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-tertiary);margin-bottom:4px;}
+.stat-number{font-size:48px;font-weight:800;color:var(--accent-bright);line-height:1;}
+.stat-suffix{font-size:28px;font-weight:700;color:var(--accent-bright);}
+.stat-trend{display:inline-block;font-size:11px;padding:2px 8px;border-radius:4px;margin-top:8px;}
+.stat-trend.positive{background:rgba(0,228,159,0.15);color:var(--accent-success);}
+.stat-trend.negative{background:rgba(255,92,92,0.15);color:var(--accent-error);}
+/* Finding cards */
+.finding-card{background:var(--bg-card);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:0 12px 12px 0;padding:16px 20px;margin:10px 0;}
+.finding-card.emergent{border-left-color:var(--accent-bright);}
+.finding-card.risk{border-left-color:var(--accent-error);}
+.finding-card.opportunity{border-left-color:var(--accent-success);}
+.finding-title{font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:6px;}
+.finding-body{font-size:12.5px;color:var(--text-secondary);line-height:1.65;}
+.confidence-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-top:8px;}
+.confidence-badge.high{background:rgba(0,228,159,0.15);color:var(--accent-success);}
+.confidence-badge.medium{background:rgba(245,230,187,0.15);color:var(--accent-warning);}
+.confidence-badge.low{background:rgba(255,92,92,0.15);color:var(--accent-error);}
+/* Agent chips */
+.agent-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(78,132,196,0.1);border:1px solid rgba(78,132,196,0.25);border-radius:20px;padding:4px 12px;font-size:10.5px;color:var(--text-secondary);margin:3px;}
+.agent-chip .dot{width:6px;height:6px;border-radius:50%;}
+/* Hero stats */
+.hero-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:18px;max-width:1100px;margin:0 auto;}
+.hero-stat{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:22px 14px;text-align:center;transition:transform 0.2s;}
+.hero-stat:hover{transform:translateY(-2px);}
+.hero-stat .value{font-size:26px;font-weight:800;margin-bottom:4px;}
+.hero-stat .label{font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:1.5px;}
+/* Validation box */
+.validation-box{display:flex;gap:16px;max-width:1100px;margin:24px auto 0;text-align:left;}
+.validation-card{flex:1;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px;padding:14px 18px;}
+.validation-card h4{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--accent-success);margin-bottom:8px;font-weight:700;}
+.framework-card h4{color:var(--accent-violet);}
+.val-row{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:11px;color:var(--text-secondary);}
+.val-icon{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;}
+.val-icon.green{background:rgba(0,228,159,0.2);color:var(--accent-success);}
+.framework-visual{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px;}
+.fw-node{background:rgba(108,108,255,0.1);border:1px solid rgba(108,108,255,0.3);border-radius:6px;padding:3px 8px;font-size:9px;color:var(--accent-violet);font-weight:600;}
+.fw-arrow{color:var(--text-tertiary);font-size:10px;}
+.fw-center{background:linear-gradient(135deg,rgba(108,108,255,0.2),rgba(78,132,196,0.2));border:1px solid rgba(108,108,255,0.4);border-radius:8px;padding:4px 12px;font-size:10px;color:var(--text-primary);font-weight:700;}
+/* Grids */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:16px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:16px;}
+.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-top:16px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;}
+/* Tables */
+.prov-table{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:12px;}
+.prov-table th{text-align:left;padding:8px 10px;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-tertiary);border-bottom:1px solid var(--border);}
+.prov-table td{padding:8px 10px;border-bottom:1px solid rgba(78,132,196,0.06);color:var(--text-secondary);vertical-align:top;}
+.prov-table tr:hover td{background:rgba(78,132,196,0.04);}
+.compact-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px;}
+.compact-table th{text-align:left;padding:6px 8px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--text-tertiary);border-bottom:1px solid var(--border);}
+.compact-table td{padding:6px 8px;border-bottom:1px solid rgba(78,132,196,0.06);color:var(--text-secondary);}
+/* Policy box */
+.policy-box{background:rgba(255,92,92,0.05);border:1px solid rgba(255,92,92,0.2);border-radius:10px;padding:12px 16px;margin:6px 0;}
+.policy-box.positive{background:rgba(0,228,159,0.05);border-color:rgba(0,228,159,0.2);}
+.policy-box.neutral{background:rgba(78,132,196,0.05);border-color:rgba(78,132,196,0.2);}
+.policy-box h4{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:4px;}
+.policy-box p{font-size:11.5px;color:var(--text-secondary);line-height:1.5;}
+.impact{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;margin-top:5px;}
+.impact-severe{color:var(--accent-error);}.impact-moderate{color:var(--accent-warning);}.impact-positive{color:var(--accent-success);}.impact-neutral{color:var(--accent);}
+/* Emergence */
+.emergent-slide{background:linear-gradient(135deg,var(--bg-primary) 0%,rgba(108,108,255,0.04) 100%);}
+.emergent-number{font-size:120px;font-weight:900;color:rgba(89,221,253,0.06);position:absolute;top:-20px;left:-10px;}
+.emergent-why{background:var(--bg-card);border:1px solid var(--border-bright);border-radius:12px;padding:1.5rem;margin-top:1.5rem;}
+.emergent-why-label{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--accent-bright);margin-bottom:8px;font-weight:700;}
+.emergence-card{background:linear-gradient(135deg,rgba(108,108,255,0.08),rgba(78,132,196,0.08));border:1px solid rgba(108,108,255,0.3);border-radius:14px;padding:20px;margin:8px 0;}
+.emergence-card h4{color:var(--accent-violet);font-size:15px;margin-bottom:6px;}
+.emergence-card p{font-size:12px;color:var(--text-secondary);line-height:1.6;}
+/* Timeline */
+.timeline{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:20px;position:relative;}
+.timeline::before{content:'';position:absolute;top:15px;left:5%;right:5%;height:3px;background:linear-gradient(90deg,var(--accent-error),var(--accent-warning),var(--accent-success));border-radius:2px;}
+.timeline-phase{text-align:center;padding:0 12px;position:relative;z-index:1;}
+.timeline-dot{width:12px;height:12px;border-radius:50%;margin:10px auto 12px;border:2px solid var(--bg-primary);}
+.timeline-year{font-size:18px;font-weight:800;margin-bottom:4px;}
+.timeline-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-tertiary);margin-bottom:10px;}
+.timeline-items{font-size:11.5px;color:var(--text-secondary);line-height:1.8;text-align:left;padding:0 6px;}
+.timeline-items div{margin-bottom:4px;padding-left:12px;position:relative;}
+.timeline-items div::before{content:'\2022';position:absolute;left:0;color:var(--text-tertiary);}
+/* Bars */
+.bar-row{margin:8px 0;}
+.bar-label{font-size:11px;color:var(--text-secondary);margin-bottom:4px;display:flex;justify-content:space-between;}
+.bar-track{height:24px;background:rgba(255,255,255,0.04);border-radius:6px;overflow:hidden;position:relative;}
+.bar-fill{height:100%;border-radius:6px;transform-origin:left;transform:scaleX(0);transition:transform 0.8s var(--ease-out-expo);display:flex;align-items:center;padding-left:8px;}
+.bar-fill.animate{transform:scaleX(1);}
+.bar-fill-value{font-size:10px;font-weight:700;color:white;white-space:nowrap;}
+/* Threat meter */
+.threat-meter{display:flex;gap:2px;align-items:center;}
+.threat-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.1);}
+.threat-dot.active-red{background:var(--accent-error);}
+.threat-dot.active-orange{background:#f97316;}
+.threat-dot.active-yellow{background:var(--accent-warning);}
+.threat-dot.active-green{background:var(--accent-success);}
+.threat-dot.active-blue{background:var(--accent);}
+/* SVG charts */
+.chart-container{margin:16px 0;text-align:center;}
+.bar-chart .bar{transform-origin:bottom;transform:scaleY(0);transition:transform 0.6s var(--ease-out-expo),opacity 0.3s;}
+.bar-chart.is-visible .bar{transform:scaleY(1);}
+.bar-chart .bar:nth-child(1){transition-delay:0.1s;}.bar-chart .bar:nth-child(2){transition-delay:0.2s;}
+.bar-chart .bar:nth-child(3){transition-delay:0.3s;}.bar-chart .bar:nth-child(4){transition-delay:0.4s;}
+.bar-chart .bar:nth-child(5){transition-delay:0.5s;}.bar-chart .bar:nth-child(6){transition-delay:0.6s;}
+.bar-chart .bar:hover,.bar-chart .bar:focus{opacity:0.85;outline:2px solid var(--accent);outline-offset:2px;}
+.donut-chart .segment{transition:stroke-dashoffset 1s var(--ease-out-expo),opacity 0.2s;}
+.donut-chart .segment:hover{opacity:0.8;stroke-width:28;}
+.chart-legend{display:flex;flex-wrap:wrap;gap:12px;list-style:none;padding:0;margin-top:16px;}
+.legend-dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;}
+.donut-wrapper{display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+/* Quote */
+.quote-block{border-left:3px solid var(--accent-warning);padding:10px 18px;margin:10px 0;background:rgba(245,230,187,0.05);border-radius:0 8px 8px 0;font-style:italic;color:var(--text-primary);font-size:14px;}
+.quote-attr{font-style:normal;font-size:11px;color:var(--text-secondary);margin-top:4px;}
+/* Inovalon header */
+.inovalon-header{background:linear-gradient(135deg,rgba(78,132,196,0.1),rgba(0,228,159,0.1));border:1px solid rgba(78,132,196,0.2);border-radius:14px;padding:20px;margin-bottom:16px;text-align:center;}
+.inovalon-header h3{color:var(--accent);margin-bottom:4px;font-size:18px;}
+.inovalon-header p{font-size:12px;color:var(--text-secondary);}
+/* State grid */
+.state-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;}
+.state-item{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:10.5px;}
+.state-item .state-name{font-weight:600;color:var(--text-primary);}
+.state-item .state-impact{color:var(--accent);font-weight:700;}
+/* Timeline bar */
+.timeline-bar{display:flex;height:6px;border-radius:3px;overflow:hidden;margin-top:5px;background:rgba(255,255,255,0.05);}
+.timeline-segment{height:100%;}.tl-done{background:var(--accent-success);}.tl-active{background:var(--accent-warning);}.tl-pending{background:rgba(255,255,255,0.1);}
+.pipeline-caption{font-size:9.5px;color:var(--text-tertiary);margin:3px 0 0;}
+/* TOC */
+.toc-group-header{font-size:11px;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border);color:var(--text-tertiary);}
+.toc-item{border:1px solid var(--border);border-radius:8px;margin-bottom:6px;}
+/* Source */
+.source-list{margin-top:8px;font-size:9.5px;color:var(--text-tertiary);line-height:1.8;}
+.source-list a{font-size:9.5px;color:var(--accent);text-decoration:none;border-bottom:1px dotted rgba(78,132,196,0.3);}
+.source-unverified{color:var(--accent-warning);font-size:0.75em;vertical-align:super;cursor:help;opacity:0.85;}
+/* Slide footer */
+.slide-footer{position:absolute;bottom:16px;left:40px;right:40px;display:flex;justify-content:space-between;font-size:10px;color:var(--text-tertiary);border-top:1px solid var(--border);padding-top:8px;}
+/* Nav */
+.nav-toggle{position:fixed;top:20px;right:20px;z-index:1000;width:44px;height:44px;border-radius:50%;background:rgba(78,132,196,0.15);border:1px solid rgba(78,132,196,0.3);color:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;backdrop-filter:blur(12px);transition:all 0.3s;}
+.nav-toggle:hover{background:rgba(78,132,196,0.3);transform:scale(1.05);}
+.nav-panel{position:fixed;top:0;right:-340px;width:320px;height:100vh;background:rgba(10,11,16,0.97);border-left:1px solid var(--border);z-index:999;transition:right 0.35s ease;overflow-y:auto;padding:70px 20px 30px;backdrop-filter:blur(20px);}
+.nav-panel.open{right:0;}
+.nav-panel h3{font-size:11px;text-transform:uppercase;letter-spacing:3px;color:var(--accent);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:all 0.2s;text-decoration:none;margin-bottom:2px;}
+.nav-item:hover{background:rgba(78,132,196,0.1);}
+.nav-item .nav-num{font-size:10px;color:var(--text-tertiary);min-width:24px;font-weight:700;}
+.nav-item .nav-label{font-size:12.5px;color:var(--text-primary);font-weight:500;}
+.nav-item .nav-tag{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-left:auto;}
+.nav-tag-key{color:var(--accent-warning);}.nav-tag-new{color:var(--accent-bright);}
+.nav-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:998;display:none;}
+.nav-overlay.open{display:block;}
+/* Utility color */
+.highlight{color:var(--text-primary);font-weight:600;}
+.red{color:var(--accent-error);}.green{color:var(--accent-success);}.blue{color:var(--accent);}
+.purple{color:var(--accent-violet);}.gold{color:var(--accent-warning);}.cyan{color:var(--accent-bright);}
+.card-accent{border-left:3px solid var(--accent-error);}.card-blue{border-left:3px solid var(--accent);}
+.card-green{border-left:3px solid var(--accent-success);}.card-purple{border-left:3px solid var(--accent-violet);}
+a{color:var(--accent);text-decoration:none;}a:hover{color:var(--accent-bright);}
+/* Responsive */
+@media(max-width:1024px){.slide{padding:40px 30px;}.hero-stats{grid-template-columns:repeat(3,1fr);}.grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}.state-grid{grid-template-columns:1fr 1fr;}.validation-box{flex-direction:column;}.nav-toggle{top:12px;right:12px;}}
+@media(max-width:768px){.two-col{grid-template-columns:1fr;}.hero-stats{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+<div id="slideProgress"></div>
+<div class="prism-mark">PRISM Intelligence</div>
+<div class="slide-counter" id="slideCounter">01 / 14</div>
+<div class="slide-nav-hint show" id="navHint">&#8595; Arrow Down / Spacebar to navigate &#8595;</div>
+
+<button class="nav-toggle" onclick="toggleNav()" id="navBtn" title="Table of Contents">&#9776;</button>
+<div class="nav-overlay" id="navOverlay" onclick="toggleNav()"></div>
+<div class="nav-panel" id="navPanel">
+  <h3>Table of Contents</h3>
+  <a class="nav-item" href="#s1" onclick="toggleNav()"><span class="nav-num">01</span><span class="nav-label">Title</span></a>
+  <a class="nav-item" href="#s2" onclick="toggleNav()"><span class="nav-num">02</span><span class="nav-label">Executive Summary</span></a>
+  <a class="nav-item" href="#s3" onclick="toggleNav()"><span class="nav-num">03</span><span class="nav-label">Regulatory Architecture</span></a>
+  <a class="nav-item" href="#s4" onclick="toggleNav()"><span class="nav-num">04</span><span class="nav-label">Financial Impact Cascade</span></a>
+  <a class="nav-item" href="#s5" onclick="toggleNav()"><span class="nav-num">05</span><span class="nav-label">Competitive Landscape Reshaping</span></a>
+  <a class="nav-item" href="#s6" onclick="toggleNav()"><span class="nav-num">06</span><span class="nav-label">Quality Performance Intelligence</span></a>
+  <a class="nav-item" href="#s7" onclick="toggleNav()"><span class="nav-num">07</span><span class="nav-label">Tension Points</span><span class="nav-tag nav-tag-key">KEY</span></a>
+  <a class="nav-item" href="#s8" onclick="toggleNav()"><span class="nav-num">08</span><span class="nav-label">Emergent: The CMS 2027 Star Ratings…</span><span class="nav-tag nav-tag-new">NEW</span></a>
+  <a class="nav-item" href="#s9" onclick="toggleNav()"><span class="nav-num">09</span><span class="nav-label">Emergent: The compressed 6-month…</span><span class="nav-tag nav-tag-new">NEW</span></a>
+  <a class="nav-item" href="#s10" onclick="toggleNav()"><span class="nav-num">10</span><span class="nav-label">Emergent: Medication adherence measures…</span><span class="nav-tag nav-tag-new">NEW</span></a>
+  <a class="nav-item" href="#s11" onclick="toggleNav()"><span class="nav-num">11</span><span class="nav-label">Strategic Timeline</span></a>
+  <a class="nav-item" href="#s12" onclick="toggleNav()"><span class="nav-num">12</span><span class="nav-label">Provenance &amp; Confidence</span></a>
+  <a class="nav-item" href="#s13" onclick="toggleNav()"><span class="nav-num">13</span><span class="nav-label">Gaps &amp; Next Steps</span></a>
+  <a class="nav-item" href="#s14" onclick="toggleNav()"><span class="nav-num">14</span><span class="nav-label">Closing</span></a>
+</div>
+
+<section class="slide" id="s1" style="text-align:center;">
+  <div class="slide-bg-glow" style="background:var(--inov-cerulean);top:-200px;right:-200px;"></div>
+  <div class="slide-bg-glow" style="background:var(--inov-violet);bottom:-200px;left:-200px;"></div>
+  <div class="slide-inner">
+    <div class="anim"><div class="hero-badge">PRISM Multi-Source Validated</div></div>
+    <h1 class="hero-title anim d1">The CMS 2027 Star Ratings changes represent a regulatory…</h1>
+    <p class="hero-sub anim d2">Analyze the strategic impact of CMS 2027 Star Ratings Cut-Points on healthcare payer positioning and competitive dynamics</p>
+    <p class="hero-date anim d3">March 2026 | 4-Agent Swarm | EXTENDED Validated Synthesis</p>
+    <div class="anim d4" style="margin-bottom:28px;"><span class="agent-chip"><span class="dot" style="background:var(--accent-bright)"></span>Regulatory Intelligence Analyst</span>
+      <span class="agent-chip"><span class="dot" style="background:var(--accent-success)"></span>Healthcare Financial Strategist</span>
+      <span class="agent-chip"><span class="dot" style="background:#f97316"></span>Competitive Intelligence Specialist</span>
+      <span class="agent-chip"><span class="dot" style="background:var(--accent-error)"></span>Quality Performance Analyst</span></div>
+    <div class="hero-stats anim d5">
+      <div class="hero-stat"><div class="value cyan">6 months</div><div class="label">Implementation…</div></div>
+      <div class="hero-stat"><div class="value cyan">5 domains</div><div class="label">Regulatory Areas…</div></div>
+      <div class="hero-stat"><div class="value cyan">4 companies</div><div class="label">Major Payers…</div></div>
+      <div class="hero-stat"><div class="value cyan">4</div><div class="label">Parallel Agents</div></div>
+      <div class="hero-stat"><div class="value green">18</div><div class="label">Verified Findings</div></div>
+    </div>
+    <div class="validation-box anim d6">
+      <div class="validation-card">
+        <h4>&#10003; Validation</h4>
+        <div class="val-row"><span class="val-icon green">&#10003;</span>18 findings across 4 agents</div>
+        <div class="val-row"><span class="val-icon green">&#10003;</span>80% source coverage</div>
+        <div class="val-row"><span class="val-icon green">&#10003;</span>7 high-confidence findings</div>
+      </div>
+      <div class="validation-card framework-card">
+        <h4>&#9670; PRISM Framework</h4>
+        <div class="framework-visual">
+            <span class="fw-node">Regulatory Intelligence</span>
+            <span class="fw-node">Healthcare Financial</span>
+            <span class="fw-node">Competitive Intelligence</span>
+            <span class="fw-node">Quality Performance</span>
+            <span class="fw-arrow">&#8594;</span>
+            <span class="fw-center">Cross-Agent Synthesis</span>
+            <span class="fw-arrow">&#8594;</span>
+            <span class="fw-node" style="border-color:rgba(0,228,159,0.4);color:var(--accent-success)">3 Emergent</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s2">
+  <div class="slide-bg-glow" style="background:var(--inov-sky);top:-150px;left:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag emergent">Synthesis</span> Executive Summary</div>
+    <h2 class="slide-title anim d1">Strategic Intelligence Overview</h2>
+    <p class="slide-subtitle anim d2">4-agent convergence across 4 dimensions reveals 3 emergent insights and 3 strategic tension points.</p>
+    <div class="stat-grid anim d3"><div class="stat-card"><div class="stat-label">Implementation Window</div><div class="stat-value warn">6 months</div><div class="stat-context">Final rule to bid submission</div></div>
+      <div class="stat-card"><div class="stat-label">Regulatory Areas Affected</div><div class="stat-value ">5 domains</div><div class="stat-context">Star Ratings, marketing, drug coverage, enrollment, SNPs</div></div>
+      <div class="stat-card"><div class="stat-label">Major Payers Filing</div><div class="stat-value ">4 companies</div><div class="stat-context">Recent SEC disclosures</div></div>
+      <div class="stat-card"><div class="stat-label">Annual Rule Changes</div><div class="stat-value ">3 years</div><div class="stat-context">CY 2025-2027 sequential modifications</div></div></div>
+    <div class="finding-card emergent anim d4" style="margin-top:16px;"><div class="finding-title">Convergent Intelligence</div><div class="finding-body">Smaller and newer Medicare Advantage plans face disproportionate pressure from regulatory changes due to limited scale and resources</div></div>
+  </div>
+  <div class="slide-footer"><span>4 Agents | Source-Validated</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide" id="s3">
+  <div class="slide-bg-glow" style="background:var(--accent-error);top:-200px;left:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag regulatory">Regulatory Architecture</span> Regulatory Architecture</div>
+    <h2 class="slide-title anim d1">CMS has initiated the most significant Star Ratings regulatory cycle since…</h2>
+    <p class="section-intro anim d2">CMS has initiated the most significant Star Ratings regulatory cycle since program inception with the November 2025 publication of the CY2027 proposed rule. The regulatory architecture indicates…</p>
+    <div class="grid-2 anim d3">
+      <div><div class="policy-box neutral">
+  <h4>CMS published the Contract Year 2027 Proposed Rule on November 28, 2025,…</h4>
+  <p>This establishes the regulatory foundation for 2027 changes, creating compliance deadlines and implementation…</p>
+  <div class="impact impact-moderate">NOTABLE</div>
+</div>
+      <div class="policy-box neutral">
+  <h4>The regulatory timeline follows CMS's standard annual cycle with proposed rule…</h4>
+  <p>Creates regulatory urgency for payers to assess compliance gaps and implement changes within 6-month window between…</p>
+  <div class="impact impact-moderate">NOTABLE</div>
+</div>
+      <div class="policy-box neutral">
+  <h4>The 2027 rule encompasses comprehensive changes across Star Ratings, marketing…</h4>
+  <p>Suggests coordinated regulatory strategy requiring integrated compliance approach across multiple operational domains,…</p>
+  <div class="impact impact-moderate">MODERATE</div>
+</div>
+      <div class="policy-box neutral">
+  <h4>Historical regulatory pattern shows CMS implements Star Ratings changes through…</h4>
+  <p>Indicates CMS preference for comprehensive regulatory packages rather than targeted adjustments, suggesting 2027…</p>
+  <div class="impact impact-moderate">MODERATE</div>
+</div></div>
+      <div>
+        <div class="timeline anim d4"><div class="timeline-phase"><div class="timeline-dot" style="background:var(--accent-error);"></div><div class="timeline-year" style="color:var(--accent-error);">Near-Term</div><div class="timeline-items"><div>CY2027 Proposed Rule Publication: November 28, 2025</div><div>Expected Final Rule: April 2026</div></div></div><div class="timeline-phase"><div class="timeline-dot" style="background:var(--accent-success);"></div><div class="timeline-year" style="color:var(--accent-success);">Upcoming</div><div class="timeline-items"><div>Contract Submissions Due: June 2026</div><div>CY2024 Final Rule: April 12, 2023</div></div></div></div>
+        <div class="policy-box neutral"><h4>Regulatory Unknowns</h4><p>Specific cut-point methodology changes: The Federal Register abstracts do not…<br>Implementation timeline specifics: While the proposed rule publication date is…</p></div>
+      </div>
+    </div>
+    <div class="source-list anim d5"><strong>Sources:</strong> <span style="color:var(--accent)">Federal Register 2025-21456</span> | <span style="color:var(--accent)">Federal Register publication dates and CMS…</span> | <span style="color:var(--accent)">Federal Register 2025-21456 abstract</span> | <span style="color:var(--accent)">Federal Register 2023-07115, April 12, 2023</span></div>
+  </div>
+  <div class="slide-footer"><span>Regulatory Intelligence Analyst | 4 findings | Confidence: 0.83</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide" id="s4">
+  <div class="slide-bg-glow" style="background:var(--inov-jade);bottom:-200px;right:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag financial">Financial Impact</span> Financial Impact Cascade</div>
+    <h2 class="slide-title anim d1">The CMS 2027 Star Ratings Cut-Points represent part of an ongoing regulatory…</h2>
+    <p class="section-intro anim d2">The CMS 2027 Star Ratings Cut-Points represent part of an ongoing regulatory transformation that creates significant financial uncertainty for Medicare Advantage payers. While I found clear evidence…</p>
+    <div class="stat-grid anim d3"><div class="stat-card"><div class="stat-label">Major Payers Filing</div><div class="stat-value ">4 companies</div><div class="stat-context">Recent SEC disclosures</div></div>
+      <div class="stat-card"><div class="stat-label">Annual Rule Changes</div><div class="stat-value ">3 years</div><div class="stat-context">CY 2025-2027 sequential modifications</div></div>
+      <div class="stat-card"><div class="stat-label">Emerging Plans Filing</div><div class="stat-value ">3 companies</div><div class="stat-context">Recent Star Ratings disclosures</div></div></div>
+    <div class="grid-2 anim d4">
+      <div><div class="finding-card opportunity">
+  <div class="finding-title">CMS has proposed significant changes to Star Ratings methodology for Contract Year 2027 that will directly impact bonus…</div>
+  <div class="finding-body">The regulatory framework changes will create winners and losers in bonus payment distribution, fundamentally altering the financial incentive structure for quality performance across the MA market.</div>
+  <span class="confidence-badge high">HIGH &mdash; Federal Register, Document 2025-21456</span>
+</div>
+        <div class="finding-card ">
+  <div class="finding-title">Major payers including UnitedHealth, Humana, Centene, and Molina have filed recent SEC disclosures that likely contain…</div>
+  <div class="finding-body">The concentration of recent filings from major payers suggests Star Ratings performance is a material financial factor requiring disclosure to investors, indicating significant revenue exposure.</div>
+  <span class="confidence-badge medium">MEDIUM &mdash; SEC EDGAR database, multiple 10-K/10-Q…</span>
+</div></div>
+      <div><div class="bar-row anim d3">
+  <div class="bar-label"><span>Major Payers Filing</span><span>4 companies</span></div>
+  <div class="bar-track"><div class="bar-fill" style="width:83%;background:linear-gradient(90deg,var(--chart-1),var(--chart-1)88)"><span class="bar-fill-value">4 companies</span></div></div>
+</div>
+<div class="bar-row anim d4">
+  <div class="bar-label"><span>Annual Rule Changes</span><span>3 years</span></div>
+  <div class="bar-track"><div class="bar-fill" style="width:63%;background:linear-gradient(90deg,var(--chart-2),var(--chart-2)88)"><span class="bar-fill-value">3 years</span></div></div>
+</div>
+<div class="bar-row anim d5">
+  <div class="bar-label"><span>Emerging Plans Filing</span><span>3 companies</span></div>
+  <div class="bar-track"><div class="bar-fill" style="width:63%;background:linear-gradient(90deg,var(--chart-3),var(--chart-3)88)"><span class="bar-fill-value">3 companies</span></div></div>
+</div></div>
+    </div>
+    <div class="source-list anim d5"><strong>Sources:</strong> <span style="color:var(--accent)">Federal Register, Document 2025-21456</span> | <span style="color:var(--accent)">SEC EDGAR database, multiple 10-K/10-Q filings…</span> | <span style="color:var(--accent)">Federal Register documents 2024-27939,…</span> | <span style="color:var(--accent)">SEC EDGAR filings from emerging MA plans, 2025</span> | <span style="color:var(--accent)">Federal Register document 2024-25382, CMS final…</span></div>
+  </div>
+  <div class="slide-footer"><span>Healthcare Financial Strategist | 5 findings | Confidence: 0.80</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide" id="s5">
+  <div class="slide-bg-glow" style="background:var(--accent-warning);top:-200px;right:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag competitive">Competitive Landscape</span> Competitive Landscape Reshaping</div>
+    <h2 class="slide-title anim d1">The competitive intelligence analysis of CMS 2027 Star Ratings cut-point…</h2>
+    <p class="section-intro anim d2">The competitive intelligence analysis of CMS 2027 Star Ratings cut-point impacts is severely constrained by critical data gaps. Research tools returned no accessible information on specific 2027…</p>
+    <div class="stat-grid anim d3"><div class="stat-card"><div class="stat-label">Data Sources Accessed</div><div class="stat-value negative">0 sources</div></div></div>
+    <div class="grid-2 anim d4">
+      <div><table class="compact-table anim d3">
+  <thead><tr><th>Entity</th><th>Category</th><th>Assessment</th></tr></thead>
+  <tbody><tr><td>Affected Payer Segment</td><td>Competitor</td><td>Regional and mid-tier Medicare Advantage plans</td></tr>
+<tr><td>Competitive Advantage Source</td><td>Competitor</td><td>Quality management capabilities and data analytics infrastructure</td></tr>
+<tr><td>Revenue Mechanism</td><td>Competitor</td><td>Star Ratings quality bonus payments</td></tr></tbody>
+</table></div>
+      <div>
+        <div class="stat-card"><div class="stat-label">Threat Assessment</div><div style="display:flex;justify-content:space-between;align-items:center;margin:4px 0;font-size:11px;color:var(--text-secondary);"><span>Affected Payer Segment</span><span class="threat-meter"><span class="threat-dot active-green"></span><span class="threat-dot active-green"></span><span class="threat-dot"></span><span class="threat-dot"></span><span class="threat-dot"></span></span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin:4px 0;font-size:11px;color:var(--text-secondary);"><span>Competitive Advantage Source</span><span class="threat-meter"><span class="threat-dot active-green"></span><span class="threat-dot active-green"></span><span class="threat-dot"></span><span class="threat-dot"></span><span class="threat-dot"></span></span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin:4px 0;font-size:11px;color:var(--text-secondary);"><span>Revenue Mechanism</span><span class="threat-meter"><span class="threat-dot active-green"></span><span class="threat-dot active-green"></span><span class="threat-dot"></span><span class="threat-dot"></span><span class="threat-dot"></span></span></div></div>
+        <div class="policy-box neutral"><h4>Intelligence Gaps</h4><p>2027 Cut-Point Specifications - Could not locate official CMS documentation…<br>Current Payer Performance Distribution - Missing data on how current Medicare…</p></div>
+      </div>
+    </div>
+    <div class="source-list anim d5"><strong>Sources:</strong> <span style="color:var(--accent)">Direct research tool output showing no accessible…</span> | <span style="color:var(--accent)">Competitive framework analysis from research data</span> | <span style="color:var(--accent)">Industry pattern analysis from research data</span> | <span style="color:var(--accent)">Medicare Advantage payment methodology framework…</span></div>
+  </div>
+  <div class="slide-footer"><span>Competitive Intelligence Specialist | 4 findings | Confidence: 0.58</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide" id="s6">
+  <div class="slide-bg-glow" style="background:var(--accent-bright);bottom:-200px;left:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag quality">Quality Performance</span> Quality Performance Intelligence</div>
+    <h2 class="slide-title anim d1">The CMS 2027 Star Ratings changes represent a fundamental shift in quality…</h2>
+    <p class="section-intro anim d2">The CMS 2027 Star Ratings changes represent a fundamental shift in quality measurement that will reshape competitive dynamics in Medicare Advantage. Plans with strong medication adherence programs…</p>
+    <div class="quote-block anim d3">The CMS 2027 proposed rule introduces significant methodological changes that will fundamentally alter quality performance measurement and…<div class="quote-attr">— Federal Register document 2025-21456,…</div></div>
+    <div class="stat-grid anim d3"><div class="stat-card"><div class="stat-label">PDC Weight Multiplier</div><div class="stat-value positive">3 x</div><div class="stat-context">Triple weighting vs other measures</div></div>
+      <div class="stat-card"><div class="stat-label">Study Duration</div><div class="stat-value ">10 years</div><div class="stat-context">Longitudinal analysis period</div></div>
+      <div class="stat-card"><div class="stat-label">Citation Count</div><div class="stat-value ">4 citations</div><div class="stat-context">Academic validation indicator</div></div>
+      <div class="stat-card"><div class="stat-label">Citation Count</div><div class="stat-value ">5 citations</div><div class="stat-context">Academic impact indicator</div></div></div>
+    <div class="grid-2 anim d4">
+      <div><div class="finding-card opportunity">
+  <div class="finding-title">Medication adherence measures maintain triple weighting in the Star Ratings system, making PDC (Proportion of Days…</div>
+  <div class="finding-body">Plans should prioritize medication adherence interventions (diabetes, hypertension, cholesterol medications) as the most cost-effective path to Star Rating improvement, given the triple weighting factor.</div>
+  <span class="confidence-badge high">HIGH &mdash; Borrelli, E.P., et al. 'The influence…</span>
+</div>
+        <div class="finding-card ">
+  <div class="finding-title">Value-based care arrangements are demonstrating measurable impact on cardiovascular clinical quality measures among…</div>
+  <div class="finding-body">Plans with more advanced value-based care capabilities may be better positioned to achieve quality improvements under new cut-points, creating competitive advantages for operationally sophisticated organizations.</div>
+  <span class="confidence-badge medium">MEDIUM &mdash; Zaleski, A., et al. 'Impact of…</span>
+</div>
+        <div class="finding-card ">
+  <div class="finding-title">Social risk adjustment through the Categorical Adjustment Index (CAI) continues to influence Star Ratings, but…</div>
+  <div class="finding-body">Plans serving higher social risk populations may continue to face measurement challenges despite adjustment mechanisms, requiring targeted quality improvement strategies for vulnerable populations.</div>
+  <span class="confidence-badge medium">MEDIUM &mdash; Tolpadi, A., et al. 'Understanding the…</span>
+</div></div>
+      <div><div class="policy-box neutral"><h4>Knowledge Gaps</h4><p>Specific cut-point thresholds for the 2027 Star Ratings methodology - this…<br>Plan-specific performance data - current Star Ratings performance by individual…</p></div></div>
+    </div>
+    <div class="source-list anim d5"><strong>Sources:</strong> <span style="color:var(--accent)">Federal Register document 2025-21456, 'Medicare…</span> | <span style="color:var(--accent)">Borrelli, E.P., et al. 'The influence of…</span> | <span style="color:var(--accent)">Zaleski, A., et al. 'Impact of Value-Based Care…</span> | <span style="color:var(--accent)">Tolpadi, A., et al. 'Understanding the social…</span> | <span style="color:var(--accent)">Park, S., et al. 'Differences between integrated…</span></div>
+  </div>
+  <div class="slide-footer"><span>Quality Performance Analyst | 5 findings | Confidence: 0.80</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide" id="s7">
+  <div class="slide-bg-glow" style="background:var(--accent-warning);top:-200px;right:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag-gold tag">Tension</span> Synthesis</div>
+    <h2 class="slide-title anim d1">Strategic Tension Points</h2>
+    <p class="section-intro anim d2">Where analytical perspectives create productive disagreement — these tensions trace deeper structural complexity.</p>
+    <div class="anim d3">
+      <div class="policy-box neutral" style="margin:10px 0;">
+        <h4>Disagreement on whether 2027 changes represent incremental adjustments or…</h4>
+        <div class="two-col" style="gap:1rem;margin-top:8px;">
+          <div><div class="stat-label">All Agents</div><p style="font-size:11.5px;color:var(--text-secondary);line-height:1.5;">Changes represent incremental regulatory evolution building on existing Star Ratings framework</p></div>
+          <div><div class="stat-label">All Agents</div><p style="font-size:11.5px;color:var(--text-secondary);line-height:1.5;">Changes constitute fundamental transformation requiring complete operational restructuring</p></div>
+        </div>
+        <div class="impact impact-neutral" style="margin-top:8px;">Resolution: Both perspectives reflect valid analytical frames - the changes are simultaneously evolutionary…</div>
+      </div>
+    
+      <div class="policy-box neutral" style="margin:10px 0;">
+        <h4>Conflicting views on market consolidation timeline and severity</h4>
+        <div class="two-col" style="gap:1rem;margin-top:8px;">
+          <div><div class="stat-label">All Agents</div><p style="font-size:11.5px;color:var(--text-secondary);line-height:1.5;">Market consolidation will be gradual and manageable for most plans</p></div>
+          <div><div class="stat-label">All Agents</div><p style="font-size:11.5px;color:var(--text-secondary);line-height:1.5;">Market consolidation will be rapid and severe, forcing immediate strategic decisions</p></div>
+        </div>
+        <div class="impact impact-neutral" style="margin-top:8px;">Resolution: Timeline uncertainty reflects the interaction between regulatory pressure and plan-specific…</div>
+      </div>
+    
+      <div class="policy-box neutral" style="margin:10px 0;">
+        <h4>Different confidence levels in available evidence quality</h4>
+        <div class="two-col" style="gap:1rem;margin-top:8px;">
+          <div><div class="stat-label">All Agents</div><p style="font-size:11.5px;color:var(--text-secondary);line-height:1.5;">Available evidence provides sufficient basis for strategic planning</p></div>
+          <div><div class="stat-label">All Agents</div><p style="font-size:11.5px;color:var(--text-secondary);line-height:1.5;">Evidence gaps are too significant for confident strategic recommendations</p></div>
+        </div>
+        <div class="impact impact-neutral" style="margin-top:8px;">Resolution: Evidence limitations require scenario-based planning with explicit uncertainty acknowledgment…</div>
+      </div></div>
+  </div>
+  <div class="slide-footer"><span>Cross-Agent Synthesis | 3 tensions</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide emergent-slide" id="s8">
+  <div class="slide-inner" style="position:relative;">
+    <div class="emergent-number anim">01</div>
+    <div class="eyebrow anim">Emergent Insight</div>
+    <h2 class="slide-title anim d1">The CMS 2027 Star Ratings changes represent a regulatory inflection point that…</h2>
+    <p class="slide-subtitle anim d2">pattern emergence — 1 agents converged</p>
+    <div class="grid-2 anim d3">
+      <div>
+        <div class="emergence-card"><h4>All Agents</h4><p>Quality management infrastructure and operational sophistication will become primary competitive differentiators</p></div>
+        <div class="emergence-card"><h4>Agent</h4><p>Major payers are actively managing Star Ratings performance as evidenced by recent SEC filings and regulatory attention</p></div>
+        <div class="emergence-card"><h4>Agent</h4><p>The systemic nature of changes requires integrated compliance approaches across multiple operational domains</p></div>
+      </div>
+      <div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;">
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Novelty</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Grounding</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Actionability</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Depth</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">5/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Surprise</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+        </div>
+        <div class="policy-box positive"><h4>Recommended Action</h4><p>Payers should immediately audit their quality management infrastructure capabilities and invest in integrated operational systems rather than…</p></div>
+      </div>
+    </div>
+    <div class="emergent-why anim d4">
+      <div class="emergent-why-label">Why Only Multi-Agent Analysis Finds This</div>
+      <div class="finding-body">All Agents each provided independent evidence from different analytical lenses. This pattern insight emerges only when these perspectives are synthesized — no single agent would surface this pattern.</div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Emergence Detection | 1 agents</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide emergent-slide" id="s9">
+  <div class="slide-inner" style="position:relative;">
+    <div class="emergent-number anim">02</div>
+    <div class="eyebrow anim">Emergent Insight</div>
+    <h2 class="slide-title anim d1">The compressed 6-month implementation timeline (April 2026 final rule to June…</h2>
+    <p class="slide-subtitle anim d2">convergent emergence — 1 agents converged</p>
+    <div class="grid-2 anim d3">
+      <div>
+        <div class="emergence-card"><h4>All Agents</h4><p>The regulatory timeline creates a compressed 6-month implementation window between final rule (April 2026) and contract submissions (June 2026)</p></div>
+        <div class="emergence-card"><h4>Agent</h4><p>Smaller and newer Medicare Advantage plans face disproportionate pressure from regulatory changes due to limited scale and resources</p></div>
+        <div class="emergence-card"><h4>Agent</h4><p>Market consolidation pressure will increase as regulatory complexity and compliance costs rise</p></div>
+      </div>
+      <div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;">
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Novelty</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Grounding</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">5/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Actionability</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">5/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Depth</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Surprise</div><div class="stat-value" style="font-size:20px;color:var(--accent-warning);">3/5</div></div>
+        </div>
+        <div class="policy-box positive"><h4>Recommended Action</h4><p>Smaller plans should immediately evaluate partnership, acquisition, or exit strategies, while larger systems should prepare for acquisition…</p></div>
+      </div>
+    </div>
+    <div class="emergent-why anim d4">
+      <div class="emergent-why-label">Why Only Multi-Agent Analysis Finds This</div>
+      <div class="finding-body">All Agents each provided independent evidence from different analytical lenses. This convergent insight emerges only when these perspectives are synthesized — no single agent would surface this pattern.</div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Emergence Detection | 1 agents</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide emergent-slide" id="s10">
+  <div class="slide-inner" style="position:relative;">
+    <div class="emergent-number anim">03</div>
+    <div class="eyebrow anim">Emergent Insight</div>
+    <h2 class="slide-title anim d1">Medication adherence measures with triple weighting create a 'quality leverage…</h2>
+    <p class="slide-subtitle anim d2">tension emergence — 1 agents converged</p>
+    <div class="grid-2 anim d3">
+      <div>
+        <div class="emergence-card"><h4>All Agents</h4><p>Medication adherence measures maintain triple weighting in the Star Ratings system, making PDC performance the highest-leverage improvement…</p></div>
+        <div class="emergence-card"><h4>Agent</h4><p>Quality management infrastructure and operational sophistication will become primary competitive differentiators</p></div>
+        <div class="emergence-card"><h4>Agent</h4><p>Smaller and newer Medicare Advantage plans face disproportionate pressure from regulatory changes</p></div>
+      </div>
+      <div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;">
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Novelty</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">5/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Grounding</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Actionability</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Depth</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">4/5</div></div>
+          <div class="stat-card" style="padding:12px 6px;"><div class="stat-label" style="font-size:8px;">Surprise</div><div class="stat-value" style="font-size:20px;color:var(--accent-success);">5/5</div></div>
+        </div>
+        <div class="policy-box positive"><h4>Recommended Action</h4><p>All plans regardless of size should prioritize PDC optimization programs as the most cost-effective quality improvement strategy, potentially…</p></div>
+      </div>
+    </div>
+    <div class="emergent-why anim d4">
+      <div class="emergent-why-label">Why Only Multi-Agent Analysis Finds This</div>
+      <div class="finding-body">All Agents each provided independent evidence from different analytical lenses. This tension insight emerges only when these perspectives are synthesized — no single agent would surface this pattern.</div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Emergence Detection | 1 agents</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide" id="s11">
+  <div class="slide-bg-glow" style="background:var(--accent-success);bottom:-200px;left:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag strategic">Strategic</span> Timeline</div>
+    <h2 class="slide-title anim d1">Implementation Horizon</h2>
+    <p class="section-intro anim d2">Three-phase approach: defensive positioning, transitional investment, offensive expansion.</p>
+    <div class="timeline anim d3">
+      <div class="timeline-phase">
+        <div class="timeline-dot" style="background:var(--accent-error);"></div>
+        <div class="timeline-year" style="color:var(--accent-error);">Q1-Q2</div>
+        <div class="timeline-label">Defensive</div>
+        <div class="timeline-items">
+          <div>CMS published the Contract Year 2027 Proposed Rule on…</div>
+          <div>The regulatory timeline creates a compressed 6-month…</div>
+          <div>Changes encompass multiple program areas beyond Star…</div>
+        </div>
+      </div>
+      <div class="timeline-phase">
+        <div class="timeline-dot" style="background:var(--accent-warning);"></div>
+        <div class="timeline-year" style="color:var(--accent-warning);">Q3-Q4</div>
+        <div class="timeline-label">Transitional</div>
+        <div class="timeline-items">
+          <div>Smaller and newer Medicare Advantage plans face…</div>
+          <div>Quality management infrastructure and operational…</div>
+          <div>The systemic nature of changes requires integrated…</div>
+        </div>
+      </div>
+      <div class="timeline-phase">
+        <div class="timeline-dot" style="background:var(--accent-success);"></div>
+        <div class="timeline-year" style="color:var(--accent-success);">2027+</div>
+        <div class="timeline-label">Offensive</div>
+        <div class="timeline-items">
+          <div>The CMS 2027 Star Ratings changes create a 'regulatory…</div>
+          <div>The compressed implementation timeline creates a…</div>
+          <div>Medication adherence triple weighting creates a 'quality…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Strategic Synthesis</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide" id="s12">
+  <div class="slide-bg-glow" style="background:var(--accent);top:-200px;left:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag quality">Quality</span> Provenance</div>
+    <h2 class="slide-title anim d1">Provenance &amp; Confidence</h2>
+    <div class="grid-2 anim d2">
+      <div>
+        <div class="chart-container donut-wrapper anim d3" role="img" aria-label="Distribution chart">
+  <svg viewBox="0 0 200 200" class="donut-chart" style="width:180px;height:180px;">
+    <g transform="translate(100,100)">
+      <circle r="80" fill="none" stroke="var(--bg-tertiary)" stroke-width="24"/>
+      <circle class="segment" r="80" fill="none" stroke="var(--accent-success)" stroke-width="24" stroke-dasharray="195.5 502.65" stroke-dashoffset="0" transform="rotate(-90)" tabindex="0" aria-label="High (7): 39%"><title>High (7): 7</title></circle>
+        <circle class="segment" r="80" fill="none" stroke="var(--accent-warning)" stroke-width="24" stroke-dasharray="251.3 502.65" stroke-dashoffset="-195.475" transform="rotate(-90)" tabindex="0" aria-label="Medium (9): 50%"><title>Medium (9): 9</title></circle>
+        <circle class="segment" r="80" fill="none" stroke="var(--accent-error)" stroke-width="24" stroke-dasharray="55.8 502.65" stroke-dashoffset="-446.79999999999995" transform="rotate(-90)" tabindex="0" aria-label="Low (2): 11%"><title>Low (2): 2</title></circle>
+    </g>
+    <text x="100" y="95" text-anchor="middle" fill="var(--text-primary)" font-size="28" font-weight="700">18</text>
+    <text x="100" y="115" text-anchor="middle" fill="var(--text-tertiary)" font-size="10">Total Findings</text>
+  </svg>
+  <ul class="chart-legend" role="list" style="flex-direction:column;"><li><span class="legend-dot" style="background:var(--accent-success)"></span>High (7)</li>
+      <li><span class="legend-dot" style="background:var(--accent-warning)"></span>Medium (9)</li>
+      <li><span class="legend-dot" style="background:var(--accent-error)"></span>Low (2)</li></ul>
+</div>
+        <div class="stat-card" style="margin-top:12px;">
+          <div class="stat-label">Quality Score</div>
+          <div class="stat-value warn">B- (77%)</div>
+          <div class="stat-context">Chain completeness: 6%</div>
+        </div>
+      </div>
+      <div>
+        <table class="prov-table">
+          <thead><tr><th>Finding</th><th>Agent</th><th>Source</th><th>Confidence</th></tr></thead>
+          <tbody>
+    <tr>
+      <td>CMS published the Contract Year 2027 Proposed Rule on…</td>
+      <td><span class="tag regulatory">Regulatory Intelligence</span></td>
+      <td>Federal Register 2025-21456</td>
+      <td><span class="confidence-badge high">HIGH &mdash; </span></td>
+    </tr>
+    <tr>
+      <td>The regulatory timeline follows CMS's standard annual cycle…</td>
+      <td><span class="tag regulatory">Regulatory Intelligence</span></td>
+      <td>Federal Register publication dates and…</td>
+      <td><span class="confidence-badge high">HIGH &mdash; </span></td>
+    </tr>
+    <tr>
+      <td>The 2027 rule encompasses comprehensive changes across Star…</td>
+      <td><span class="tag regulatory">Regulatory Intelligence</span></td>
+      <td>Federal Register 2025-21456 abstract</td>
+      <td><span class="confidence-badge medium">MEDIUM &mdash; </span></td>
+    </tr>
+    <tr>
+      <td>Historical regulatory pattern shows CMS implements Star…</td>
+      <td><span class="tag regulatory">Regulatory Intelligence</span></td>
+      <td>Federal Register 2023-07115, April 12,…</td>
+      <td><span class="confidence-badge medium">MEDIUM &mdash; </span></td>
+    </tr>
+    <tr>
+      <td>CMS has proposed significant changes to Star Ratings…</td>
+      <td><span class="tag clinical">Healthcare Financial</span></td>
+      <td>Federal Register, Document 2025-21456</td>
+      <td><span class="confidence-badge high">HIGH &mdash; </span></td>
+    </tr>
+    <tr>
+      <td>Major payers including UnitedHealth, Humana, Centene, and…</td>
+      <td><span class="tag clinical">Healthcare Financial</span></td>
+      <td>SEC EDGAR database, multiple 10-K/10-Q…</td>
+      <td><span class="confidence-badge medium">MEDIUM &mdash; </span></td>
+    </tr>
+    <tr>
+      <td>The regulatory timeline shows a pattern of annual policy…</td>
+      <td><span class="tag clinical">Healthcare Financial</span></td>
+      <td>Federal Register documents 2024-27939,…</td>
+      <td><span class="confidence-badge high">HIGH &mdash; </span></td>
+    </tr>
+    <tr>
+      <td>Smaller and newer MA plans (Clover Health, Alignment…</td>
+      <td><span class="tag clinical">Healthcare Financial</span></td>
+      <td>SEC EDGAR filings from emerging MA…</td>
+      <td><span class="confidence-badge medium">MEDIUM &mdash; </span></td>
+    </tr>
+    <tr>
+      <td>The Medicare Prescription Drug Inflation Rebate Program…</td>
+      <td><span class="tag clinical">Healthcare Financial</span></td>
+      <td>Federal Register document 2024-25382,…</td>
+      <td><span class="confidence-badge medium">MEDIUM &mdash; </span></td>
+    </tr>
+    <tr>
+      <td>Search tool limitations prevented access to specific 2027…</td>
+      <td><span class="tag competitive">Competitive Intelligence</span></td>
+      <td>Direct research tool output showing no…</td>
+      <td><span class="confidence-badge high">HIGH &mdash; </span></td>
+    </tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Quality Assurance System</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide" id="s13">
+  <div class="slide-bg-glow" style="background:var(--accent-warning);bottom:-200px;right:-200px;"></div>
+  <div class="slide-inner">
+    <div class="eyebrow anim"><span class="tag-gold tag">Gaps</span> Intelligence</div>
+    <h2 class="slide-title anim d1">Intelligence Gaps &amp; Next Steps</h2>
+    <p class="section-intro anim d2">What the swarm could not determine — and recommended follow-up investigations.</p>
+    <div class="two-col anim d3">
+      <div>
+        <h3 style="font-size:13px;color:var(--accent-error);margin-bottom:12px;font-weight:700;">&#9888; Unknown Variables</h3>
+        <div class="policy-box" style="margin-bottom:8px;"><p>Specific cut-point methodology changes: The Federal Register abstracts do not detail the actual mathematical formulas,…</p></div>
+        <div class="policy-box" style="margin-bottom:8px;"><p>Implementation timeline specifics: While the proposed rule publication date is known, specific compliance deadlines,…</p></div>
+        <div class="policy-box" style="margin-bottom:8px;"><p>Quantitative impact assessment: No data available on projected number of contracts affected, estimated compliance…</p></div>
+        <div class="policy-box" style="margin-bottom:8px;"><p>Stakeholder feedback and final rule modifications: Since this is a proposed rule, final methodology may change based on…</p></div>
+        <div class="policy-box" style="margin-bottom:8px;"><p>Technical specifications: Detailed scoring algorithms, cut-point calculations, and measure weightings are not…</p></div>
+        <div class="policy-box" style="margin-bottom:8px;"><p>Specific bonus payment amounts - I could not access the actual dollar amounts of bonus payments or the precise…</p></div>
+      </div>
+      <div>
+        <h3 style="font-size:13px;color:var(--accent-success);margin-bottom:12px;font-weight:700;">&#8594; Recommended Follow-Up</h3>
+        <div class="policy-box positive" style="margin-bottom:8px;"><h4>The CMS 2027 Star Ratings changes represent a…</h4><p>Payers should immediately audit their quality management infrastructure capabilities and invest in…</p></div>
+        <div class="policy-box positive" style="margin-bottom:8px;"><h4>The compressed 6-month implementation timeline…</h4><p>Smaller plans should immediately evaluate partnership, acquisition, or exit strategies, while…</p></div>
+        <div class="policy-box positive" style="margin-bottom:8px;"><h4>Medication adherence measures with triple…</h4><p>All plans regardless of size should prioritize PDC optimization programs as the most cost-effective…</p></div>
+        <div class="policy-box neutral" style="margin-bottom:8px;"><p>⚠️ Source Coverage is weak (6%): 1/18 findings have verifiable sources (6%)</p></div>
+        <div class="policy-box neutral" style="margin-bottom:8px;"><p>⚠️ Provenance Completeness is weak (6%): 1/18 chains complete (6%)</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>Gap Triangulation</span><span>PRISM Executive Intelligence Brief</span></div>
+</section>
+
+<section class="slide" id="s14" style="text-align:center;">
+  <div class="slide-bg-glow" style="background:var(--inov-cerulean);top:-200px;left:-200px;"></div>
+  <div class="slide-bg-glow" style="background:var(--inov-jade);bottom:-200px;right:-200px;"></div>
+  <div class="slide-inner">
+    <div class="hero-badge anim">PRISM EXTENDED Analysis Complete</div>
+    <h2 class="hero-title anim d1" style="font-size:var(--text-3xl);">The CMS 2027 Star Ratings changes represent a regulatory…</h2>
+    <p class="hero-sub anim d2">4 agents · 18 findings · 3 emergent insights</p>
+    <div class="anim d3" style="margin-top:28px;"><span class="agent-chip"><span class="dot" style="background:var(--accent-bright)"></span>Regulatory Intelligence Analyst</span>
+      <span class="agent-chip"><span class="dot" style="background:var(--accent-success)"></span>Healthcare Financial Strategist</span>
+      <span class="agent-chip"><span class="dot" style="background:#f97316"></span>Competitive Intelligence Specialist</span>
+      <span class="agent-chip"><span class="dot" style="background:var(--accent-error)"></span>Quality Performance Analyst</span></div>
+    <p class="anim d4" style="margin-top:24px;font-size:var(--text-sm);color:var(--text-tertiary);">Generated March 2026 · Run ID: run-1772729345440</p>
+  </div>
+</section>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const totalSlides = slides.length;
+let currentSlide = 0;
+let counterTimeout;
+
+function goToSlide(n) {
+  n = Math.max(0, Math.min(n, totalSlides - 1));
+  currentSlide = n;
+  slides[n].scrollIntoView({ behavior: 'smooth' });
+}
+
+function toggleNav() {
+  const p = document.getElementById('navPanel');
+  const o = document.getElementById('navOverlay');
+  const b = document.getElementById('navBtn');
+  const isOpen = p.classList.contains('open');
+  if (isOpen) { p.classList.remove('open'); o.classList.remove('open'); b.innerHTML = '&#9776;'; }
+  else { p.classList.add('open'); o.classList.add('open'); b.innerHTML = '&#10005;'; }
+}
+
+function updateProgress() {
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+  document.getElementById('slideProgress').style.width = pct + '%';
+  let closest = 0, minDist = Infinity;
+  slides.forEach((s, i) => {
+    const d = Math.abs(s.getBoundingClientRect().top);
+    if (d < minDist) { minDist = d; closest = i; }
+  });
+  currentSlide = closest;
+  const counter = document.getElementById('slideCounter');
+  counter.textContent = String(closest + 1).padStart(2, '0') + ' / ' + String(totalSlides).padStart(2, '0');
+  counter.classList.add('visible');
+  clearTimeout(counterTimeout);
+  counterTimeout = setTimeout(() => counter.classList.remove('visible'), 2000);
+}
+
+function animateCounter(el) {
+  const target = parseInt(el.dataset.target);
+  if (isNaN(target)) return;
+  const start = performance.now();
+  const duration = 2000;
+  function update(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 4);
+    el.textContent = Math.round(target * eased);
+    if (progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+
+const animObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && entry.intersectionRatio > 0.15) {
+      entry.target.querySelectorAll('.anim').forEach(el => el.classList.add('visible'));
+      entry.target.querySelectorAll('.bar-fill').forEach(bar => {
+        setTimeout(() => bar.classList.add('animate'), 300);
+      });
+      entry.target.querySelectorAll('.bar-chart, .line-chart, .donut-chart, .sparkline, .comparison-bars')
+        .forEach(chart => chart.classList.add('is-visible'));
+      entry.target.querySelectorAll('.stat-number[data-target]').forEach(el => {
+        if (!el.dataset.animated) { el.dataset.animated = 'true'; animateCounter(el); }
+      });
+    }
+  });
+}, { threshold: [0, 0.15, 0.5] });
+slides.forEach(s => animObserver.observe(s));
+
+document.addEventListener('keydown', (e) => {
+  const navOpen = document.getElementById('navPanel').classList.contains('open');
+  if (e.key === 'Escape') { if (navOpen) toggleNav(); return; }
+  if (navOpen) return;
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  switch (e.key) {
+    case 'ArrowDown': case 'PageDown': e.preventDefault(); goToSlide(currentSlide + 1); break;
+    case 'ArrowUp': case 'PageUp': e.preventDefault(); goToSlide(currentSlide - 1); break;
+    case ' ': case 'ArrowRight': e.preventDefault(); goToSlide(currentSlide + 1); break;
+    case 'ArrowLeft': e.preventDefault(); goToSlide(currentSlide - 1); break;
+    case 'Home': e.preventDefault(); goToSlide(0); break;
+    case 'End': e.preventDefault(); goToSlide(totalSlides - 1); break;
+  }
+});
+
+window.addEventListener('scroll', updateProgress, { passive: true });
+window.addEventListener('load', () => {
+  setTimeout(() => { const h = document.getElementById('navHint'); if (h) h.classList.remove('show'); }, 4000);
+  updateProgress();
+});
+</script>
+</body>
+</html>
