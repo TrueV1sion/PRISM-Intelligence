@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Finding, FindingAction } from "@/lib/mock-data";
+import type { Finding, FindingAction } from "@/lib/types";
 import { ThumbsUp, ThumbsDown, ArrowUp, Flag, Shield, FileText, Bot } from "lucide-react";
 
 const confidenceStyles: Record<string, string> = {

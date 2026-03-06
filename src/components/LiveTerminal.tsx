@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { LogEntry } from "@/lib/mock-data";
+import type { LogEntry } from "@/lib/types";
 import { Terminal } from "lucide-react";
 
 const typeColors: Record<LogEntry["type"], string> = {

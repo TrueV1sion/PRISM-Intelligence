@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { BlueprintData } from "@/lib/mock-data";
+import type { BlueprintData } from "@/lib/types";
 import { Users, Zap, Clock, Layers, ChevronRight, Pencil } from "lucide-react";
 
 const tierColors: Record<string, string> = {
