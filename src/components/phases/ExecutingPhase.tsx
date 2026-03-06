@@ -44,7 +44,7 @@ export default function ExecutingPhase({
 
             <div className="flex-1 flex gap-6 overflow-hidden">
                 {/* Agent Cards Grid */}
-                <div className="flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 content-start overflow-y-auto pr-2">
+                <div data-tour-id="tour-agent-grid" className="flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 content-start overflow-y-auto pr-2">
                     {agents.length > 0 ? (
                         agents.map((agent, i) => (
                             <AgentCard key={agent.id} agent={agent} index={i} />

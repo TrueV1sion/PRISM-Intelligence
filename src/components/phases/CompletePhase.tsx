@@ -222,6 +222,7 @@ export default function CompletePhase({
                     </button>
                     <button
                         onClick={onViewBrief}
+                        data-tour-id="tour-view-brief"
                         className="flex items-center gap-2 px-8 py-3 rounded-lg text-sm font-medium bg-prism-sky text-prism-bg shadow-[0_0_20px_rgba(89,221,253,0.25)] hover:bg-white transition-all duration-300"
                     >
                         View Cinematic Brief

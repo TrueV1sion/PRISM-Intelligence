@@ -49,7 +49,7 @@ export default function TriagePhase({
                     </button>
                 </div>
 
-                <div className="space-y-4">
+                <div data-tour-id="tour-finding-card" className="space-y-4">
                     {findings.map((finding, i) => (
                         <FindingCard key={finding.id} finding={finding} index={i} onAction={onAction} />
                     ))}

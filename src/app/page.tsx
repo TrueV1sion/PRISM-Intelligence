@@ -56,6 +56,15 @@ import DeckLibrary from "@/components/DeckLibrary";
 import DeckViewer from "@/components/DeckViewer";
 import AdminSettings from "@/components/AdminSettings";
 import OnboardingWizard from "@/components/onboarding/OnboardingWizard";
+import CoachMarkProvider, { useCoachMarkPhase } from "@/components/onboarding/CoachMarkProvider";
+
+function PhaseSync({ phase }: { phase: Phase }) {
+  const { setCurrentPhase } = useCoachMarkPhase();
+  useEffect(() => {
+    setCurrentPhase(phase);
+  }, [phase, setCurrentPhase]);
+  return null;
+}
 
 export default function Home() {
   const [query, setQuery] = useState("");
@@ -241,158 +250,130 @@ export default function Home() {
   }
 
   // ─── Phase Routing ─────────────────────────────────
-  if (effectivePhase === "input") {
-    return (
-      <InputPhase
-        query={query}
-        setQuery={setQuery}
-        onSubmitLive={handleSubmitLive}
-        onSubmitDemo={handleSubmitDemo}
-        onOpenSettings={() => setPhase("settings")}
-      />
-    );
-  }
 
-  if (effectivePhase === "blueprint") {
-    // Convert stream blueprint to BlueprintData format for the approval component
-    const blueprintData = isLiveMode && stream.blueprint ? {
-      query: stream.blueprint.query,
-      tier: stream.blueprint.tier as "MICRO" | "STANDARD" | "EXTENDED" | "MEGA",
-      estimatedTime: stream.blueprint.estimatedTime,
-      agentCount: stream.blueprint.agents.length,
-      complexity: stream.blueprint.complexity,
-      dimensions: stream.blueprint.dimensions.map((d, i) => ({ id: `dim-${i}`, ...d })),
-      agents: stream.blueprint.agents.map((a, i) => ({
-        id: `agent-${i}`,
-        name: a.name,
-        archetype: a.archetype,
-        mandate: a.mandate,
-        tools: a.tools,
-        dimension: a.dimension,
-        color: AGENT_COLORS[i % AGENT_COLORS.length],
-      })),
-    } : { ...MOCK_BLUEPRINT, query };
+  // Convert stream blueprint to BlueprintData format for the approval component
+  const blueprintData = isLiveMode && stream.blueprint ? {
+    query: stream.blueprint.query,
+    tier: stream.blueprint.tier as "MICRO" | "STANDARD" | "EXTENDED" | "MEGA",
+    estimatedTime: stream.blueprint.estimatedTime,
+    agentCount: stream.blueprint.agents.length,
+    complexity: stream.blueprint.complexity,
+    dimensions: stream.blueprint.dimensions.map((d, i) => ({ id: `dim-${i}`, ...d })),
+    agents: stream.blueprint.agents.map((a, i) => ({
+      id: `agent-${i}`,
+      name: a.name,
+      archetype: a.archetype,
+      mandate: a.mandate,
+      tools: a.tools,
+      dimension: a.dimension,
+      color: AGENT_COLORS[i % AGENT_COLORS.length],
+    })),
+  } : { ...MOCK_BLUEPRINT, query };
 
-    return (
-      <BlueprintApproval
-        blueprint={blueprintData}
-        onApprove={() => {
-          if (isLiveMode) {
-            setBlueprintApproved(true);
-          } else {
-            setPhase("executing");
-          }
-        }}
-      />
-    );
-  }
+  const activeAgents = isLiveMode ? streamAgents : liveAgents;
+  const activeLogs = isLiveMode ? streamLogs : liveLogs;
+  const executingPhaseLabel = isLiveMode
+    ? stream.phase === "idle" || stream.phase === "think" ? "THINKING — DECOMPOSING QUERY"
+      : stream.phase === "construct" ? "CONSTRUCTING AGENT PROMPTS"
+        : "DEPLOYING AGENTS"
+    : liveAgents.some(a => a.status === "active" || a.status === "complete")
+      ? "DEPLOYING AGENTS" : "CONSTRUCTING AGENT PROMPTS";
 
-  if (effectivePhase === "executing") {
-    const activeAgents = isLiveMode ? streamAgents : liveAgents;
-    const activeLogs = isLiveMode ? streamLogs : liveLogs;
-    const phaseLabel = isLiveMode
-      ? stream.phase === "idle" || stream.phase === "think" ? "THINKING — DECOMPOSING QUERY"
-        : stream.phase === "construct" ? "CONSTRUCTING AGENT PROMPTS"
-          : "DEPLOYING AGENTS"
-      : liveAgents.some(a => a.status === "active" || a.status === "complete")
-        ? "DEPLOYING AGENTS" : "CONSTRUCTING AGENT PROMPTS";
+  const activeFindings = isLiveMode ? streamFindings : liveFindings;
+  const triageAgentCount = isLiveMode ? stream.agents.length : MOCK_BLUEPRINT.agents.length;
 
-    return (
-      <ExecutingPhase
-        agents={activeAgents}
-        logs={activeLogs}
-        phaseLabel={phaseLabel}
-        phaseMessage={isLiveMode ? stream.phaseMessage : "Deploying simulated agent swarm..."}
-        isLiveMode={isLiveMode}
-      />
-    );
-  }
+  const completeSynthesisLayers = isLiveMode ? stream.synthesisLayers as typeof MOCK_SYNTHESIS : MOCK_SYNTHESIS;
+  const completeFindingCount = isLiveMode ? stream.findings.length : 6;
+  const completeHasError = isLiveMode && stream.phase === "error";
 
-  if (effectivePhase === "triage") {
-    const activeFindings = isLiveMode ? streamFindings : liveFindings;
-    const agentCount = isLiveMode ? stream.agents.length : MOCK_BLUEPRINT.agents.length;
-
-    return (
-      <TriagePhase
-        findings={activeFindings}
-        agentCount={agentCount}
-        onAction={handleFindingAction}
-        onApproveAndSynthesize={() => setPhase("synthesis")}
-      />
-    );
-  }
-
-  if (effectivePhase === "synthesis") {
-    return (
-      <SynthesisPhase
-        synthesisLayers={isLiveMode ? stream.synthesisLayers as typeof MOCK_SYNTHESIS : MOCK_SYNTHESIS}
-        emergences={stream.emergences}
-        phaseMessage={stream.phaseMessage}
-        isLiveMode={isLiveMode}
-      />
-    );
-  }
-
-  if (effectivePhase === "complete") {
-    const synthesisLayers = isLiveMode ? stream.synthesisLayers as typeof MOCK_SYNTHESIS : MOCK_SYNTHESIS;
-    const findingCount = isLiveMode ? stream.findings.length : 6;
-    const hasError = isLiveMode && stream.phase === "error";
-
-    return (
-      <CompletePhase
-        synthesisLayers={synthesisLayers}
-        findingCount={findingCount}
-        hasError={hasError}
-        errorMessage={stream.error}
-        isLiveMode={isLiveMode}
-        quality={stream.quality}
-        completionData={stream.completionData}
-        emergences={stream.emergences}
-        onNewAnalysis={() => {
-          stream.reset();
-          setPhase("input");
-          setQuery("");
-          setIsLiveMode(false);
-        }}
-        onViewBrief={() => {
-          if (isLiveMode && stream.completionData?.presentationPath) {
-            window.open(stream.completionData.presentationPath, "_blank");
-          } else {
-            setSelectedDeck(DECK_LIBRARY[0]);
-            setPhase("viewer");
-          }
-        }}
-        onBrowseLibrary={() => setPhase("library")}
-      />
-    );
-  }
-
-  if (effectivePhase === "library") {
-    return (
-      <DeckLibrary
-        onSelectDeck={(deck) => {
-          setSelectedDeck(deck);
+  const phaseContent = effectivePhase === "input" ? (
+    <InputPhase
+      query={query}
+      setQuery={setQuery}
+      onSubmitLive={handleSubmitLive}
+      onSubmitDemo={handleSubmitDemo}
+      onOpenSettings={() => setPhase("settings")}
+    />
+  ) : effectivePhase === "blueprint" ? (
+    <BlueprintApproval
+      blueprint={blueprintData}
+      onApprove={() => {
+        if (isLiveMode) {
+          setBlueprintApproved(true);
+        } else {
+          setPhase("executing");
+        }
+      }}
+    />
+  ) : effectivePhase === "executing" ? (
+    <ExecutingPhase
+      agents={activeAgents}
+      logs={activeLogs}
+      phaseLabel={executingPhaseLabel}
+      phaseMessage={isLiveMode ? stream.phaseMessage : "Deploying simulated agent swarm..."}
+      isLiveMode={isLiveMode}
+    />
+  ) : effectivePhase === "triage" ? (
+    <TriagePhase
+      findings={activeFindings}
+      agentCount={triageAgentCount}
+      onAction={handleFindingAction}
+      onApproveAndSynthesize={() => setPhase("synthesis")}
+    />
+  ) : effectivePhase === "synthesis" ? (
+    <SynthesisPhase
+      synthesisLayers={isLiveMode ? stream.synthesisLayers as typeof MOCK_SYNTHESIS : MOCK_SYNTHESIS}
+      emergences={stream.emergences}
+      phaseMessage={stream.phaseMessage}
+      isLiveMode={isLiveMode}
+    />
+  ) : effectivePhase === "complete" ? (
+    <CompletePhase
+      synthesisLayers={completeSynthesisLayers}
+      findingCount={completeFindingCount}
+      hasError={completeHasError}
+      errorMessage={stream.error}
+      isLiveMode={isLiveMode}
+      quality={stream.quality}
+      completionData={stream.completionData}
+      emergences={stream.emergences}
+      onNewAnalysis={() => {
+        stream.reset();
+        setPhase("input");
+        setQuery("");
+        setIsLiveMode(false);
+      }}
+      onViewBrief={() => {
+        if (isLiveMode && stream.completionData?.presentationPath) {
+          window.open(stream.completionData.presentationPath, "_blank");
+        } else {
+          setSelectedDeck(DECK_LIBRARY[0]);
           setPhase("viewer");
-        }}
-        onBack={() => setPhase("complete")}
-      />
-    );
-  }
+        }
+      }}
+      onBrowseLibrary={() => setPhase("library")}
+    />
+  ) : effectivePhase === "library" ? (
+    <DeckLibrary
+      onSelectDeck={(deck) => {
+        setSelectedDeck(deck);
+        setPhase("viewer");
+      }}
+      onBack={() => setPhase("complete")}
+    />
+  ) : effectivePhase === "viewer" && selectedDeck ? (
+    <DeckViewer
+      deck={selectedDeck}
+      onClose={() => setPhase("library")}
+    />
+  ) : effectivePhase === "settings" ? (
+    <AdminSettings onBack={() => setPhase("input")} />
+  ) : null;
 
-  if (effectivePhase === "viewer" && selectedDeck) {
-    return (
-      <DeckViewer
-        deck={selectedDeck}
-        onClose={() => setPhase("library")}
-      />
-    );
-  }
-
-  if (effectivePhase === "settings") {
-    return (
-      <AdminSettings onBack={() => setPhase("input")} />
-    );
-  }
-
-  return null;
+  return (
+    <CoachMarkProvider>
+      <PhaseSync phase={effectivePhase} />
+      {phaseContent}
+    </CoachMarkProvider>
+  );
 }

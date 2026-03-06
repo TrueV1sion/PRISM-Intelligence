@@ -44,7 +44,7 @@ export default function SynthesisPhase({
                             : "Applying Cross-Agent Theme Mining, Tension Point Mapping, Gap Triangulation, and Structural Pattern Recognition..."}
                     </p>
                 </div>
-                <div className="flex items-center justify-center gap-3 text-xs font-mono text-prism-muted flex-wrap">
+                <div data-tour-id="tour-synthesis-layers" className="flex items-center justify-center gap-3 text-xs font-mono text-prism-muted flex-wrap">
                     {layerNames.map((name, i) => (
                         <span key={`${name}-${i}`} className="flex items-center gap-1.5">
                             <span className={`w-2 h-2 rounded-full ${i === layerNames.length - 1 ? "bg-prism-sky animate-pulse" : "bg-prism-jade"}`} />
