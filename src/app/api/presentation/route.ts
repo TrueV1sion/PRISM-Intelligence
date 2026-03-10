@@ -7,7 +7,7 @@
  */
 
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/db";
 import { present } from "@/lib/pipeline/present";
 import type { PipelineEvent } from "@/lib/pipeline/types";
 import { writeFileSync, mkdirSync } from "fs";
@@ -23,23 +23,19 @@ export async function POST(request: Request) {
     }
 
     // Load run data from database
-    const run = await prisma.run.findUnique({
-      where: { id: runId },
-      include: {
-        agents: { include: { findings: true } },
-        synthesis: { orderBy: { order: "asc" } },
-        dimensions: true,
-      },
-    });
+    const run = await db.run.findUniqueWithRelations(runId);
 
     if (!run) {
       return NextResponse.json({ error: "Run not found" }, { status: 404 });
     }
 
-    // Reconstruct the data structures needed for present()
+    const dimensions = run.dimensions ?? [];
+    const agents = run.agents ?? [];
+    const synthesisList = run.synthesis ?? [];
+
     const blueprint = {
       query: run.query,
-      dimensions: run.dimensions.map((d) => ({
+      dimensions: dimensions.map((d) => ({
         name: d.name,
         description: d.description,
         justification: "",
@@ -47,7 +43,7 @@ export async function POST(request: Request) {
         lens: "",
         signalMatch: "",
       })),
-      agents: run.agents.map((a) => ({
+      agents: agents.map((a) => ({
         name: a.name,
         archetype: a.archetype ?? "",
         dimension: a.dimension ?? "",
@@ -71,11 +67,11 @@ export async function POST(request: Request) {
       ethicalConcerns: [] as string[],
     };
 
-    const agentResults = run.agents.map((a) => ({
+    const agentResults = agents.map((a) => ({
       agentName: a.name,
       archetype: a.archetype ?? "",
       dimension: a.dimension ?? "",
-      findings: a.findings.map((f) => ({
+      findings: (a.findings ?? []).map((f) => ({
         statement: f.statement,
         evidence: f.evidence ?? "",
         confidence: (f.confidence ?? "MEDIUM") as "HIGH" | "MEDIUM" | "LOW",
@@ -93,7 +89,7 @@ export async function POST(request: Request) {
     }));
 
     const synthesis = {
-      layers: run.synthesis.map((s) => ({
+      layers: synthesisList.map((s) => ({
         name: s.layerName as "foundation" | "convergence" | "tension" | "emergence" | "gap",
         description: s.description,
         insights: JSON.parse(s.insights) as string[],
@@ -118,29 +114,13 @@ export async function POST(request: Request) {
     const filename = `${runId}.html`;
     writeFileSync(join(decksDir, filename), presentation.html, "utf-8");
 
-    // Update or create presentation record
-    const existing = await prisma.presentation.findFirst({ where: { runId } });
-    if (existing) {
-      await prisma.presentation.update({
-        where: { id: existing.id },
-        data: {
-          title: presentation.title,
-          subtitle: presentation.subtitle,
-          htmlPath: `/decks/${filename}`,
-          slideCount: presentation.slideCount,
-        },
-      });
-    } else {
-      await prisma.presentation.create({
-        data: {
-          title: presentation.title,
-          subtitle: presentation.subtitle,
-          htmlPath: `/decks/${filename}`,
-          slideCount: presentation.slideCount,
-          runId,
-        },
-      });
-    }
+    // Upsert presentation record
+    await db.presentation.upsertByRunId(runId, {
+      title: presentation.title,
+      subtitle: presentation.subtitle,
+      htmlPath: `/decks/${filename}`,
+      slideCount: presentation.slideCount,
+    });
 
     return NextResponse.json({
       success: true,

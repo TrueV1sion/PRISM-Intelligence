@@ -54,6 +54,59 @@ export interface PresentInput {
  *
  * Cached after first load.
  */
+const FALLBACK_PRESENTATION_SPEC = `# PRISM Presentation System (Fallback Spec)
+
+You are a presentation generator for PRISM Intelligence briefs.
+
+## Output Format
+Generate a complete, self-contained HTML5 document. Output ONLY raw HTML starting with <!DOCTYPE html>.
+
+## Required External Assets
+Include these in <head>:
+- <link rel="stylesheet" href="/styles/presentation.css">
+- <script src="/js/presentation.js" defer></script>
+
+Do NOT write any inline <style> or <script> tags.
+
+## Slide Structure
+Every slide must follow this skeleton:
+<section class="slide" id="slide-N">
+  <div class="slide-bg-glow"></div>
+  <div class="slide-inner"><!-- content --></div>
+  <div class="slide-footer">
+    <span>PRISM Intelligence</span>
+    <span>Source: [tier] - [description]</span>
+    <span>Slide N of T</span>
+  </div>
+</section>
+
+## Slide Sequence
+1. Title Slide - hero stats (.stat-block in .grid-3), dramatic title
+2. Executive Summary - 3-4 key takeaways as .card elements
+3. Methodology - agent roster as .compact-table
+4. Dimension Slides (one per agent) - use rich components, no plain bullet lists
+5. Emergence Slide (if emergent insights exist) - .emergence-card
+6. Tension Slide (if tensions exist) - .grid-2 side-by-side
+7. Strategic Implications - timeline or action matrix
+8. Source Provenance - .source-list with tier indicators
+9. Closing Slide - call to action, PRISM branding
+
+## Component Classes
+- .stat-block, .stat-number, .stat-eyebrow, .stat-suffix, .stat-trend
+- .card, .card-accent (color variants)
+- .tag, .tag-red through .tag-cyan, .tag.quality
+- .grid-2, .grid-3, .grid-4
+- .compact-table
+- .timeline-bar, .tl-segment
+- .bar-track, .bar-fill
+- .source-list, .source-item
+- .anim (fade-in on scroll), .anim-scale, .anim-blur
+- Stagger: style="--delay:1" through --delay:8
+
+## Branding
+Use "PRISM | Intelligence" throughout. No other brand references.
+`;
+
 let cachedSpec: string | null = null;
 
 function loadPresentationSpec(): string {
@@ -74,10 +127,12 @@ function loadPresentationSpec(): string {
     }
   }
 
-  throw new Error(
-    `[PRESENT] Cannot locate presentation-system.md. Searched: ${candidatePaths.join(", ")}. ` +
-    `Set PRISM_PRESENTATION_SPEC env var to the absolute path.`
+  console.warn(
+    `[PRESENT] presentation-system.md not found. Searched: ${candidatePaths.join(", ")}. ` +
+    `Using embedded fallback spec. Set PRISM_PRESENTATION_SPEC for full design fidelity.`,
   );
+  cachedSpec = FALLBACK_PRESENTATION_SPEC;
+  return cachedSpec;
 }
 
 // ─── Prompt Building ────────────────────────────────────────
