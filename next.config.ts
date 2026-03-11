@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  reactCompiler: true,
+  reactCompiler: false,
   serverExternalPackages: ["@modelcontextprotocol/sdk", "@anthropic-ai/sdk"],
 };
 
