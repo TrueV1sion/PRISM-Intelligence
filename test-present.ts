@@ -39,6 +39,7 @@ async function run() {
         console.log("HTML Size:", result.html.length, "bytes");
 
         // Write to a test file
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         const fs = require('fs');
         fs.writeFileSync('./public/decks/test-css-exclusion.html', result.html);
         console.log("Saved to public/decks/test-css-exclusion.html");

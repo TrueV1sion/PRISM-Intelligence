@@ -14,7 +14,6 @@ import {
   MCP_SERVERS,
   ARCHETYPE_TOOL_ROUTING,
   WEB_SEARCH_ARCHETYPES,
-  type MCPServerConfig,
 } from "@/lib/mcp/config";
 
 // ─── MCP_SERVERS Registry ──────────────────────────────────

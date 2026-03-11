@@ -400,7 +400,7 @@ export async function present(input: PresentInput): Promise<PresentationResult> 
         token: chunk.delta.text,
       });
     } else if (chunk.type === "message_stop") {
-      console.log("[PRESENT] Generation complete. Stop Reason:", (chunk as any).stop_reason);
+      console.log("[PRESENT] Generation complete. Stop Reason:", (chunk as unknown as Record<string, unknown>).stop_reason);
     }
   }
 

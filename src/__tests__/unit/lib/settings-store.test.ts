@@ -10,7 +10,7 @@
  * Uses prismaMock from @/__mocks__/prisma for Prisma client mocking.
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { prismaMock } from "@/__mocks__/prisma";
 import { loadSettings, saveSettings, DEFAULT_SETTINGS, type SettingsState } from "@/lib/settings-store";
 
@@ -157,7 +157,7 @@ describe("saveSettings", () => {
     const serialized = callArgs.create.data;
 
     // Verify the serialized JSON can be parsed back
-    const parsed = JSON.parse(serialized);
+    const parsed = JSON.parse(serialized as string);
     expect(parsed).toEqual(settings);
   });
 });
