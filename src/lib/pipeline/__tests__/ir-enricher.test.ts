@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { enrichAfterDeploy } from "../ir-enricher";
+import { enrichAfterDeploy, enrichAfterSynthesize } from "../ir-enricher";
 import { createEmptyIRGraph } from "../ir-types";
 import type { IRGraph } from "../ir-types";
-import type { AgentResult } from "../types";
+import type { AgentResult, SynthesisResult } from "../types";
 import type { MemoryBusState } from "../memory-bus";
 
 function makeAgentResult(overrides: Partial<AgentResult> = {}): AgentResult {
@@ -139,5 +139,118 @@ describe("IR Enricher — DEPLOY phase", () => {
 
     expect(graph.findings[0].findingIndex).toBe(0);
     expect(graph.findings[1].findingIndex).toBe(1);
+  });
+});
+
+function makeSynthesisResult(): SynthesisResult {
+  return {
+    layers: [
+      { name: "foundation", insights: ["Insight 1"], description: "Foundation layer" },
+      { name: "convergence", insights: ["Convergence 1"], description: "Convergence layer" },
+      { name: "tension", insights: ["Tension 1"], description: "Tension layer" },
+      { name: "emergence", insights: ["Emergence 1"], description: "Emergence layer" },
+      { name: "gap", insights: ["Gap 1: Missing APAC data"], description: "Gap layer" },
+    ],
+    emergentInsights: [
+      {
+        insight: "Cross-sector convergence in health data",
+        algorithm: "cross_agent_theme_mining",
+        supportingAgents: ["market-analyst", "regulatory-specialist"],
+        evidenceSources: ["source-a", "source-b"],
+        qualityScores: { novelty: 4, grounding: 3, actionability: 5, depth: 3, surprise: 4 },
+        whyMultiAgent: "Required both market and regulatory perspectives",
+      },
+    ],
+    tensionPoints: [
+      {
+        tension: "Market growth vs regulatory headwinds",
+        sideA: { position: "Growth", agents: ["market-analyst"], evidence: ["Data shows growth"] },
+        sideB: { position: "Headwinds", agents: ["regulatory-specialist"], evidence: ["New regulations"] },
+        conflictType: "interpretive",
+        resolution: "Growth with regulatory risk premium",
+      },
+    ],
+    overallConfidence: "HIGH",
+    criticRevisions: [],
+  };
+}
+
+describe("IR Enricher — SYNTHESIZE phase", () => {
+  it("populates emergences from synthesis emergent insights", () => {
+    const graph = createEmptyIRGraph("run-1", "test");
+    // Pre-populate with a finding to test constituentFindingIds matching
+    graph.findings.push({
+      id: "f-1",
+      agent: "market-analyst",
+      agentArchetype: "ANALYST-FINANCIAL",
+      dimension: "Market",
+      key: "market/direct",
+      value: "Market is $5B",
+      confidence: 0.9,
+      evidenceType: "direct",
+      tags: [],
+      references: [],
+      timestamp: new Date().toISOString(),
+      findingIndex: 0,
+      actionabilityScore: 3,
+      noveltyScore: 4,
+    });
+
+    const synthesis = makeSynthesisResult();
+    enrichAfterSynthesize(graph, synthesis, [makeAgentResult()]);
+
+    expect(graph.emergences).toHaveLength(1);
+    expect(graph.emergences[0].insight).toBe("Cross-sector convergence in health data");
+    expect(graph.emergences[0].algorithm).toBe("cross_agent_theme_mining");
+    expect(graph.emergences[0].supportingAgents).toContain("market-analyst");
+  });
+
+  it("populates gaps from gap layer insights and agent-reported gaps", () => {
+    const graph = createEmptyIRGraph("run-1", "test");
+    const synthesis = makeSynthesisResult();
+    const agents = [makeAgentResult()];
+
+    enrichAfterSynthesize(graph, synthesis, agents);
+
+    // At least 1 from gap layer + 1 from agent.gaps
+    expect(graph.gaps.length).toBeGreaterThanOrEqual(2);
+    const synthGap = graph.gaps.find(g => g.source === "synthesis_layer");
+    const agentGap = graph.gaps.find(g => g.source === "agent_reported");
+    expect(synthGap).toBeDefined();
+    expect(agentGap).toBeDefined();
+    expect(agentGap!.sourceAgent).toBe("market-analyst");
+  });
+
+  it("enriches tensions with conflictType from tension points", () => {
+    const graph = createEmptyIRGraph("run-1", "test");
+    // Add a pre-existing tension (from DEPLOY enrichment)
+    graph.tensions.push({
+      id: "t-1",
+      registeredBy: "market-analyst",
+      timestamp: new Date().toISOString(),
+      status: "open",
+      claim: "Market growth vs regulatory headwinds",
+      positions: [],
+      resolution: null,
+    });
+
+    const synthesis = makeSynthesisResult();
+    enrichAfterSynthesize(graph, synthesis, [makeAgentResult()]);
+
+    // Should have enriched the existing tension
+    const enriched = graph.tensions.find(t => t.id === "t-1");
+    expect(enriched?.conflictType).toBe("interpretive");
+  });
+
+  it("sets pyramidLayersApplied in metadata", () => {
+    const graph = createEmptyIRGraph("run-1", "test");
+    const synthesis = makeSynthesisResult();
+
+    enrichAfterSynthesize(graph, synthesis, [makeAgentResult()]);
+
+    expect(graph.metadata.pyramidLayersApplied).toEqual([
+      "foundation", "convergence", "tension", "emergence", "gap",
+    ]);
+    expect(graph.metadata.synthesisMode).toBe("full_pyramid");
   });
 });

@@ -15,9 +15,11 @@ import type {
   IRAgent,
   IRSource,
   IRTension,
+  IREmergence,
+  IRGap,
 } from "./ir-types";
-import { mapSwarmTierToInvestigationTier } from "./ir-types";
-import type { AgentResult, SwarmTier } from "./types";
+import { mapSwarmTierToInvestigationTier, deriveSynthesisMode } from "./ir-types";
+import type { AgentResult, SwarmTier, SynthesisResult } from "./types";
 import type { MemoryBusState } from "./memory-bus";
 
 // ─── Helpers ────────────────────────────────────────────────
@@ -191,5 +193,106 @@ export function enrichAfterDeploy(
       resolutionStrategy: conflict.resolutionStrategy,
     };
     graph.tensions.push(tension);
+  }
+}
+
+// ─── SYNTHESIZE Enrichment ──────────────────────────────────
+
+export function enrichAfterSynthesize(
+  graph: IRGraph,
+  synthesis: SynthesisResult,
+  agentResults: AgentResult[],
+): void {
+  // Update metadata
+  graph.metadata.pyramidLayersApplied = synthesis.layers.map(l => l.name);
+  graph.metadata.synthesisMode = deriveSynthesisMode(synthesis.layers.length);
+
+  // Emergences — from emergentInsights
+  for (const ei of synthesis.emergentInsights) {
+    // Match constituentFindingIds: find findings from supporting agents
+    const constituentFindingIds = graph.findings
+      .filter(f => ei.supportingAgents.includes(f.agent))
+      .map(f => f.id);
+
+    const emergence: IREmergence = {
+      id: generateIRId("emrg"),
+      insight: ei.insight,
+      algorithm: ei.algorithm,
+      supportingAgents: ei.supportingAgents,
+      evidenceSources: ei.evidenceSources,
+      constituentFindingIds,
+      qualityScores: ei.qualityScores,
+      whyMultiAgent: ei.whyMultiAgent,
+    };
+    graph.emergences.push(emergence);
+  }
+
+  // Gaps — from gap layer insights (source: synthesis_layer)
+  const gapLayer = synthesis.layers.find(l => l.name === "gap");
+  if (gapLayer) {
+    for (const gapInsight of gapLayer.insights) {
+      const gap: IRGap = {
+        id: generateIRId("gap"),
+        title: gapInsight.slice(0, 80),
+        description: gapInsight,
+        gapType: "structural",
+        source: "synthesis_layer",
+        priority: "medium",
+        researchable: true,
+      };
+      graph.gaps.push(gap);
+    }
+  }
+
+  // Gaps — from agent-reported gaps (source: agent_reported)
+  for (const ar of agentResults) {
+    for (const gapText of ar.gaps) {
+      const gap: IRGap = {
+        id: generateIRId("gap"),
+        title: gapText.slice(0, 80),
+        description: gapText,
+        gapType: "researchable",
+        source: "agent_reported",
+        sourceAgent: ar.agentName,
+        priority: "medium",
+        researchable: true,
+      };
+      graph.gaps.push(gap);
+    }
+  }
+
+  // Enrich tensions with conflictType from tension points
+  for (const tp of synthesis.tensionPoints) {
+    // Find matching tension by claim text similarity
+    const matchingTension = graph.tensions.find(t =>
+      t.claim.toLowerCase().includes(tp.tension.toLowerCase().slice(0, 20)) ||
+      tp.tension.toLowerCase().includes(t.claim.toLowerCase().slice(0, 20))
+    );
+    if (matchingTension) {
+      matchingTension.conflictType = tp.conflictType;
+      matchingTension.resolutionFramework = tp.resolution;
+    }
+  }
+
+  // Add convergence edges from the convergence layer
+  const convergenceLayer = synthesis.layers.find(l => l.name === "convergence");
+  if (convergenceLayer) {
+    // Create inter-agent convergence relationships for agents that appear in emergences together
+    for (const emergence of graph.emergences) {
+      const agents = emergence.supportingAgents;
+      for (let i = 0; i < agents.length - 1; i++) {
+        const rel: IRRelationship = {
+          id: generateIRId("rel"),
+          from: agents[i],
+          to: agents[i + 1],
+          type: "discovery",
+          relationshipType: "convergence",
+          priority: "medium",
+          timestamp: new Date().toISOString(),
+          message: `Convergence on: ${emergence.insight.slice(0, 60)}`,
+        };
+        graph.relationships.push(rel);
+      }
+    }
   }
 }
