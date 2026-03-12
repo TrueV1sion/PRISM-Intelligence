@@ -41,6 +41,15 @@ function hashSource(url: string, title: string): string {
   return `src_${Math.abs(hash).toString(36)}`;
 }
 
+function confidenceStringToNumber(conf: string): number {
+  switch (conf.toUpperCase()) {
+    case "HIGH": return 0.9;
+    case "MEDIUM": return 0.6;
+    case "LOW": return 0.3;
+    default: return 0.5;
+  }
+}
+
 function deriveActionabilityScore(finding: { evidenceType: string; tags: string[] }): number {
   let score = 3;
   if (finding.evidenceType === "direct") score += 1;
