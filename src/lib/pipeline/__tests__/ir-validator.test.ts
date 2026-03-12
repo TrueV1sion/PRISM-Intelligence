@@ -60,7 +60,7 @@ describe("IR Validator", () => {
 
   it("fails if metadata.version is missing", () => {
     const graph = makePopulatedGraph();
-    (graph.metadata as Record<string, unknown>).version = undefined;
+    (graph.metadata as unknown as Record<string, unknown>).version = undefined;
     const result = validateIRGraph(graph);
     expect(result.valid).toBe(false);
     expect(result.errors.some(e => e.includes("version"))).toBe(true);
@@ -68,7 +68,7 @@ describe("IR Validator", () => {
 
   it("fails if metadata.runId is missing", () => {
     const graph = makePopulatedGraph();
-    (graph.metadata as Record<string, unknown>).runId = "";
+    (graph.metadata as unknown as Record<string, unknown>).runId = "";
     const result = validateIRGraph(graph);
     expect(result.valid).toBe(false);
     expect(result.errors.some(e => e.includes("runId"))).toBe(true);
@@ -76,7 +76,7 @@ describe("IR Validator", () => {
 
   it("fails for invalid investigationTier", () => {
     const graph = makePopulatedGraph();
-    (graph.metadata as Record<string, unknown>).investigationTier = "INVALID";
+    (graph.metadata as unknown as Record<string, unknown>).investigationTier = "INVALID";
     const result = validateIRGraph(graph);
     expect(result.valid).toBe(false);
   });
