@@ -7,9 +7,9 @@
  *   Stage 3: Generate  — generateSlidesBatch() → SlideHTML[]
  *   Stage 4: Assemble  — assemble()            → AssemblerOutput
  *   Stage 5: Validate  — validate()            → QualityScorecard
+ *   Stage 6: Review    — reviewDesign()        → DesignReview | null
+ *   Stage 7: Remediate — remediateSlides()     → SlideHTML[]
  *   Stage 8: Return    — PresentationResult
- *
- * Stages 6-7 (QA loop / remediation) are deferred to Task 18.
  *
  * On any failure, falls back to the legacy present() function.
  */
@@ -19,11 +19,14 @@ import { compileCharts } from "./present/chart-compiler";
 import { generateSlidesBatch } from "./present/slide-generator";
 import { assemble } from "./present/assembler";
 import { validate } from "./present/validator";
+import { reviewDesign } from "./present/design-reviewer";
+import { remediateSlides } from "./present/remediator";
 import { ComponentCatalog } from "./present/component-catalog";
 import { present } from "./present";
 import type {
   ChartDataMap,
   SlideGeneratorInput,
+  RemediationInput,
 } from "./present/types";
 import type { PresentationResult } from "./types";
 import type { PresentInput } from "./present";
@@ -49,6 +52,12 @@ export async function presentOrchestrated(
   const { emitEvent } = input;
 
   try {
+    // ── Timings accumulator ───────────────────────────────────────────────────
+    const timings: {
+      reviewMs?: number;
+      remediateMs?: number;
+    } = {};
+
     // ── Stage 1: Plan ────────────────────────────────────────────────────────
 
     emitEvent({
@@ -158,7 +167,7 @@ export async function presentOrchestrated(
     // ── Stage 5: Validate ─────────────────────────────────────────────────────
 
     const validateStart = Date.now();
-    const scorecard = validate(assemblerOutput.html);
+    let scorecard = validate(assemblerOutput.html);
     const validateMs = Date.now() - validateStart;
 
     console.log(
@@ -195,12 +204,102 @@ export async function presentOrchestrated(
       },
     });
 
-    // ── Stages 6-7: Deferred (QA loop / remediation — Task 18) ───────────────
+    // ── Stage 6-7: Design Review + Remediation Loop ──────────────────────────
+    let bestHtml = assemblerOutput.html;
+    let bestScore = scorecard.overall;
+    let remediationRounds = 0;
+    const MAX_ITERATIONS = 2;
+
+    for (let iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
+      // Stage 6: Design Review
+      const reviewStart = Date.now();
+      const review = await reviewDesign({
+        html: bestHtml,
+        manifest,
+        scorecard,
+      });
+      timings.reviewMs = (timings.reviewMs ?? 0) + (Date.now() - reviewStart);
+
+      if (!review) break; // Reviewer timed out or failed — skip remediation
+
+      console.log(
+        `[orchestrator] Stage 6 Design Review (iteration ${iteration + 1}): overallScore=${review.overallScore.toFixed(1)} in ${timings.reviewMs}ms`,
+      );
+
+      // Collect slides needing remediation
+      const slidesToRemediate: RemediationInput[] = [];
+
+      for (const slideReview of review.slides) {
+        const hasValidatorIssues = scorecard.perSlideIssues
+          .filter(i => i.slideNumber === slideReview.slideNumber)
+          .filter(i => i.severity === "error" || i.severity === "warning").length > 0;
+
+        if (slideReview.regenerate || hasValidatorIssues) {
+          const slideSpec = manifest.slides.find(s => s.slideNumber === slideReview.slideNumber);
+          const slideIdx = slides.findIndex(s => s.slideNumber === slideReview.slideNumber);
+
+          if (slideSpec && slideIdx >= 0) {
+            slidesToRemediate.push({
+              slideNumber: slideReview.slideNumber,
+              originalHtml: slides[slideIdx].html,
+              validatorIssues: scorecard.perSlideIssues.filter(i => i.slideNumber === slideReview.slideNumber),
+              reviewerFeedback: slideReview.feedback,
+              exemplarHtml: catalog.exemplarForSlideType(slideSpec.type),
+              chartData: chartDataMap[slideReview.slideNumber] ?? [],
+            });
+          }
+        }
+      }
+
+      if (slidesToRemediate.length === 0) break; // Nothing to fix
+
+      console.log(
+        `[orchestrator] Stage 7 Remediating ${slidesToRemediate.length} slides (iteration ${iteration + 1})...`,
+      );
+
+      // Stage 7: Remediate
+      const remediateStart = Date.now();
+      const remediated = await remediateSlides(slidesToRemediate);
+      timings.remediateMs = (timings.remediateMs ?? 0) + (Date.now() - remediateStart);
+      remediationRounds++;
+
+      // Replace remediated slides
+      for (const fixed of remediated) {
+        const idx = slides.findIndex(s => s.slideNumber === fixed.slideNumber);
+        if (idx >= 0) slides[idx] = fixed;
+      }
+
+      // Re-assemble and re-validate
+      const reAssembled = assemble({ slides, manifest });
+      const reScored = validate(reAssembled.html);
+
+      console.log(
+        `[orchestrator] Stage 7 Remediation round ${remediationRounds} complete: score ${bestScore} → ${reScored.overall} (${reScored.grade})`,
+      );
+
+      // Regression detection: keep the better version
+      if (reScored.overall >= bestScore) {
+        bestHtml = reAssembled.html;
+        bestScore = reScored.overall;
+        scorecard = reScored;
+      } else {
+        // Revert — remediation made it worse
+        console.warn(
+          `[orchestrator] Remediation regression detected (${reScored.overall} < ${bestScore}) — reverting`,
+        );
+        break;
+      }
+    }
+
+    console.log(
+      `[orchestrator] QA loop complete: ${remediationRounds} remediation round(s), final score=${bestScore} (${scorecard.grade})`,
+    );
 
     // ── Stage 8: Return ───────────────────────────────────────────────────────
 
     const totalMs =
-      planMs + chartCompileMs + generateMs + assembleMs + validateMs;
+      planMs + chartCompileMs + generateMs + assembleMs + validateMs +
+      (timings.reviewMs ?? 0) + (timings.remediateMs ?? 0);
 
     console.log(
       `[orchestrator] Pipeline complete in ${totalMs}ms — grade: ${scorecard.grade}`,
@@ -214,7 +313,7 @@ export async function presentOrchestrated(
     });
 
     return {
-      html: assemblerOutput.html,
+      html: bestHtml,
       title: manifest.title,
       subtitle: manifest.subtitle,
       slideCount: assemblerOutput.slideCount,
