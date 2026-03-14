@@ -1201,3 +1201,18 @@
       .grid-4 { grid-template-columns: 1fr 1fr; }
       .state-grid { grid-template-columns: 1fr 1fr; }
     }
+
+    /* ─── Missing Component Rules ─────── */
+    .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); }
+    .source-item { display: inline; font-size: 11px; color: var(--text-secondary); }
+    .finding-card.caution { border-left-color: var(--accent-warning); }
+    .finding-card.regulatory { border-left-color: var(--accent-error); }
+
+    /* ─── Stagger Delays for anim-scale and anim-blur ─────── */
+    .anim-scale.d1, .anim-blur.d1 { transition-delay: 100ms; }
+    .anim-scale.d2, .anim-blur.d2 { transition-delay: 200ms; }
+    .anim-scale.d3, .anim-blur.d3 { transition-delay: 300ms; }
+    .anim-scale.d4, .anim-blur.d4 { transition-delay: 400ms; }
+    .anim-scale.d5, .anim-blur.d5 { transition-delay: 500ms; }
+    .anim-scale.d6, .anim-blur.d6 { transition-delay: 600ms; }
+    .anim-scale.d7, .anim-blur.d7 { transition-delay: 700ms; }

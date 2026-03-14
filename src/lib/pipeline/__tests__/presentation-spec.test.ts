@@ -3,7 +3,7 @@
  * 1. Compiler: design-tokens.yaml → references/presentation-system.md
  * 2. Loader: loadPresentationSpec() resolves compiled spec vs fallback
  * 3. Token coverage: all CSS variables from YAML appear in compiled output
- * 4. Exemplar embedding: all 5 golden exemplar files are included
+ * 4. Exemplar embedding: all 6 golden exemplar files are included
  * 5. Idempotency: compiler produces identical output on repeated runs
  */
 
@@ -347,7 +347,7 @@ describe("golden exemplar embedding", () => {
 
   it("embeds all 5 exemplar files", () => {
     const exemplarFiles = readdirSync(EXEMPLARS_DIR).filter((f) => f.endsWith(".html"));
-    expect(exemplarFiles).toHaveLength(5);
+    expect(exemplarFiles).toHaveLength(6);
 
     for (const file of exemplarFiles) {
       const content = readFileSync(resolve(EXEMPLARS_DIR, file), "utf-8").trim();
@@ -356,6 +356,7 @@ describe("golden exemplar embedding", () => {
   });
 
   it("formats exemplar names as title case headings", () => {
+    expect(compiledSpec).toContain("### Chart Heavy");
     expect(compiledSpec).toContain("### Data Heavy");
     expect(compiledSpec).toContain("### Emergence");
     expect(compiledSpec).toContain("### Findings");
@@ -472,8 +473,8 @@ describe("source file integrity", () => {
     expect(parsed).toHaveProperty("prism");
   });
 
-  it("all 5 exemplar HTML files exist", () => {
-    const expected = ["data-heavy.html", "emergence.html", "findings.html", "hero-title.html", "tension.html"];
+  it("all 6 exemplar HTML files exist", () => {
+    const expected = ["chart-heavy.html", "data-heavy.html", "emergence.html", "findings.html", "hero-title.html", "tension.html"];
     for (const file of expected) {
       expect(existsSync(resolve(EXEMPLARS_DIR, file))).toBe(true);
     }
@@ -489,5 +490,45 @@ describe("source file integrity", () => {
 
   it("compiler script exists", () => {
     expect(existsSync(COMPILER_PATH)).toBe(true);
+  });
+});
+
+// ─── CSS Class Coverage Tests ────────────────────────────────
+
+describe("CSS class coverage", () => {
+  const CSS_PATH = resolve(ROOT, "public", "styles", "presentation.css");
+  let css: string;
+
+  beforeEach(() => {
+    expect(existsSync(CSS_PATH)).toBe(true);
+    css = readFileSync(CSS_PATH, "utf-8");
+  });
+
+  it("includes .legend-item class", () => {
+    expect(css).toContain(".legend-item");
+  });
+
+  it("includes .source-item class", () => {
+    expect(css).toContain(".source-item");
+  });
+
+  it("includes .finding-card.caution class", () => {
+    expect(css).toContain(".finding-card.caution");
+  });
+
+  it("includes .finding-card.regulatory class", () => {
+    expect(css).toContain(".finding-card.regulatory");
+  });
+
+  it("includes .anim-scale.d1 through .anim-scale.d7 stagger delays", () => {
+    for (let i = 1; i <= 7; i++) {
+      expect(css).toContain(`.anim-scale.d${i}`);
+    }
+  });
+
+  it("includes .anim-blur.d1 through .anim-blur.d7 stagger delays", () => {
+    for (let i = 1; i <= 7; i++) {
+      expect(css).toContain(`.anim-blur.d${i}`);
+    }
   });
 });
