@@ -17,6 +17,12 @@ import type {
   PipelineEvent,
   SwarmTier,
 } from "@/lib/pipeline/types";
+import type {
+  SlotSchema,
+  ComponentSlot,
+  ComponentField,
+  ChartSlotSchema,
+} from "./template-registry";
 
 // Re-export imported types for convenience
 export type { AgentFinding, SynthesisResult, AgentResult, Blueprint, PipelineEvent, SwarmTier };
@@ -360,3 +366,66 @@ export interface ContentGeneratorOutput {
   chartDataRefs: Record<string, string>;
   contentNotes?: string;
 }
+
+// ── Content Generator Input ──
+
+export interface ContentGeneratorInput {
+  templateId: string;
+  templateName: string;
+  slotSchema: SlotSchema[];
+  componentSlotSchemas: ComponentSlot[];
+  datasets: EnrichedDataset[];
+  slideIntent: string;
+  narrativePosition: string;
+  deckThesis: string;
+  priorSlideHeadlines: string[];
+}
+
+// ── Planner & Manifest Types ──
+
+export type SlideIntent = "context" | "evidence" | "comparison" | "trend" | "composition" |
+  "ranking" | "process" | "recommendation" | "summary" | "transition";
+
+export interface NarrativeArc {
+  opening: string;
+  development: string;
+  climax: string;
+  resolution: string;
+}
+
+export interface TemplateSlideSpec {
+  index: number;
+  templateId: string;
+  slideIntent: SlideIntent;
+  narrativePosition: string;
+  datasetBindings: {
+    chartSlots: Record<string, string>;
+    statSources: Record<string, string>;
+  };
+  transitionFrom: string | null;
+  transitionTo: string | null;
+  slideClass: string;
+  accentColor: string;
+}
+
+export interface TemplateSlideManifest {
+  title: string;
+  subtitle: string;
+  thesis: string;
+  narrativeArc: NarrativeArc;
+  slides: TemplateSlideSpec[];
+}
+
+export interface PlannerInput {
+  brief: string;
+  maxSlides: number;
+  audience: "executive" | "technical" | "board" | "sales";
+  deckThesis: string;
+  keyInsights: string[];
+  datasetRegistry: DatasetRegistry;
+}
+
+// ── Slot & Component Schemas (re-exported from template-registry) ──
+// These are defined in template-registry.ts as the source of truth.
+// Re-export here for convenience so consumers can import from either location.
+export type { SlotSchema, ComponentSlot, ComponentField, ChartSlotSchema } from "./template-registry";
