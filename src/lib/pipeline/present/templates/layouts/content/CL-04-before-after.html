@@ -1,0 +1,25 @@
+<!-- template: CL-04-before-after -->
+<!-- data_shapes: comparison -->
+<!-- density: sparse (2-4 points) -->
+
+<section class="slide {{slot:slide_class}}">
+  <div class="slide-inner">
+    <h2 class="slide-title anim">{{slot:headline}}</h2>
+    <p class="slide-subtitle anim d1">{{slot:subhead}}</p>
+
+    <div class="grid-2 anim d2">
+      <div class="policy-box">
+        <h4>{{slot:before_label}}</h4>
+        <p style="color: var(--text-secondary); font-size: var(--text-sm);">{{slot:before_content}}</p>
+      </div>
+      <div class="policy-box positive">
+        <h4>{{slot:after_label}}</h4>
+        <p style="color: var(--text-secondary); font-size: var(--text-sm);">{{slot:after_content}}</p>
+      </div>
+    </div>
+
+    {{#if slot:impact}}
+    <p class="section-intro anim d3">{{slot:impact}}</p>
+    {{/if}}
+  </div>
+</section>

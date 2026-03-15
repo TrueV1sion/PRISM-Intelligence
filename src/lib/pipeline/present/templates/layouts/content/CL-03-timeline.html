@@ -1,0 +1,23 @@
+<!-- template: CL-03-timeline -->
+<!-- data_shapes: time_series -->
+<!-- density: sparse (3-5 points) -->
+
+<section class="slide {{slot:slide_class}}">
+  <div class="slide-inner">
+    <h2 class="slide-title anim">{{slot:headline}}</h2>
+    <p class="slide-subtitle anim d1">{{slot:subhead}}</p>
+
+    <div class="timeline anim d2">
+      {{component:timeline-step slot:step_1}}
+      {{component:timeline-step slot:step_2}}
+      {{component:timeline-step slot:step_3}}
+      {{#if slot:step_4}}
+      {{component:timeline-step slot:step_4}}
+      {{/if}}
+    </div>
+
+    <div class="source-list anim d3">
+      {{component:source-citation slot:source}}
+    </div>
+  </div>
+</section>

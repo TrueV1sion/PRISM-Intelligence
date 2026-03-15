@@ -1,0 +1,34 @@
+<!-- template: CO-04-competitive-landscape -->
+<!-- data_shapes: comparison, ranking -->
+<!-- density: medium (3-8 competitors) -->
+
+<section class="slide {{slot:slide_class}}">
+  <div class="slide-inner">
+    <h2 class="slide-title anim">{{slot:headline}}</h2>
+    <p class="slide-subtitle anim d1">{{slot:subhead}}</p>
+
+    <div class="anim d2">
+      <table class="compact-table">
+        <thead>
+          <tr>
+            <th>{{slot:col_1_header}}</th>
+            <th>{{slot:col_2_header}}</th>
+            <th>{{slot:col_3_header}}</th>
+            <th>{{slot:col_4_header}}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{slot:table_rows}}
+        </tbody>
+      </table>
+    </div>
+
+    {{#if slot:insight}}
+    <p class="section-intro anim d3">{{slot:insight}}</p>
+    {{/if}}
+
+    <div class="source-list anim d4">
+      {{component:source-citation slot:source}}
+    </div>
+  </div>
+</section>

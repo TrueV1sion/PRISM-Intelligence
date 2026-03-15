@@ -1,0 +1,16 @@
+<!-- template: CL-02-three-column-features -->
+<!-- data_shapes: any (flexible fallback) -->
+<!-- density: any -->
+
+<section class="slide {{slot:slide_class}}">
+  <div class="slide-inner">
+    <h2 class="slide-title anim">{{slot:headline}}</h2>
+    <p class="slide-subtitle anim d1">{{slot:subhead}}</p>
+
+    <div class="grid-3 anim d2">
+      {{component:feature-card slot:feature_1}}
+      {{component:feature-card slot:feature_2}}
+      {{component:feature-card slot:feature_3}}
+    </div>
+  </div>
+</section>

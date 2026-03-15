@@ -1,0 +1,7 @@
+<!-- component: chart-container -->
+<div class="chart-container">
+  {{#if slot:chart_title}}
+  <div class="eyebrow">{{slot:chart_title}}</div>
+  {{/if}}
+  {{slot:chart_svg}}
+</div>

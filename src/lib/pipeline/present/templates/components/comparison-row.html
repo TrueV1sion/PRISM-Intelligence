@@ -1,0 +1,9 @@
+<!-- component: comparison-row -->
+<div class="bar-row">
+  <span class="bar-label">{{slot:label}}</span>
+  <div class="bar-track">
+    <div class="bar-fill animate" style="width: {{slot:percent}}%; background: var({{slot:color_var}});">
+      <span class="bar-fill-value">{{slot:value}}</span>
+    </div>
+  </div>
+</div>

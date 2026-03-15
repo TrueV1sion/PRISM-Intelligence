@@ -1,0 +1,27 @@
+<!-- template: DV-05-dual-chart -->
+<!-- data_shapes: time_series, comparison, distribution, composition -->
+<!-- density: medium (3-5 each) -->
+
+<section class="slide {{slot:slide_class}}">
+  <div class="slide-inner">
+    <h2 class="slide-title anim">{{slot:headline}}</h2>
+    <p class="slide-subtitle anim d1">{{slot:subhead}}</p>
+
+    <div class="grid-2 anim d2">
+      <div class="chart-container">
+        {{slot:chart_primary}}
+      </div>
+      <div class="chart-container">
+        {{slot:chart_secondary}}
+      </div>
+    </div>
+
+    {{#if slot:insight}}
+    <p class="section-intro anim d3">{{slot:insight}}</p>
+    {{/if}}
+
+    <div class="source-list anim d4">
+      {{component:source-citation slot:source}}
+    </div>
+  </div>
+</section>

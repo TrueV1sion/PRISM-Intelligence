@@ -1,0 +1,16 @@
+<!-- template: SF-03-quote-insight -->
+<!-- data_shapes: none -->
+<!-- density: sparse (0-2 points) -->
+
+<section class="slide {{slot:slide_class}}">
+  <div class="slide-inner" style="max-width: 800px;">
+    <div class="quote-block anim">
+      <p>{{slot:quote_text}}</p>
+      <div class="quote-attr">— {{slot:attribution}}</div>
+    </div>
+
+    {{#if slot:insight}}
+    <p class="section-intro anim d2">{{slot:insight}}</p>
+    {{/if}}
+  </div>
+</section>

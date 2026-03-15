@@ -1,0 +1,26 @@
+<!-- template: CO-01-dashboard -->
+<!-- data_shapes: time_series, composition, comparison, single_metric -->
+<!-- density: medium (multiple datasets) -->
+
+<section class="slide {{slot:slide_class}}">
+  <div class="slide-inner">
+    <h2 class="slide-title anim">{{slot:headline}}</h2>
+    <p class="slide-subtitle anim d1">{{slot:subhead}}</p>
+
+    <div class="grid-2 anim d2">
+      <div class="chart-container">{{slot:chart_primary}}</div>
+      <div class="chart-container">{{slot:chart_secondary}}</div>
+    </div>
+
+    <div class="hero-stats anim d3">
+      {{component:stat-block-mini slot:stat_1}}
+      {{component:stat-block-mini slot:stat_2}}
+      {{component:stat-block-mini slot:stat_3}}
+      {{component:stat-block-mini slot:stat_4}}
+    </div>
+
+    <div class="source-list anim d4">
+      {{component:source-citation slot:source}}
+    </div>
+  </div>
+</section>

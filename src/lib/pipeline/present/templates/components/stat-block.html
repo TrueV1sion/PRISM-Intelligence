@@ -1,0 +1,8 @@
+<!-- component: stat-block -->
+<div class="stat-block">
+  <span class="stat-number {{slot:color_class}}">{{slot:value}}</span>
+  <span class="stat-label">{{slot:label}}</span>
+  {{#if slot:delta}}
+  <span class="stat-trend {{slot:trend_direction}}">{{slot:delta}}</span>
+  {{/if}}
+</div>

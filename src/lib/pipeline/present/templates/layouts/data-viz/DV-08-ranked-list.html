@@ -1,0 +1,22 @@
+<!-- template: DV-08-ranked-list -->
+<!-- data_shapes: ranking -->
+<!-- density: medium (4-8 points) -->
+
+<section class="slide {{slot:slide_class}}">
+  <div class="slide-inner">
+    <h2 class="slide-title anim">{{slot:headline}}</h2>
+    <p class="slide-subtitle anim d1">{{slot:subhead}}</p>
+
+    <div class="comparison-bars anim d2">
+      {{slot:chart_primary}}
+    </div>
+
+    {{#if slot:insight}}
+    <p class="section-intro anim d3">{{slot:insight}}</p>
+    {{/if}}
+
+    <div class="source-list anim d4">
+      {{component:source-citation slot:source}}
+    </div>
+  </div>
+</section>

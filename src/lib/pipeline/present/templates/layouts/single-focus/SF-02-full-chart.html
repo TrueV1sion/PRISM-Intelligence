@@ -1,0 +1,22 @@
+<!-- template: SF-02-full-chart -->
+<!-- data_shapes: time_series, comparison, distribution -->
+<!-- density: medium (4-8 points) -->
+
+<section class="slide {{slot:slide_class}}">
+  <div class="slide-inner">
+    <h2 class="slide-title anim">{{slot:headline}}</h2>
+    <p class="slide-subtitle anim d1">{{slot:subhead}}</p>
+
+    <div class="chart-container anim d2">
+      {{slot:chart_primary}}
+    </div>
+
+    {{#if slot:annotation}}
+    <p class="section-intro anim d3">{{slot:annotation}}</p>
+    {{/if}}
+
+    <div class="source-list anim d4">
+      {{component:source-citation slot:source}}
+    </div>
+  </div>
+</section>

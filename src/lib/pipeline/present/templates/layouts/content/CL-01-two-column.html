@@ -1,0 +1,31 @@
+<!-- template: CL-01-two-column -->
+<!-- data_shapes: any (flexible fallback) -->
+<!-- density: any -->
+
+<section class="slide {{slot:slide_class}}">
+  <div class="slide-inner">
+    <h2 class="slide-title anim">{{slot:headline}}</h2>
+    <p class="slide-subtitle anim d1">{{slot:subhead}}</p>
+
+    <div class="two-col anim d2">
+      <div>
+        <p class="section-intro">{{slot:left_content}}</p>
+        {{#if slot:left_stat}}
+        {{component:stat-block slot:left_stat}}
+        {{/if}}
+      </div>
+      <div>
+        {{#if slot:chart_primary}}
+        <div class="chart-container">{{slot:chart_primary}}</div>
+        {{/if}}
+        {{#if slot:right_content}}
+        <p class="section-intro">{{slot:right_content}}</p>
+        {{/if}}
+      </div>
+    </div>
+
+    <div class="source-list anim d3">
+      {{component:source-citation slot:source}}
+    </div>
+  </div>
+</section>

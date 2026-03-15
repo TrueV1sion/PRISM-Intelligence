@@ -1,0 +1,33 @@
+<!-- template: DV-07-counter-grid -->
+<!-- data_shapes: single_metric -->
+<!-- density: sparse (4-6 points) -->
+
+<section class="slide {{slot:slide_class}}">
+  <div class="slide-inner">
+    <h2 class="slide-title anim">{{slot:headline}}</h2>
+    <p class="slide-subtitle anim d1">{{slot:subhead}}</p>
+
+    <div class="hero-stats anim d2">
+      <div class="hero-stat">
+        <div class="value {{slot:counter_1_color}}">{{slot:counter_1_value}}</div>
+        <div class="label">{{slot:counter_1_label}}</div>
+      </div>
+      <div class="hero-stat">
+        <div class="value {{slot:counter_2_color}}">{{slot:counter_2_value}}</div>
+        <div class="label">{{slot:counter_2_label}}</div>
+      </div>
+      <div class="hero-stat">
+        <div class="value {{slot:counter_3_color}}">{{slot:counter_3_value}}</div>
+        <div class="label">{{slot:counter_3_label}}</div>
+      </div>
+      <div class="hero-stat">
+        <div class="value {{slot:counter_4_color}}">{{slot:counter_4_value}}</div>
+        <div class="label">{{slot:counter_4_label}}</div>
+      </div>
+    </div>
+
+    <div class="source-list anim d3">
+      {{component:source-citation slot:source}}
+    </div>
+  </div>
+</section>

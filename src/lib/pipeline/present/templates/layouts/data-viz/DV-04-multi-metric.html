@@ -1,0 +1,25 @@
+<!-- template: DV-04-multi-metric -->
+<!-- data_shapes: single_metric -->
+<!-- density: medium (4-6 points) -->
+
+<section class="slide {{slot:slide_class}}">
+  <div class="slide-inner">
+    <h2 class="slide-title anim">{{slot:headline}}</h2>
+    <p class="slide-subtitle anim d1">{{slot:subhead}}</p>
+
+    <div class="stat-grid anim d2">
+      {{component:stat-block slot:stat_1}}
+      {{component:stat-block slot:stat_2}}
+      {{component:stat-block slot:stat_3}}
+      {{component:stat-block slot:stat_4}}
+    </div>
+
+    {{#if slot:context}}
+    <p class="section-intro anim d3">{{slot:context}}</p>
+    {{/if}}
+
+    <div class="source-list anim d4">
+      {{component:source-citation slot:source}}
+    </div>
+  </div>
+</section>

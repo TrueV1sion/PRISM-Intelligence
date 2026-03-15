@@ -1,0 +1,26 @@
+<!-- template: SF-01-hero-stat -->
+<!-- data_shapes: single_metric -->
+<!-- density: sparse (1-3 points) -->
+
+<section class="slide {{slot:slide_class}}">
+  <div class="slide-inner">
+    <div class="eyebrow anim">{{slot:eyebrow}}</div>
+    <h2 class="slide-title anim d1">{{slot:headline}}</h2>
+    <p class="slide-subtitle anim d2">{{slot:subhead}}</p>
+
+    <div class="hero-stats anim d3" style="grid-template-columns: 1fr;">
+      <div class="hero-stat">
+        <div class="value {{slot:hero_color_class}}" style="font-size: var(--text-hero);">{{slot:hero_value}}</div>
+        <div class="label">{{slot:hero_label}}</div>
+      </div>
+    </div>
+
+    {{#if slot:context}}
+    <p class="section-intro anim d4">{{slot:context}}</p>
+    {{/if}}
+
+    <div class="source-list anim d5">
+      {{component:source-citation slot:source}}
+    </div>
+  </div>
+</section>

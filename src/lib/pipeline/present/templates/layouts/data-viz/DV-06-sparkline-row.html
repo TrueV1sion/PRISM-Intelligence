@@ -1,0 +1,32 @@
+<!-- template: DV-06-sparkline-row -->
+<!-- data_shapes: time_series -->
+<!-- density: sparse (3-5 each) -->
+
+<section class="slide {{slot:slide_class}}">
+  <div class="slide-inner">
+    <h2 class="slide-title anim">{{slot:headline}}</h2>
+    <p class="slide-subtitle anim d1">{{slot:subhead}}</p>
+
+    <div class="stat-grid anim d2">
+      <div class="stat-card">
+        <div class="stat-label">{{slot:metric_1_label}}</div>
+        <div class="stat-value {{slot:metric_1_color}}">{{slot:metric_1_value}}</div>
+        <div class="sparkline-container">{{slot:chart_spark_1}}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">{{slot:metric_2_label}}</div>
+        <div class="stat-value {{slot:metric_2_color}}">{{slot:metric_2_value}}</div>
+        <div class="sparkline-container">{{slot:chart_spark_2}}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">{{slot:metric_3_label}}</div>
+        <div class="stat-value {{slot:metric_3_color}}">{{slot:metric_3_value}}</div>
+        <div class="sparkline-container">{{slot:chart_spark_3}}</div>
+      </div>
+    </div>
+
+    <div class="source-list anim d3">
+      {{component:source-citation slot:source}}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,24 @@
+<!-- template: DV-01-trend-hero -->
+<!-- data_shapes: time_series -->
+<!-- density: medium (4-7 points) -->
+
+<section class="slide {{slot:slide_class}}">
+  <div class="slide-inner">
+    <h2 class="slide-title anim">{{slot:headline}}</h2>
+    <p class="slide-subtitle anim d1">{{slot:subhead}}</p>
+
+    <div class="chart-container anim d2">
+      {{slot:chart_primary}}
+    </div>
+
+    <div class="stat-grid anim d3" style="grid-template-columns: repeat(3, 1fr);">
+      {{component:stat-block slot:stat_1}}
+      {{component:stat-block slot:stat_2}}
+      {{component:stat-block slot:stat_3}}
+    </div>
+
+    <div class="source-list anim d4">
+      {{component:source-citation slot:source}}
+    </div>
+  </div>
+</section>

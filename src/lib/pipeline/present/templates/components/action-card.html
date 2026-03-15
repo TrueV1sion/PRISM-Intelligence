@@ -1,0 +1,8 @@
+<!-- component: action-card -->
+<div class="finding-card {{slot:priority_class}}">
+  <div class="finding-title">{{slot:title}}</div>
+  <div class="finding-body">{{slot:description}}</div>
+  {{#if slot:priority_label}}
+  <span class="confidence-badge {{slot:priority_badge}}">{{slot:priority_label}}</span>
+  {{/if}}
+</div>

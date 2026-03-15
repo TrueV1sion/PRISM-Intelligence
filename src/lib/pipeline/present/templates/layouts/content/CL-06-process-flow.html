@@ -1,0 +1,22 @@
+<!-- template: CL-06-process-flow -->
+<!-- data_shapes: none -->
+<!-- density: sparse (3-5 steps) -->
+
+<section class="slide {{slot:slide_class}}">
+  <div class="slide-inner">
+    <h2 class="slide-title anim">{{slot:headline}}</h2>
+    <p class="slide-subtitle anim d1">{{slot:subhead}}</p>
+
+    <div class="timeline anim d2">
+      {{component:timeline-step slot:step_1}}
+      {{component:timeline-step slot:step_2}}
+      {{component:timeline-step slot:step_3}}
+      {{#if slot:step_4}}
+      {{component:timeline-step slot:step_4}}
+      {{/if}}
+      {{#if slot:step_5}}
+      {{component:timeline-step slot:step_5}}
+      {{/if}}
+    </div>
+  </div>
+</section>

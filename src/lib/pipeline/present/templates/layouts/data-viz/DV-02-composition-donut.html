@@ -1,0 +1,27 @@
+<!-- template: DV-02-composition-donut -->
+<!-- data_shapes: composition -->
+<!-- density: medium (4-8 points) -->
+
+<section class="slide {{slot:slide_class}}">
+  <div class="slide-inner">
+    <h2 class="slide-title anim">{{slot:headline}}</h2>
+    <p class="slide-subtitle anim d1">{{slot:subhead}}</p>
+
+    <div class="two-col anim d2">
+      <div class="chart-container">
+        {{slot:chart_primary}}
+      </div>
+      <div>
+        <p class="section-intro">{{slot:analysis}}</p>
+        <div class="stat-grid" style="grid-template-columns: 1fr 1fr; margin-top: 1rem;">
+          {{component:stat-block-mini slot:stat_1}}
+          {{component:stat-block-mini slot:stat_2}}
+        </div>
+      </div>
+    </div>
+
+    <div class="source-list anim d3">
+      {{component:source-citation slot:source}}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,20 @@
+<!-- template: CO-05-strategic-recommendation -->
+<!-- data_shapes: none -->
+<!-- density: sparse (3-4 recommendations) -->
+
+<section class="slide {{slot:slide_class}}">
+  <div class="slide-inner">
+    <h2 class="slide-title anim">{{slot:headline}}</h2>
+    <p class="slide-subtitle anim d1">{{slot:subhead}}</p>
+
+    <div class="grid-3 anim d2">
+      {{component:action-card slot:action_1}}
+      {{component:action-card slot:action_2}}
+      {{component:action-card slot:action_3}}
+    </div>
+
+    {{#if slot:closing}}
+    <p class="section-intro anim d3">{{slot:closing}}</p>
+    {{/if}}
+  </div>
+</section>
