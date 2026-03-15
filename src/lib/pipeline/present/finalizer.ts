@@ -8,6 +8,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from "fs";
 import { resolve, dirname, join } from "path";
 import { prisma } from "@/lib/prisma";
+import { computeQualityScorecard, type ScorecardInput } from "./quality-scorecard";
 import type { QualityScorecard, PipelineTimings, DesignReview } from "./types";
 
 /**
@@ -235,6 +236,9 @@ export async function finalize(
 
   // 6. Persist quality telemetry
   await persistQuality(runId, quality, review, timings, remediationRounds);
+
+  // TODO: When pipelineVersion === "v2", persist template scorecard fields
+  // using computeQualityScorecard() and the new PresentationQuality columns
 
   return htmlPath;
 }

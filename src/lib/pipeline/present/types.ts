@@ -419,6 +419,36 @@ export interface PlannerInput {
   datasetRegistry: DatasetRegistry;
 }
 
+// ── Template Quality Scorecard ──
+
+export interface TemplateQualityScorecard {
+  structural: {
+    templateCoverage: number;
+    renderSuccess: number;
+    chartCompilation: number;
+  };
+  dataIntegrity: {
+    dataBackedSlides: number;
+    sourceAttribution: number;
+    valueAccuracy: number;
+    noHallucinations: number;
+  };
+  contentQuality: {
+    headlineSpecificity: number;
+    narrativeArc: number;
+    insightDensity: number;
+    audienceAlignment: number;
+  };
+  visualDesign: {
+    templateVariety: number;
+    colorDistribution: number;
+    densityBalance: number;
+    transitionSmooth: number;
+  };
+  overall: number;
+  grade: "A" | "B" | "C" | "D" | "F";
+}
+
 // ── Slot & Component Schemas (re-exported from template-registry) ──
 // These are defined in template-registry.ts as the source of truth.
 // Re-export here for convenience so consumers can import from either location.

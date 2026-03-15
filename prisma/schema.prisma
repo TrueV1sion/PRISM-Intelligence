@@ -188,6 +188,20 @@ model PresentationQuality {
   issueCount          Int
   reviewScore         Float?
   remediationRounds   Int      @default(0)
+  // Template pipeline fields (new)
+  templateCoverage     Float?
+  renderSuccess        Float?
+  dataBackedSlides     Float?
+  valueAccuracy        Float?
+  noHallucinations     Float?
+  headlineSpecificity  Float?
+  narrativeArcScore    Float?
+  insightDensity       Float?
+  templateVariety      Float?
+  colorDistribution    Float?
+  densityBalance       Float?
+  transitionSmooth     Float?
+  pipelineVersion      String  @default("v1")  // "v1" = legacy, "v2" = template
   planMs              Int?
   chartCompileMs      Int?
   generateMs          Int?
