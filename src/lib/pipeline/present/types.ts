@@ -336,3 +336,27 @@ export interface PresentInput {
   emitEvent: (event: PipelineEvent) => void;
   memoryBus?: unknown;
 }
+
+// ── Renderer & Content Output Types ──
+
+export interface StatData {
+  value: string;
+  label: string;
+  // NOTE: Spec says "magenta" but CSS has `.purple` (no `.magenta` class exists).
+  // This plan uses "purple" to match the actual CSS design system.
+  color_class: "cyan" | "green" | "purple" | "orange";
+  trend_direction?: "up" | "down" | "flat";
+  delta?: string;
+}
+
+export interface ListItem {
+  text: string;
+  icon?: string;
+  emphasis?: boolean;
+}
+
+export interface ContentGeneratorOutput {
+  slots: Record<string, string | StatData | ListItem[]>;
+  chartDataRefs: Record<string, string>;
+  contentNotes?: string;
+}
