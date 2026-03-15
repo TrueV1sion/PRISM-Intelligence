@@ -260,9 +260,76 @@ export interface PipelineTimings {
   totalMs: number;
 }
 
+// ─── Data Pipeline Types ─────────────────────────────────────
+
+export type DataShape = "time_series" | "distribution" | "comparison" | "ranking" | "single_metric" | "composition";
+export type DensityTier = "sparse" | "medium" | "dense";
+
+export interface DataRegistryPoint {
+  period: string;
+  value: number;
+  label?: string;
+}
+
+export interface ComputedMetrics {
+  trend?: "up" | "down" | "flat";
+  cagr?: number;
+  yoyGrowth?: number;
+  movingAvg?: number;
+  min: number;
+  max: number;
+  mean: number;
+  percentileRank?: number;
+  distribution?: number[];
+}
+
+export interface ResolvedEntity {
+  id: string;
+  canonicalName: string;
+  entityType: string;
+  identifiers: Record<string, string>;
+  aliases: string[];
+}
+
+export interface EnrichedDataset {
+  id: string;
+  sourceCallId: string;
+  metricName: string;
+  dataShape: DataShape;
+  densityTier: DensityTier;
+  values: DataRegistryPoint[];
+  computed: ComputedMetrics;
+  sourceLabel: string;
+  entityId?: string;
+  chartWorthiness: number;
+}
+
+export interface DatasetRegistry {
+  runId: string;
+  datasets: EnrichedDataset[];
+  entities: ResolvedEntity[];
+}
+
+export interface DataCoverage {
+  dataShapes: Record<DataShape, number>;
+  domains: string[];
+  entityCount: number;
+  totalDataPoints: number;
+  strongestSignals: SignalSummary[];
+}
+
+export interface SignalSummary {
+  datasetId: string;
+  metricName: string;
+  dataShape: DataShape;
+  chartWorthiness: number;
+  headline: string;
+}
+
 // ─── Orchestrator Input ───────────────────────────────────────
 
 export interface PresentInput {
+  runId: string;
   synthesis: SynthesisResult;
   agentResults: AgentResult[];
   blueprint: Blueprint;
