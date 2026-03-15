@@ -7,12 +7,19 @@
  * - Call Sonnet to generate a JSON SlideManifest
  * - Validate the response with SlideManifestSchema (Zod)
  * - Retry once on JSON parse / schema validation failures
+ *
+ * Also exports planSlidesWithData() for data-aware template selection
+ * using a DatasetRegistry from the data capture pipeline.
  */
 
+import { z } from "zod";
+import Anthropic from "@anthropic-ai/sdk";
 import { getAnthropicClient } from "@/lib/ai/client";
+import { resolveApiKey } from "@/lib/resolve-api-key";
 import { ComponentCatalog } from "./component-catalog";
+import { getAllTemplates } from "./template-registry";
 import { SlideManifestSchema } from "./types";
-import type { SlideManifest, PresentInput } from "./types";
+import type { SlideManifest, PresentInput, PlannerInput, TemplateSlideManifest } from "./types";
 import type { SynthesisResult, AgentResult, Blueprint } from "@/lib/pipeline/types";
 
 // Use the specific model version requested for the planner
@@ -293,4 +300,139 @@ export async function planSlides(input: PresentInput): Promise<SlideManifest> {
 
     throw firstError;
   }
+}
+
+// ─── Data-Aware Planner (Template-Based) ──────────────────────────────────────
+
+const SlideIntentSchema = z.enum([
+  "context", "evidence", "comparison", "trend", "composition",
+  "ranking", "process", "recommendation", "summary", "transition",
+]);
+
+const NarrativeArcSchema = z.object({
+  opening: z.string(),
+  development: z.string(),
+  climax: z.string(),
+  resolution: z.string(),
+});
+
+const TemplateSlideSpecSchema = z.object({
+  index: z.number(),
+  templateId: z.string(),
+  slideIntent: SlideIntentSchema,
+  narrativePosition: z.string(),
+  datasetBindings: z.object({
+    chartSlots: z.record(z.string(), z.string()),
+    statSources: z.record(z.string(), z.string()),
+  }),
+  transitionFrom: z.string().nullable(),
+  transitionTo: z.string().nullable(),
+  slideClass: z.string(),
+  accentColor: z.string(),
+});
+
+export const TemplateSlideManifestSchema = z.object({
+  title: z.string(),
+  subtitle: z.string(),
+  thesis: z.string(),
+  narrativeArc: NarrativeArcSchema,
+  slides: z.array(TemplateSlideSpecSchema).min(1),
+});
+
+/**
+ * Data-aware slide planner that uses the DatasetRegistry to select
+ * templates based on data shapes, density tiers, and chart-worthiness.
+ *
+ * This is the new pipeline entry point; the legacy planSlides() is
+ * preserved above for backward compatibility.
+ */
+export async function planSlidesWithData(
+  input: PlannerInput,
+): Promise<TemplateSlideManifest> {
+  const apiKey = await resolveApiKey("anthropic");
+  const client = new Anthropic({ apiKey: apiKey ?? undefined });
+
+  // Rank datasets by chart-worthiness
+  const rankedDatasets = [...input.datasetRegistry.datasets]
+    .sort((a, b) => b.chartWorthiness - a.chartWorthiness);
+
+  // Build template catalog summary
+  const templateCatalog = getAllTemplates().map(t => ({
+    id: t.id,
+    name: t.name,
+    category: t.category,
+    dataShapes: t.dataShapes,
+    densityRange: t.densityRange,
+  }));
+
+  // Compute adaptive slide count
+  const strongSlides = rankedDatasets.filter(d => d.chartWorthiness > 40).length;
+  const contentSlides = Math.ceil(input.keyInsights.length / 2);
+  const recommendedCount = Math.min(
+    input.maxSlides,
+    Math.max(8, strongSlides + contentSlides + 2),
+  );
+
+  const prompt = `You are a presentation architect. Design a ${recommendedCount}-slide deck.
+
+## Brief
+${input.brief}
+
+## Thesis
+${input.deckThesis}
+
+## Audience
+${input.audience}
+
+## Key Insights
+${input.keyInsights.map(i => `- ${i}`).join("\n")}
+
+## Available Datasets (ranked by chart-worthiness)
+${JSON.stringify(rankedDatasets.map(d => ({
+  id: d.id, metricName: d.metricName, dataShape: d.dataShape,
+  densityTier: d.densityTier, pointCount: d.values.length,
+  chartWorthiness: d.chartWorthiness, sourceLabel: d.sourceLabel,
+})), null, 2)}
+
+## Template Catalog
+${JSON.stringify(templateCatalog, null, 2)}
+
+## Rules
+- First slide must use SF-05 (title)
+- Select templates that match dataset data shapes and density ranges
+- Bind high chart-worthiness datasets to chart slots
+- No template used more than twice
+- Adjacent slides must NOT share the same slideClass + accentColor
+- Accent colors: cyan, green, purple, orange — distribute evenly
+- Slide classes: gradient-dark, gradient-blue, gradient-radial, dark-mesh, dark-particles
+- slideIntent must be one of: context, evidence, comparison, trend, composition, ranking, process, recommendation, summary, transition
+
+Return a JSON object matching this schema:
+{
+  "title": "string",
+  "subtitle": "string",
+  "thesis": "string",
+  "narrativeArc": { "opening": "...", "development": "...", "climax": "...", "resolution": "..." },
+  "slides": [{ "index": 0, "templateId": "SF-05", "slideIntent": "transition", "narrativePosition": "...", "datasetBindings": { "chartSlots": {}, "statSources": {} }, "transitionFrom": null, "transitionTo": "...", "slideClass": "...", "accentColor": "..." }, ...]
+}`;
+
+  const response = await client.messages.create({
+    model: PLANNER_MODEL,
+    max_tokens: 4096,
+    messages: [{ role: "user", content: prompt }],
+  });
+
+  const textBlock = response.content.find(b => b.type === "text");
+  if (!textBlock || textBlock.type !== "text") {
+    throw new Error("No text content in planner LLM response");
+  }
+
+  let jsonStr = textBlock.text.trim();
+  const jsonMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (jsonMatch) jsonStr = jsonMatch[1].trim();
+
+  const parsed = JSON.parse(jsonStr);
+  const validated = TemplateSlideManifestSchema.parse(parsed);
+
+  return validated as TemplateSlideManifest;
 }
