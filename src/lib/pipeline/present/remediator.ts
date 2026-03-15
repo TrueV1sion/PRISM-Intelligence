@@ -11,7 +11,9 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { ComponentCatalog } from "./component-catalog";
-import type { RemediationInput, SlideHTML, ChartData } from "./types";
+import { generateSlideContent } from "./content-generator";
+import { renderSlide } from "./template-renderer";
+import type { RemediationInput, SlideHTML, ChartData, ContentGeneratorInput, ContentGeneratorOutput } from "./types";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -241,4 +243,30 @@ export async function remediateSlides(
 
   // Return sorted by slideNumber
   return results.sort((a, b) => a.slideNumber - b.slideNumber);
+}
+
+// ─── Content-Only Remediation (template pipeline) ────────────────────────────
+
+/**
+ * Remediates content-level issues by re-running the content generator with
+ * issue-aware prompting, then re-rendering through the deterministic template.
+ *
+ * This is for the template pipeline only — structural issues are impossible
+ * since templates are hand-crafted. Only content quality issues need fixing.
+ */
+export async function remediateContentIssues(
+  originalInput: ContentGeneratorInput,
+  originalOutput: ContentGeneratorOutput,
+  issues: string[],
+  chartFragments: Map<string, string>,
+): Promise<{ content: ContentGeneratorOutput; html: string }> {
+  const remediationInput: ContentGeneratorInput = {
+    ...originalInput,
+    slideIntent: `${originalInput.slideIntent}\n\nREMEDIATION REQUIRED — fix these issues:\n${issues.map(i => `- ${i}`).join("\n")}`,
+  };
+
+  const updatedContent = await generateSlideContent(remediationInput);
+  const html = renderSlide(originalInput.templateId, updatedContent, chartFragments);
+
+  return { content: updatedContent, html };
 }

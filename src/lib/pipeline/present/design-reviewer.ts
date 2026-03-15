@@ -22,6 +22,35 @@ import type {
 const REVIEWER_MODEL = "claude-sonnet-4-20250514";
 const REVIEWER_TIMEOUT_MS = 30_000;
 
+// ─── Template Pipeline Review Prompt ──────────────────────────────────────────
+
+export const TEMPLATE_REVIEW_PROMPT = `You are a presentation content reviewer. The slide HTML was generated
+from a hand-crafted template — structural quality (CSS, layout, HTML) is guaranteed by construction.
+
+Review ONLY these aspects:
+
+CONTENT FIT:
+- Is the headline specific and action-oriented (not generic)?
+- Are stat values plausible given the data context?
+- Does the content fit the slide's narrative position?
+
+DATA INTEGRITY:
+- Is a source citation present for every stat?
+- Do values match the provided enriched datasets?
+
+NARRATIVE FLOW:
+- Does this slide advance the deck's thesis?
+- Are there redundancies with prior slide headlines?
+
+VISUAL VARIETY:
+- Has this template been overused in the deck?
+- Is the accent color distribution balanced?
+
+DO NOT check: CSS classes, HTML structure, grid layout, animations, component nesting.
+These are impossible to get wrong in the template system.
+
+Return JSON: { "issues": [{ "type": "content_fit|data_integrity|narrative|variety", "severity": "high|medium|low", "description": "..." }], "pass": boolean }`;
+
 // ─── Input Type ───────────────────────────────────────────────────────────────
 
 export interface DesignReviewInput {

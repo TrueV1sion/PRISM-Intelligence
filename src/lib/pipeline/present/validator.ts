@@ -10,7 +10,7 @@
 
 import fs from "fs";
 import path from "path";
-import type { QualityScorecard, QualityMetrics, MetricScore, SlideIssue } from "./types";
+import type { QualityScorecard, QualityMetrics, MetricScore, SlideIssue, ContentGeneratorOutput, EnrichedDataset, StatData } from "./types";
 
 // ─── CSS Class Extraction ─────────────────────────────────────────────────────
 
@@ -398,5 +398,60 @@ export function validate(html: string): QualityScorecard {
     overall,
     grade,
     perSlideIssues,
+  };
+}
+
+// ─── Data Integrity Validation (template pipeline) ──────────────────────────
+
+export interface DataIntegrityResult {
+  sourceAttribution: boolean;
+  issues: string[];
+}
+
+export function validateDataIntegrity(
+  slideHtml: string,
+  contentOutput: ContentGeneratorOutput,
+  datasets: EnrichedDataset[],
+): DataIntegrityResult {
+  const issues: string[] = [];
+
+  // Check source attribution
+  let hasSourceAttribution = false;
+  for (const [key, val] of Object.entries(contentOutput.slots)) {
+    if (key === "source" || key.includes("source")) {
+      if (typeof val === "string" && val.length > 0) hasSourceAttribution = true;
+      if (typeof val === "object" && val !== null && "text" in val) hasSourceAttribution = true;
+    }
+  }
+
+  if (datasets.length > 0 && !hasSourceAttribution) {
+    issues.push("Missing source attribution — datasets are bound but no source slot populated");
+  }
+
+  // Check stat values against datasets (basic plausibility)
+  for (const [key, val] of Object.entries(contentOutput.slots)) {
+    if (typeof val === "object" && val !== null && "value" in val && "label" in val) {
+      const statData = val as StatData;
+      const numMatch = statData.value.match(/[\d.]+/);
+      if (numMatch && datasets.length > 0) {
+        const statNum = parseFloat(numMatch[0]);
+        const foundInDataset = datasets.some(d =>
+          d.values.some(v => {
+            const scaled = [v.value, v.value / 1e6, v.value / 1e9, v.value * 100];
+            return scaled.some(s => Math.abs(s - statNum) / Math.max(Math.abs(s), 1) < 0.01);
+          }) ||
+          (d.computed.cagr !== undefined && Math.abs(d.computed.cagr * 100 - statNum) < 0.5) ||
+          (d.computed.yoyGrowth !== undefined && Math.abs(d.computed.yoyGrowth * 100 - statNum) < 0.5)
+        );
+        if (!foundInDataset) {
+          issues.push(`Stat "${key}" value "${statData.value}" not found in any bound dataset — possible hallucination`);
+        }
+      }
+    }
+  }
+
+  return {
+    sourceAttribution: hasSourceAttribution || datasets.length === 0,
+    issues,
   };
 }
