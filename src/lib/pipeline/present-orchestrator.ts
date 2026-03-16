@@ -75,7 +75,10 @@ export async function presentOrchestrated(
   input: PresentInput,
 ): Promise<PresentationResult> {
   const { emitEvent } = input;
-  const hasCapturedData = (input.capturedCalls?.length ?? 0) > 0;
+  const capturedCount = input.capturedCalls?.length ?? 0;
+  const hasCapturedData = capturedCount > 0;
+
+  console.log(`[orchestrator] 🎬 Starting presentation pipeline — capturedCalls: ${capturedCount}, hasCapturedData: ${hasCapturedData}`);
 
   if (hasCapturedData) {
     try {
@@ -295,29 +298,37 @@ async function presentLegacy(
     });
 
     const planStart = Date.now();
+    console.log(`[orchestrator] Legacy Stage 1: Planning slides...`);
     const manifest = await planSlides(input);
     const planMs = Date.now() - planStart;
 
     console.log(
-      `[orchestrator] Stage 1 Plan complete: ${manifest.slides.length} slides planned in ${planMs}ms`,
+      `[orchestrator] ✅ Legacy Stage 1 Plan complete: ${manifest.slides.length} slides planned in ${planMs}ms`,
     );
 
     // ── Stage 2: Compile Charts ───────────────────────────────────────────────
 
+    console.log(`[orchestrator] Legacy Stage 2: Compiling charts...`);
     const chartStart = Date.now();
     const chartDataMap: ChartDataMap = {};
 
     for (const slide of manifest.slides) {
       if (slide.dataPoints.length > 0) {
-        chartDataMap[slide.slideNumber] = compileCharts(slide.dataPoints);
+        try {
+          chartDataMap[slide.slideNumber] = compileCharts(slide.dataPoints);
+        } catch (chartErr) {
+          console.warn(`[orchestrator] Chart compile error for slide ${slide.slideNumber}: ${chartErr}`);
+          chartDataMap[slide.slideNumber] = [];
+        }
       } else {
         chartDataMap[slide.slideNumber] = [];
       }
     }
 
     const chartCompileMs = Date.now() - chartStart;
+    const chartCount = Object.values(chartDataMap).reduce((s, v) => s + v.length, 0);
     console.log(
-      `[orchestrator] Stage 2 Chart compile complete in ${chartCompileMs}ms`,
+      `[orchestrator] ✅ Legacy Stage 2 Chart compile complete: ${chartCount} charts in ${chartCompileMs}ms`,
     );
 
     // ── Stage 3: Generate Slides ──────────────────────────────────────────────
@@ -369,8 +380,12 @@ async function presentLegacy(
       },
     );
 
+    console.log(`[orchestrator] Legacy Stage 3: Generating ${slideGeneratorInputs.length} slides in parallel...`);
     const slides = await generateSlidesBatch(slideGeneratorInputs);
     const generateMs = Date.now() - generateStart;
+
+    const successCount = slides.filter(s => s.status === "success").length;
+    const fallbackCount = slides.filter(s => s.status !== "success").length;
 
     emitEvent({
       type: "phase_change",
@@ -379,7 +394,7 @@ async function presentLegacy(
     });
 
     console.log(
-      `[orchestrator] Stage 3 Generate complete: ${slides.length} slides in ${generateMs}ms`,
+      `[orchestrator] ✅ Legacy Stage 3 Generate complete: ${successCount} success, ${fallbackCount} fallback in ${generateMs}ms`,
     );
 
     // ── Stages 4-8: Assemble → Validate → Review → Remediate → Finalize ──────
@@ -391,15 +406,20 @@ async function presentLegacy(
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error(`[orchestrator] Legacy pipeline failed, falling back to base presenter: ${message}`);
+    const stack = error instanceof Error ? error.stack : "";
+    console.error(`[orchestrator] ❌ Legacy pipeline failed: ${message}`);
+    console.error(`[orchestrator] Stack: ${stack}`);
 
     emitEvent({
-      type: "error",
-      message: `Agentic presenter failed (${message}) — falling back to legacy presenter`,
-      phase: "PRESENT",
+      type: "agent_progress",
+      agentName: "orchestrator",
+      progress: 0,
+      message: `Legacy pipeline error: ${message} — attempting base presenter as last resort`,
     });
 
     // ── Fallback: base present() ────────────────────────────────────────────
+    // Log this so we know the base presenter was used instead of templates
+    console.warn(`[orchestrator] ⚠️ USING BASE PRESENTER — template system NOT active. Fix the legacy pipeline error above.`);
     return present(input);
   }
 }
@@ -437,16 +457,26 @@ async function finishPipeline(
     title: manifest.title,
     subtitle: manifest.subtitle,
     totalSlides: manifest.slides.length,
-    slides: manifest.slides.map((_s, i) => ({
-      slideNumber: i + 1,
-      title: manifest.title,
-      type: "data-metrics" as const,
-      purpose: "",
-      agentSources: [] as string[],
-      componentHints: [] as string[],
-      animationType: "anim" as const,
-      dataPoints: [],
-    })),
+    slides: manifest.slides.map((s, i) => {
+      // Extract title from either SlideManifest or TemplateSlideManifest slides
+      const slideObj = s as Record<string, unknown> | null;
+      const slideTitle =
+        (slideObj && typeof slideObj.title === "string" ? slideObj.title : null) ??
+        `Slide ${i + 1}`;
+      const slideType =
+        (slideObj && typeof slideObj.type === "string" ? slideObj.type : null) ??
+        "data-metrics";
+      return {
+        slideNumber: i + 1,
+        title: slideTitle,
+        type: slideType as "data-metrics",
+        purpose: "",
+        agentSources: [] as string[],
+        componentHints: [] as string[],
+        animationType: "anim" as const,
+        dataPoints: [],
+      };
+    }),
   };
   const assemblerOutput = assemble({ slides, manifest: assemblerManifest });
   const assembleMs = Date.now() - assembleStart;

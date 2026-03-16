@@ -86,7 +86,7 @@ function resolveSlotValue(
   // (supports simple components like source-citation where {{slot:text}} is used)
   if (typeof parentVal === "string") return parentVal;
   if (Array.isArray(parentVal)) return undefined;
-  const nested = (parentVal as Record<string, unknown>)[parts[1]];
+  const nested = (parentVal as unknown as Record<string, unknown>)[parts[1]];
   if (nested === undefined || nested === null) return undefined;
   return String(nested);
 }

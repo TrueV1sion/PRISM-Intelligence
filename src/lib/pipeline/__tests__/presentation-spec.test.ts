@@ -345,7 +345,7 @@ describe("golden exemplar embedding", () => {
     compiledSpec = readFileSync(OUTPUT_PATH, "utf-8");
   });
 
-  it("embeds all 5 exemplar files", () => {
+  it("embeds all exemplar files", () => {
     const exemplarFiles = readdirSync(EXEMPLARS_DIR).filter((f) => f.endsWith(".html"));
     expect(exemplarFiles).toHaveLength(6);
 
@@ -404,6 +404,19 @@ describe("golden exemplar embedding", () => {
     expect(compiledSpec).toContain("stat-eyebrow");
     expect(compiledSpec).toContain("stat-trend positive");
     expect(compiledSpec).toContain("source-list");
+  });
+
+  it("includes key component tokens from chart-heavy exemplar", () => {
+    expect(compiledSpec).toContain("donut-chart");
+    expect(compiledSpec).toContain("segment");
+    expect(compiledSpec).toContain("chart-legend");
+    expect(compiledSpec).toContain("legend-dot");
+    expect(compiledSpec).toContain("bar-chart-container");
+    expect(compiledSpec).toContain("bar-wrapper");
+    expect(compiledSpec).toContain("sparkline-container");
+    expect(compiledSpec).toContain("sparkline-line");
+    expect(compiledSpec).toContain("sparkline-dot");
+    expect(compiledSpec).toContain('data-target="2400"');
   });
 });
 

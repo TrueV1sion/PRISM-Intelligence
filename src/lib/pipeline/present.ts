@@ -105,7 +105,7 @@ Every slide must follow this skeleton:
 - .bar-track, .bar-fill
 - .source-list, .source-item
 - .anim (fade-in on scroll), .anim-scale, .anim-blur
-- Stagger: style="--delay:1" through --delay:8
+- Stagger: .d1 through .d7 classes (100ms increments)
 
 ## Branding
 Use "PRISM | Intelligence" throughout. No other brand references.
@@ -327,101 +327,41 @@ Use "PRISM Intelligence" in the header mark and footer attributions.
 
 ## Output Instructions (CRITICAL)
 
-### File Structure
-1. Generate a complete HTML5 file following the Presentation System spec exactly.
-2. DO NOT write any inline CSS inside a <style> tag — ALL styles come from the external stylesheet.
-3. DO NOT write any inline Javascript inside a <script> tag — ALL behavior comes from the external script.
-4. You MUST include exactly these two external links in the <head>:
+1. Follow the Presentation System spec (your system prompt) exactly — it is the authoritative reference for all components, tokens, and structure.
+2. Output ONLY raw HTML starting with <!DOCTYPE html>. No markdown fences.
+3. Include exactly these external links in <head>:
    <link rel="stylesheet" href="/styles/presentation.css">
    <script src="/js/presentation.js" defer></script>
-5. Output ONLY the raw HTML string starting with <!DOCTYPE html>. No markdown fences.
+4. Do NOT write inline <style> or <script> tags. Do NOT use inline style="" except for slide-bg-glow background/position and grid column sizing.
+5. The slide-footer is MANDATORY on every slide. Never omit it.
 
-### Mandatory Slide Structure
-Every slide MUST follow this skeleton:
-<section class="slide" id="slide-N">
-  <div class="slide-bg-glow"></div>
-  <div class="slide-inner">
-    <!-- content here -->
-  </div>
-  <div class="slide-footer">
-    <span>PRISM Intelligence</span>
-    <span>Source: [tier] — [description]</span>
-    <span>Slide N of T</span>
-  </div>
-</section>
+### Component Emphasis (CRITICAL — NO PLAIN BULLETS)
+You MUST use rich components from the spec. Key reminders:
 
-The slide-footer is MANDATORY on every slide. Never omit it.
+**Quantitative data** — Use SVG charts aggressively:
+- .donut-chart with .segment circles for part-of-whole (use circumference 502.65 for dasharray math)
+- .bar-chart-container with .bar-wrapper > .bar for vertical category comparisons
+- .sparkline-container with .sparkline-line polyline inside .stat-block for inline trends
+- .stat-number[data-target="N"] for animated counters (counters animate via presentation.js)
+- .bar-row > .bar-track > .bar-fill for horizontal comparison bars
 
-### Slide Sequence (follow this order)
-1. **Title Slide**: Hero stats (3-4 .stat-block items in a .grid-3), dramatic title, subtitle with agent count and tier
-2. **Executive Summary**: 3-4 key takeaways as Finding Cards (.card with .card-accent colors), overall confidence meter
-3. **Methodology Slide**: Agent roster as compact table (.compact-table), PRISM tier badge, dimension breakdown
-4. **Dimension Slides** (one per agent/dimension): Each MUST use 3+ rich components — no plain bullet lists
-5. **Emergence Slide** (only if emergent insights exist): Use .emergence-card template with multi-agent provenance
-6. **Tension/Debate Slide** (only if tension points exist): Side-by-side comparison using .grid-2
-7. **Strategic Implications**: Timeline (.timeline-bar) or action matrix
-8. **Source Provenance Slide**: Source tier breakdown with dagger notation (.dagger-footnote), source list (.source-list)
-9. **Closing Slide**: Call to action, PRISM branding
+**Emergence slides** — Use the FULL emergence component hierarchy:
+- <section class="slide emergent-slide"> (NOT just "slide")
+- .emergent-number for large visual impact number
+- .emergent-content wrapping all content
+- .emergence-card (NOT .finding-card) for each cross-agent insight
+- .emergent-why > .emergent-why-label explaining multi-agent methodology
 
-### Component Selection Rules (CRITICAL — NO PLAIN BULLETS)
-You MUST use these components aggressively. Match data type to the right component:
-
-**For quantitative data (numbers, percentages, metrics):**
-- .stat-block with .stat-number[data-target="N"] for animated big numbers (counter animates on scroll)
-- .stat-block includes .stat-eyebrow (label above), .stat-number, .stat-suffix (unit), .stat-trend.up/.down (arrow)
-- SVG bar charts: <svg class="bar-chart"> with <rect class="bar"> elements (animate via .is-visible)
-- SVG donut charts: <svg class="donut-chart"> with <circle class="segment"> (stroke-dasharray animation)
-- Sparklines: <svg class="sparkline-container"> with <polyline class="sparkline-line">
-- Comparison bars: .bar-label + .bar-track > .bar-fill[style="--fill-pct:75%"] + .bar-fill-value
-- Stat grids: .grid-3 or .grid-4 wrapping multiple .stat-block elements
-
-**For qualitative findings (insights, analysis, assessments):**
-- Finding Cards: .card with color accent classes (.card-accent through .card-cyan)
-- Tags: .tag with color variants (.tag-red through .tag-cyan) and .tag.quality for confidence badges
-- Quote Blocks: blockquote.quote-block with .quote-source attribution
-- Policy Boxes: .policy-box > .policy-label + .policy-body
-- Validation Boxes: .validation-box.pass or .validation-box.fail
-
-**For comparisons and tensions:**
-- .grid-2 side-by-side layouts
-- Comparison bars with labeled tracks
-- Threat meters: .threat-meter with 5x .threat-dot (colored .active dots for severity)
-- State grids: .state-grid > .state-item (with .active class for highlighted states)
-
-**For timelines and processes:**
-- Timeline bars: .timeline-bar > .tl-segment.tl-done / .tl-active / .tl-pending with labels
-- Strategic timelines: vertical .timeline with .tl-item entries
-
-**For source provenance:**
-- Source lists: .source-list > .source-item with tier indicators
-- Dagger notation: .source-unverified for unverified claims, .dagger-footnote for footnotes
-- Compact tables: .compact-table for structured data grids
-
-### Animation Classes
-- .anim — fade-in on scroll (opacity 0→1, translateY 30px→0)
-- .anim-scale — scale-in on scroll
-- .anim-blur — blur-in on scroll
-- .bar-fill — animated width bars (add .animate class)
-- Stagger delays: style="--delay:1" through --delay:8 for sequential reveals
-
-### Visual Hierarchy Rules
-- Maximum 2 component types per slide section (don't over-clutter)
-- Every slide needs a clear focal point — one hero element
-- Use .grid-2 or .grid-3 for multi-item layouts, .grid-4 for stat dashboards
-- Color-code by agent/dimension using card accent classes
-
-### TOC & Navigation (Extended Brief, 6+ agents)
-Include a TOC slide with grouped navigation:
-<div class="toc-group-header">Group Name</div>
-<a href="#slide-N" class="toc-item">Slide Title</a>
-
-Also populate the nav panel (#navPanel) with corresponding anchor links.
+**Animation stagger** — Use .d1 through .d7 CSS classes (NOT inline --delay styles):
+- .anim.d1 = 100ms, .anim.d2 = 200ms, ..., .anim.d7 = 700ms
+- Also use .anim-scale and .anim-blur for variety, not just .anim
 
 ### Editorial Judgment
-- If an agent returned thin data (few findings, low confidence), use a compact half-slide or merge with another dimension — do NOT pad with filler
-- If no emergent insights exist, skip the emergence slide entirely — do NOT fabricate emergence
-- Match slide density to data richness: data-heavy agents get full slides with charts; qualitative agents get cards and quotes
-- Prefer specificity over generality: use exact numbers, name sources, cite evidence tiers` +
+- Thin data agents → merge into compact half-slide, do NOT pad
+- No emergent insights → skip emergence slide entirely, do NOT fabricate
+- Data-heavy agents → full slides with SVG charts and stat grids
+- Qualitative agents → finding cards, quote blocks, policy boxes
+- Use exact numbers, name sources, cite evidence tiers` +
     buildMemoryBusSections(memoryBus);
 }
 

@@ -127,8 +127,12 @@ export async function executePipeline(
     await persistBlueprint(runId, blueprint);
     emitEvent({ type: "blueprint", blueprint });
 
-    emitEvent({ type: "phase_change", phase: "BLUEPRINT", message: "Awaiting blueprint approval..." });
-    await waitForBlueprintApproval(runId);
+    if (autonomyMode === "autonomous") {
+      emitEvent({ type: "phase_change", phase: "BLUEPRINT", message: "Autonomous mode — auto-approving blueprint." });
+    } else {
+      emitEvent({ type: "phase_change", phase: "BLUEPRINT", message: "Awaiting blueprint approval..." });
+      await waitForBlueprintApproval(runId);
+    }
     checkAbort();
 
     // Create MemoryBus for cross-phase intelligence sharing

@@ -22,46 +22,40 @@ function inlineAssets(html: string): string {
 
   let processed = html;
 
-  // Inline CSS if not already present
-  if (!processed.includes("presentation.css") && !processed.includes("<style>")) {
-    try {
-      const css = readFileSync(cssPath, "utf-8");
-      if (processed.includes("</head>")) {
-        processed = processed.replace(
-          "</head>",
-          `  <style>\n${css}\n  </style>\n</head>`,
-        );
-      }
-    } catch {
-      // Fallback to external link if CSS file not found
-      if (processed.includes("</head>")) {
-        processed = processed.replace(
-          "</head>",
-          `  <link rel="stylesheet" href="/styles/presentation.css">\n</head>`,
-        );
-      }
+  // Inline CSS — replace external <link> with inlined <style> for self-contained deck
+  try {
+    const css = readFileSync(cssPath, "utf-8");
+    // Remove external link tag if present
+    processed = processed.replace(
+      /<link[^>]*href="[^"]*presentation\.css"[^>]*>\s*/g,
+      "",
+    );
+    if (processed.includes("</head>") && !processed.includes("<style>")) {
+      processed = processed.replace(
+        "</head>",
+        `  <style>\n${css}\n  </style>\n</head>`,
+      );
     }
+  } catch {
+    // Keep external link if CSS file not found (already present from assembler)
   }
 
-  // Inline JS if not already present
-  if (!processed.includes("presentation.js")) {
-    try {
-      const js = readFileSync(jsPath, "utf-8");
-      if (processed.includes("</body>")) {
-        processed = processed.replace(
-          "</body>",
-          `  <script>\n${js}\n  </script>\n</body>`,
-        );
-      }
-    } catch {
-      // Fallback to external script if JS file not found
-      if (processed.includes("</body>")) {
-        processed = processed.replace(
-          "</body>",
-          `  <script src="/js/presentation.js" defer></script>\n</body>`,
-        );
-      }
+  // Inline JS — replace external <script src> with inlined <script> for self-contained deck
+  try {
+    const js = readFileSync(jsPath, "utf-8");
+    // Remove external script tag if present
+    processed = processed.replace(
+      /<script[^>]*src="[^"]*presentation\.js"[^>]*><\/script>\s*/g,
+      "",
+    );
+    if (processed.includes("</body>")) {
+      processed = processed.replace(
+        "</body>",
+        `  <script>\n${js}\n  </script>\n</body>`,
+      );
     }
+  } catch {
+    // Keep external script if JS file not found
   }
 
   return processed;
@@ -234,8 +228,14 @@ export async function finalize(
   mkdirSync(dirname(fullPath), { recursive: true });
   writeFileSync(fullPath, processed, "utf-8");
 
-  // 6. Persist quality telemetry
-  await persistQuality(runId, quality, review, timings, remediationRounds);
+  // 6. Persist quality telemetry (non-blocking — don't crash pipeline on DB errors)
+  try {
+    await persistQuality(runId, quality, review, timings, remediationRounds);
+  } catch (dbError) {
+    console.warn(
+      `[finalizer] Failed to persist quality telemetry for run ${runId}: ${dbError instanceof Error ? dbError.message : String(dbError)}`,
+    );
+  }
 
   // TODO: When pipelineVersion === "v2", persist template scorecard fields
   // using computeQualityScorecard() and the new PresentationQuality columns
