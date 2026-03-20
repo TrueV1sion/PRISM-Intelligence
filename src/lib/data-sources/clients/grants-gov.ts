@@ -89,13 +89,13 @@ async function makeGetRequest(
     }
 
     if (!response.ok) {
-      const body = await response.json().catch(() => ({})) as Record<string, unknown>;
+      const body = await response.json().catch(() => ({})) as unknown as Record<string, unknown>;
       throw new Error(
         `Grants.gov API error (HTTP ${response.status}): ${JSON.stringify(body)}`,
       );
     }
 
-    const data = (await response.json()) as Record<string, unknown>;
+    const data = (await response.json()) as unknown as Record<string, unknown>;
     return { data, status: response.status };
   } finally {
     globalRateLimiter.release();
@@ -126,13 +126,13 @@ async function makePostRequest(
     }
 
     if (!response.ok) {
-      const respBody = await response.json().catch(() => ({})) as Record<string, unknown>;
+      const respBody = await response.json().catch(() => ({})) as unknown as Record<string, unknown>;
       throw new Error(
         `Grants.gov legacy API error (HTTP ${response.status}): ${JSON.stringify(respBody)}`,
       );
     }
 
-    const data = (await response.json()) as Record<string, unknown>;
+    const data = (await response.json()) as unknown as Record<string, unknown>;
     return { data, status: response.status };
   } finally {
     globalRateLimiter.release();
@@ -219,9 +219,9 @@ export const grantsGovClient = {
 
       if (!data._notFound) {
         const items =
-          (data.opportunities as Record<string, unknown>[]) ??
-          (data.oppHits as Record<string, unknown>[]) ??
-          (data.data as Record<string, unknown>[]) ??
+          (data.opportunities as unknown as Record<string, unknown>[]) ??
+          (data.oppHits as unknown as Record<string, unknown>[]) ??
+          (data.data as unknown as Record<string, unknown>[]) ??
           [];
 
         const totalRecords =
@@ -262,8 +262,8 @@ export const grantsGovClient = {
     );
 
     const legacyItems =
-      (legacyData.oppHits as Record<string, unknown>[]) ??
-      (legacyData.opportunities as Record<string, unknown>[]) ??
+      (legacyData.oppHits as unknown as Record<string, unknown>[]) ??
+      (legacyData.opportunities as unknown as Record<string, unknown>[]) ??
       [];
 
     const legacyTotal =
@@ -285,8 +285,8 @@ export const grantsGovClient = {
 
       if (!data._notFound) {
         const oppData =
-          (data.opportunity as Record<string, unknown>) ??
-          (data as Record<string, unknown>);
+          (data.opportunity as unknown as Record<string, unknown>) ??
+          (data as unknown as Record<string, unknown>);
 
         if (oppData.opportunityId || oppData.id || oppData.title) {
           if (!oppData.opportunityId) oppData.opportunityId = opportunityId;

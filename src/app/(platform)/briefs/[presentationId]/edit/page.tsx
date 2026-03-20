@@ -19,6 +19,7 @@ import InspectorPanel from "@/components/editor/InspectorPanel";
 // ─── Types ───────────────────────────────────────────────────
 
 interface SlideContent {
+  [key: string]: unknown;
   headline?: string;
   body?: string;
   stats?: Array<{ label: string; value: string; prefix?: string; suffix?: string }>;
@@ -343,15 +344,18 @@ export default function BriefEditorPage({
         {/* Left: Slide List */}
         <SlideList
           slides={slides}
-          activeSlideIndex={activeSlideIndex}
-          onSelectSlide={setActiveSlideIndex}
+          activeSlide={activeSlideIndex}
+          onSelect={setActiveSlideIndex}
+          onAdd={() => {/* TODO: implement add slide */}}
         />
 
         {/* Center: Slide Canvas */}
         {activeSlide && (
           <SlideCanvas
             slide={activeSlide}
-            onUpdate={updateSlideContent}
+            onUpdate={(content) => {
+              if (activeSlide) updateSlideContent(activeSlide.id, content as SlideContent);
+            }}
           />
         )}
 

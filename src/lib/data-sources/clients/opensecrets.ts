@@ -74,10 +74,10 @@ async function makeRequest(
       );
     }
 
-    const data = (await response.json()) as Record<string, unknown>;
+    const data = (await response.json()) as unknown as Record<string, unknown>;
 
     // OpenSecrets wraps responses in a top-level key like "response"
-    const responseData = data.response as Record<string, unknown> | undefined;
+    const responseData = data.response as unknown as Record<string, unknown> | undefined;
     const results = extractResults(responseData ?? data);
 
     return {
@@ -100,25 +100,25 @@ function extractResults(data: Record<string, unknown>): Record<string, unknown>[
   for (const key of Object.keys(data)) {
     const val = data[key];
     if (Array.isArray(val)) {
-      return val as Record<string, unknown>[];
+      return val as unknown as Record<string, unknown>[];
     }
     if (val && typeof val === "object" && !Array.isArray(val)) {
-      const nested = val as Record<string, unknown>;
+      const nested = val as unknown as Record<string, unknown>;
       // Check for nested arrays like { contributor: [{ @attributes: {...} }] }
       for (const innerKey of Object.keys(nested)) {
         const innerVal = nested[innerKey];
         if (Array.isArray(innerVal)) {
           return innerVal.map((item) => {
-            if (item && typeof item === "object" && (item as Record<string, unknown>)["@attributes"]) {
-              return (item as Record<string, unknown>)["@attributes"] as Record<string, unknown>;
+            if (item && typeof item === "object" && (item as unknown as Record<string, unknown>)["@attributes"]) {
+              return (item as unknown as Record<string, unknown>)["@attributes"] as unknown as Record<string, unknown>;
             }
-            return item as Record<string, unknown>;
+            return item as unknown as Record<string, unknown>;
           });
         }
       }
       // Single result objects often have @attributes
       if (nested["@attributes"]) {
-        return [nested["@attributes"] as Record<string, unknown>];
+        return [nested["@attributes"] as unknown as Record<string, unknown>];
       }
     }
   }

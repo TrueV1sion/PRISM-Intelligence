@@ -99,6 +99,7 @@ For each finding, classify source tier:
 - **Source Tier:** PRIMARY | SECONDARY | TERTIARY
 - If SECONDARY/TERTIARY for regulatory, clinical, or financial claims,
   you MUST attempt to locate the PRIMARY source and verify the claim.
+- **Source URL:** You MUST provide the full, hyperlinked URL to the primary source whenever available. Do not just provide hostnames.
 
 Definitions:
 - **PRIMARY**: Original data, official filings, peer-reviewed studies, government databases, first-party disclosures
@@ -121,8 +122,14 @@ For EACH finding, provide ALL of the following:
 3. **Confidence**: HIGH, MEDIUM, or LOW
 4. **Confidence Reasoning**: WHY this confidence level -- explain based on evidence quality, source diversity, and corroboration. Not just the label.
 5. **Evidence Type**: "direct" (original data/study), "inferred" (analysis/review), "analogical" (parallel from another domain), or "modeled" (projection/forecast)
-6. **Source**: Where this came from -- URL, document name, database name. Be specific.
-7. **Implication**: So what? Why does this matter for the strategic question?
+6. **Source**: Where this came from -- Document name or database name. Be specific.
+7. **Source URL**: (Optional but highly recommended) The full, exact URL linking directly to the source evidence.
+8. **Implication**: So what? Why does this matter for the strategic question?
+9. **Metrics**: (Optional) Extract any key numbers, statistics, or data points into a structured array. For each metric:
+   - **Label**: Short description (e.g., "Revenue Growth", "Phase 3 Success Rate")
+   - **Value**: The numerical or textual value (e.g., 25, "1.2B")
+   - **Trend**: "up", "down", or "flat"
+   - **Format**: "currency", "percentage", "number", or "text"
 ${SOURCE_TIER_REQUIREMENTS}
 
 ### Gaps & Uncertainties

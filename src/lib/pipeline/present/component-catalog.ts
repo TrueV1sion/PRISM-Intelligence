@@ -65,17 +65,35 @@ const COMPONENT_DESCRIPTIONS: Record<string, string> = {
   "fw-arrow": "Arrow between nodes (→)",
   "fw-center": "Central synthesis node in framework visual",
 
+  // Slide background variants
+  "gradient-dark": "Default dark gradient background for slides",
+  "gradient-blue": "Blue-tinted gradient for data-heavy analytical slides",
+  "gradient-radial": "Radial gradient for emergent insights (focal point)",
+  "dark-mesh": "Grid pattern background for technical/process slides",
+  "dark-particles": "Particle background for innovation/future-looking slides",
+
   // Animation
-  anim: "Fade-up entrance animation; add .visible via IntersectionObserver to trigger",
-  "anim-scale": "Scale-in entrance animation; triggered by .visible",
-  "anim-blur": "Blur-fade entrance animation; triggered by .visible",
-  d1: "Stagger delay 100ms on anim/anim-scale/anim-blur",
+  anim: "Fade-up entrance animation (translateY 24px→0); triggered by .visible via IntersectionObserver",
+  "anim-scale": "Scale-in entrance animation (0.9→1 with spring); best for cards and stat blocks",
+  "anim-blur": "Blur-fade entrance animation (8px→0 + fade-up); best for hero text and key insights",
+  "anim-slide-left": "Slide from left (-3rem→0); best for left column in side-by-side comparisons",
+  "anim-slide-right": "Slide from right (3rem→0); best for right column in side-by-side comparisons",
+  "anim-spring": "Scale-in with spring overshoot (0.85→1); best for emphasis elements and badges",
+  "anim-fade": "Opacity-only (0→1); best for background elements and subtle reveals",
+  "anim-zoom": "Zoom-out cinematic (1.15→1); best for hero sections and dramatic reveals — use sparingly",
+  "stagger-children": "Auto-staggers all direct children (50ms × child index); best for grids, lists, card groups",
+  d1: "Stagger delay 100ms on any animation class",
   d2: "Stagger delay 200ms",
   d3: "Stagger delay 300ms",
   d4: "Stagger delay 400ms",
   d5: "Stagger delay 500ms",
   d6: "Stagger delay 600ms",
   d7: "Stagger delay 700ms",
+  d8: "Stagger delay 800ms",
+  d9: "Stagger delay 900ms",
+  d10: "Stagger delay 1000ms",
+  d11: "Stagger delay 1100ms",
+  d12: "Stagger delay 1200ms",
   "is-visible": "Applied by JS to trigger bar-chart, line-chart, donut-chart, sparkline animations",
   animate: "Applied by JS to trigger bar-fill scaleX animation",
 
@@ -245,6 +263,47 @@ const COMPONENT_DESCRIPTIONS: Record<string, string> = {
 
   // Header
   "inovalon-header": "Branded header banner with teal-to-green gradient border",
+
+  // Interactive: Accordion
+  "accordion-item": "Expandable section container; add .open to expand",
+  "accordion-trigger": "Click target button for accordion; has ::after chevron indicator",
+  "accordion-content": "Collapsible content inside accordion-item; max-height animated",
+
+  // Interactive: Tabs
+  "tab-group": "Container for tab navigation and panels",
+  "tab-list": "Flex row of tab-button elements",
+  "tab-button": "Individual tab trigger; add .active for selected state",
+  "tab-panel": "Content panel for a tab; add .active to show",
+
+  // Interactive: Tooltip
+  "tooltip-wrap": "Inline wrapper for tooltip trigger + tooltip-text",
+  "tooltip-text": "Hidden tooltip content; appears on hover of tooltip-wrap",
+
+  // Interactive: Callout
+  callout: "Highlighted callout box for key insights or executive summaries",
+  "callout-title": "Bold title inside callout box",
+
+  // Interactive: Process Flow
+  "process-flow": "Horizontal step-by-step sequence container",
+  "process-step": "Individual step in a process flow",
+  "process-step-number": "Step number label (e.g., 'Step 01')",
+  "process-step-title": "Step title text",
+  "process-step-desc": "Step description text",
+  "process-arrow": "Arrow connector between process steps (→)",
+
+  // Interactive: Feature Grid
+  "feature-grid": "Card-based feature/benefit display grid",
+  "feature-card": "Individual feature card with icon, title, description",
+  "feature-icon": "Icon element inside feature-card",
+  "feature-title": "Title text inside feature-card",
+  "feature-desc": "Description text inside feature-card",
+
+  // Interactive: Icon Grid
+  "icon-grid": "Compact icon + label grid for categories or capabilities",
+  "icon-grid-item": "Individual icon item with icon, label, description",
+  icon: "Icon element inside icon-grid-item",
+  "icon-label": "Label text inside icon-grid-item",
+  "icon-desc": "Short description inside icon-grid-item",
 };
 
 // ─── ComponentCatalog class ───────────────────────────────────────────────────
@@ -265,13 +324,13 @@ export class ComponentCatalog {
   exemplarForSlideType(type: string): string {
     const routingTable: Record<string, string> = {
       title: "hero-title",
-      "executive-summary": "hero-title",
+      "executive-summary": "executive-summary",
       "dimension-deep-dive": "findings",
       "data-metrics": "chart-heavy",
       emergence: "emergence",
       tension: "tension",
-      "findings-toc": "data-heavy",
-      closing: "hero-title",
+      "findings-toc": "intelligence-map",
+      closing: "closing-framework",
     };
 
     const key = routingTable[type] ?? "findings";
@@ -319,11 +378,24 @@ Use ONLY these CSS classes from presentation.css. Do not invent class names.
 - \`.eyebrow\` — Small label row above slide-title (tag + agent name)
 - \`.section-intro\` — Framing paragraph (13.5px, max 800px)
 
-## ANIMATION (all require JS .visible trigger via IntersectionObserver)
-- \`.anim\` — Fade-up entrance
-- \`.anim-scale\` — Scale-in entrance
-- \`.anim-blur\` — Blur-fade entrance
-- \`.d1–.d7\` — Stagger delays (100ms–700ms)
+## SLIDE BACKGROUNDS (class on the section element)
+- \`.gradient-dark\` — Default dark gradient
+- \`.gradient-blue\` — Data-heavy analytical slides
+- \`.gradient-radial\` — Emergent insights (focal point)
+- \`.dark-mesh\` — Technical/process slides (grid pattern)
+- \`.dark-particles\` — Innovation/future-looking slides
+
+## ANIMATION (all trigger via IntersectionObserver .visible)
+- \`.anim\` — Fade-up entrance (default)
+- \`.anim-scale\` — Scale-in with spring (cards, stat blocks)
+- \`.anim-blur\` — Blur-fade (hero text, key insights)
+- \`.anim-slide-left\` — Slide from left (side-by-side comparisons, left column)
+- \`.anim-slide-right\` — Slide from right (side-by-side comparisons, right column)
+- \`.anim-spring\` — Scale-in with overshoot (emphasis badges)
+- \`.anim-fade\` — Opacity-only (background elements, subtle reveals)
+- \`.anim-zoom\` — Zoom-out cinematic (hero sections, dramatic reveals — use sparingly)
+- \`.stagger-children\` — Auto-staggers all direct children (50ms per child)
+- \`.d1–.d12\` — Manual stagger delays (100ms–1200ms)
 - \`.is-visible\` — Triggers chart animations (bar-chart, donut-chart, line-chart, sparkline)
 
 ## GRID LAYOUTS
@@ -372,6 +444,15 @@ Use ONLY these CSS classes from presentation.css. Do not invent class names.
 - \`.compact-table\` — Dense comparison table
 - \`.threat-meter / .threat-dot\` — 5-dot severity indicator (.active-red/orange/yellow/green/blue)
 - \`.state-grid / .state-item\` — State/region comparison grid
+
+## INTERACTIVE COMPONENTS
+- \`.accordion-item / .accordion-trigger / .accordion-content\` — Expandable detail sections (methodology, evidence)
+- \`.tab-group / .tab-list / .tab-button / .tab-panel\` — Content switcher (agent comparisons, dimensions)
+- \`.tooltip-wrap / .tooltip-text\` — Hover tooltips (terminology, acronyms)
+- \`.callout / .callout-title\` — Highlighted insight box (executive summaries, key takeaways)
+- \`.process-flow / .process-step / .process-arrow\` — Step sequences (pipelines, methodology)
+- \`.feature-grid / .feature-card / .feature-icon / .feature-title / .feature-desc\` — Feature/benefit cards
+- \`.icon-grid / .icon-grid-item / .icon / .icon-label / .icon-desc\` — Compact category displays
 
 ## SPECIAL COMPONENTS
 - \`.timeline / .timeline-phase / .timeline-dot / .timeline-year / .timeline-label\` — Horizontal timeline

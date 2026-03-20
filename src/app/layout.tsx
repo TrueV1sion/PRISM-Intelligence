@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ReactNode } from "react";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import AuthProvider from "@/components/AuthProvider";
 
 export const metadata: Metadata = {
   title: "PRISM Strategic Intelligence",
@@ -16,7 +17,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased min-h-screen app-shell">
-        <ErrorBoundary>{children}</ErrorBoundary>
+        <AuthProvider>
+          <ErrorBoundary>{children}</ErrorBoundary>
+        </AuthProvider>
       </body>
     </html>
   );

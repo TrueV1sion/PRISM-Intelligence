@@ -76,12 +76,12 @@ async function makeRequest(
 
     let results: Record<string, unknown>[];
     if (Array.isArray(data)) {
-      results = data as Record<string, unknown>[];
+      results = data as unknown as Record<string, unknown>[];
     } else if (data && typeof data === "object") {
-      const obj = data as Record<string, unknown>;
-      results = (obj.results as Record<string, unknown>[]) ??
-        (obj.hospitals as Record<string, unknown>[]) ??
-        (obj.data as Record<string, unknown>[]) ??
+      const obj = data as unknown as Record<string, unknown>;
+      results = (obj.results as unknown as Record<string, unknown>[]) ??
+        (obj.hospitals as unknown as Record<string, unknown>[]) ??
+        (obj.data as unknown as Record<string, unknown>[]) ??
         [];
       // If the response itself is a single hospital object with a grade
       if (results.length === 0 && (obj.grade || obj.hospital_name || obj.name)) {

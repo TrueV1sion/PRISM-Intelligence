@@ -9,6 +9,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@/generated/prisma/client";
 import { z } from "zod";
 
 const FlushSchema = z.object({
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
     return prisma.slideVersion.updateMany({
       where: { versionId, slideNumber },
       data: {
-        content: content as unknown as Record<string, unknown>,
+        content: content as unknown as Prisma.InputJsonValue,
         updatedAt: new Date(),
       },
     });

@@ -1,12 +1,21 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { HistoryQuerySchema, validateParams } from "@/lib/api-validation";
 
 // GET /api/history — List all runs with their agent counts and status
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
-    const tier = searchParams.get("tier");
-    const status = searchParams.get("status");
-    const limit = parseInt(searchParams.get("limit") || "50");
+    const validation = validateParams(HistoryQuerySchema, {
+        tier: searchParams.get("tier") || "ALL",
+        status: searchParams.get("status") || "ALL",
+        limit: searchParams.get("limit") || "50",
+    });
+    if (!validation.success) {
+        return NextResponse.json({ error: validation.error }, { status: 400 });
+    }
+    const { tier: tierFilter, status: statusFilter, limit } = validation.data;
+    const tier = tierFilter === "ALL" ? null : tierFilter;
+    const status = statusFilter === "ALL" ? null : statusFilter;
 
     try {
         const runs = await prisma.run.findMany({

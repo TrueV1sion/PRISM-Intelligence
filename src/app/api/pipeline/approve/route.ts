@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { approveBlueprintForRun } from "@/lib/pipeline/approval";
+import { PipelineApproveSchema, validateBody } from "@/lib/api-validation";
 
 /**
  * POST /api/pipeline/approve
@@ -10,14 +11,14 @@ import { approveBlueprintForRun } from "@/lib/pipeline/approval";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { runId } = body;
-
-    if (!runId || typeof runId !== "string") {
+    const validation = validateBody(PipelineApproveSchema, body);
+    if (!validation.success) {
       return NextResponse.json(
-        { error: "runId is required" },
+        { error: validation.error },
         { status: 400 },
       );
     }
+    const { runId } = validation.data;
 
     const approved = approveBlueprintForRun(runId);
 

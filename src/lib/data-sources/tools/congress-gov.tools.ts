@@ -61,7 +61,7 @@ const searchCongressBills: DataSourceTool = {
       limit: (input.limit as number | undefined) ?? 20,
     });
 
-    const body = response.data.data as Record<string, unknown>;
+    const body = response.data.data as unknown as Record<string, unknown>;
     const bills = (body.bills as Array<Record<string, unknown>>) ?? [];
     const pagination = response.data.pagination;
     const total = pagination?.count ?? bills.length;
@@ -130,8 +130,8 @@ const getCongressBill: DataSourceTool = {
 
     const response = await congressGovClient.getBill(congress, billType, billNumber);
 
-    const body = (response.data.data ?? {}) as Record<string, unknown>;
-    const bill = (body.bill as Record<string, unknown>) ?? {};
+    const body = (response.data.data ?? {}) as unknown as Record<string, unknown>;
+    const bill = (body.bill as unknown as Record<string, unknown>) ?? {};
     const queryDesc = `${congress}th Congress ${billType.toUpperCase()} ${billNumber}`;
 
     if (response.status === 404 || !body || Object.keys(bill).length === 0) {

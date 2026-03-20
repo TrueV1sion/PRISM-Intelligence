@@ -11,9 +11,9 @@
  * - API key management
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Settings, Brain, Shield, Zap, Key, ChevronRight, ToggleLeft, ToggleRight, Save, ArrowLeft, Loader2 } from "lucide-react";
+import { Settings, Brain, Shield, Zap, Key, ToggleLeft, ToggleRight, Save, ArrowLeft, Loader2, Check, AlertCircle } from "lucide-react";
 import { DEFAULT_SETTINGS, type SettingsState } from "@/lib/settings-types";
 
 const ALL_SKILLS = [
@@ -37,12 +37,71 @@ const MODEL_OPTIONS = [
 
 
 
+const API_KEY_CONFIGS = [
+    { key: "ANTHROPIC_API_KEY", provider: "anthropic", label: "Anthropic API Key", required: true, placeholder: "sk-ant-..." },
+    { key: "OPENAI_API_KEY", provider: "openai", label: "OpenAI API Key", required: false, placeholder: "sk-..." },
+    { key: "GOOGLE_GENERATIVE_AI_API_KEY", provider: "google", label: "Google AI API Key", required: false, placeholder: "AI..." },
+    { key: "FRED_API_KEY", provider: "fred", label: "FRED Economic Data Key", required: false, placeholder: "..." },
+    { key: "CENSUS_API_KEY", provider: "census", label: "Census Bureau API Key", required: false, placeholder: "..." },
+] as const;
+
 export default function AdminSettings({ onBack }: { onBack: () => void }) {
     const [settings, setSettings] = useState<SettingsState>(DEFAULT_SETTINGS);
     const [activeTab, setActiveTab] = useState<"models" | "quality" | "pipeline" | "skills" | "keys">("models");
     const [saved, setSaved] = useState(false);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+
+    // API key management state
+    const [apiKeyValues, setApiKeyValues] = useState<Record<string, string>>({});
+    const [apiKeySaved, setApiKeySaved] = useState<Record<string, boolean>>({});
+    const [apiKeyError, setApiKeyError] = useState<Record<string, string>>({});
+    const [apiKeySaving, setApiKeySaving] = useState<Record<string, boolean>>({});
+    const [apiKeyConfigured, setApiKeyConfigured] = useState<Record<string, boolean>>({});
+
+    // Load which API keys are already configured
+    useEffect(() => {
+        fetch("/api/onboarding/status")
+            .then(r => r.json())
+            .then(data => {
+                const configured: Record<string, boolean> = {};
+                if (data.keys?.anthropic) configured["anthropic"] = true;
+                if (data.keys?.openai) configured["openai"] = true;
+                setApiKeyConfigured(configured);
+            })
+            .catch(() => { });
+    }, []);
+
+    const saveApiKey = useCallback(async (provider: string) => {
+        const value = apiKeyValues[provider]?.trim();
+        if (!value) return;
+
+        setApiKeySaving(prev => ({ ...prev, [provider]: true }));
+        setApiKeyError(prev => ({ ...prev, [provider]: "" }));
+
+        try {
+            const res = await fetch("/api/onboarding/keys", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ provider, key: value }),
+            });
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || "Failed to save key");
+            }
+            setApiKeySaved(prev => ({ ...prev, [provider]: true }));
+            setApiKeyConfigured(prev => ({ ...prev, [provider]: true }));
+            setApiKeyValues(prev => ({ ...prev, [provider]: "" }));
+            setTimeout(() => setApiKeySaved(prev => ({ ...prev, [provider]: false })), 3000);
+        } catch (err) {
+            setApiKeyError(prev => ({
+                ...prev,
+                [provider]: err instanceof Error ? err.message : "Failed to save",
+            }));
+        } finally {
+            setApiKeySaving(prev => ({ ...prev, [provider]: false }));
+        }
+    }, [apiKeyValues]);
 
     // Load settings from API on mount
     useEffect(() => {
@@ -383,32 +442,76 @@ export default function AdminSettings({ onBack }: { onBack: () => void }) {
                         {/* API Keys Tab */}
                         {activeTab === "keys" && (
                             <div className="space-y-4">
-                                {[
-                                    { key: "ANTHROPIC_API_KEY", label: "Anthropic API Key", required: true },
-                                    { key: "OPENAI_API_KEY", label: "OpenAI API Key", required: false },
-                                    { key: "GOOGLE_GENERATIVE_AI_API_KEY", label: "Google AI API Key", required: false },
-                                    { key: "FRED_API_KEY", label: "FRED Economic Data Key", required: false },
-                                    { key: "CENSUS_API_KEY", label: "Census Bureau API Key", required: false },
-                                ].map(apiKey => (
-                                    <div key={apiKey.key} className="glass-panel rounded-xl p-5">
-                                        <div className="flex items-center justify-between mb-3">
-                                            <div className="flex items-center gap-2">
-                                                <Key className="w-4 h-4 text-prism-sky" />
-                                                <span className="text-sm font-medium text-white">{apiKey.label}</span>
-                                                {apiKey.required && (
-                                                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-400/10 text-red-400 font-mono">Required</span>
-                                                )}
+                                <div className="glass-panel rounded-xl p-4 mb-2">
+                                    <p className="text-xs text-prism-muted">
+                                        API keys are encrypted and stored securely. Keys saved here take priority over environment variables.
+                                    </p>
+                                </div>
+                                {API_KEY_CONFIGS.map(apiKey => {
+                                    const isSaving = apiKeySaving[apiKey.provider];
+                                    const isSaved = apiKeySaved[apiKey.provider];
+                                    const error = apiKeyError[apiKey.provider];
+                                    const isConfigured = apiKeyConfigured[apiKey.provider];
+                                    const currentValue = apiKeyValues[apiKey.provider] ?? "";
+
+                                    return (
+                                        <div key={apiKey.key} className="glass-panel rounded-xl p-5">
+                                            <div className="flex items-center justify-between mb-3">
+                                                <div className="flex items-center gap-2">
+                                                    <Key className="w-4 h-4 text-prism-sky" />
+                                                    <span className="text-sm font-medium text-white">{apiKey.label}</span>
+                                                    {apiKey.required && (
+                                                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-400/10 text-red-400 font-mono">Required</span>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    {isConfigured && (
+                                                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-prism-jade/10 text-prism-jade font-mono flex items-center gap-1">
+                                                            <Check className="w-3 h-3" /> Configured
+                                                        </span>
+                                                    )}
+                                                    <span className="text-[10px] font-mono text-prism-muted">{apiKey.key}</span>
+                                                </div>
                                             </div>
-                                            <span className="text-[10px] font-mono text-prism-muted">{apiKey.key}</span>
+                                            <div className="flex gap-2">
+                                                <input
+                                                    type="password"
+                                                    value={currentValue}
+                                                    onChange={e => setApiKeyValues(prev => ({ ...prev, [apiKey.provider]: e.target.value }))}
+                                                    placeholder={isConfigured ? "••••••••  (enter new key to replace)" : apiKey.placeholder}
+                                                    className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm text-white font-mono outline-none focus:border-prism-sky/50 placeholder:text-white/20"
+                                                />
+                                                <button
+                                                    onClick={() => saveApiKey(apiKey.provider)}
+                                                    disabled={!currentValue.trim() || isSaving}
+                                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                                                        isSaved
+                                                            ? "bg-prism-jade/20 text-prism-jade border border-prism-jade/30"
+                                                            : isSaving
+                                                                ? "bg-white/5 text-prism-muted border border-white/5 cursor-wait"
+                                                                : currentValue.trim()
+                                                                    ? "bg-prism-sky/20 text-prism-sky border border-prism-sky/30 hover:bg-prism-sky/30"
+                                                                    : "bg-white/5 text-prism-muted/50 border border-white/5 cursor-not-allowed"
+                                                    }`}
+                                                >
+                                                    {isSaving ? (
+                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                    ) : isSaved ? (
+                                                        <Check className="w-4 h-4" />
+                                                    ) : (
+                                                        "Save"
+                                                    )}
+                                                </button>
+                                            </div>
+                                            {error && (
+                                                <div className="flex items-center gap-1.5 mt-2 text-red-400">
+                                                    <AlertCircle className="w-3 h-3" />
+                                                    <p className="text-[10px]">{error}</p>
+                                                </div>
+                                            )}
                                         </div>
-                                        <input
-                                            type="password"
-                                            placeholder="sk-..."
-                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm text-white font-mono outline-none focus:border-prism-sky/50 placeholder:text-white/20"
-                                        />
-                                        <p className="text-[10px] text-prism-muted mt-2">Set via environment variables. UI changes require server restart.</p>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         )}
                     </motion.div>

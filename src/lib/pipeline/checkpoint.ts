@@ -3,9 +3,12 @@
  *
  * Provides resume capability for pipelines that experience connection drops
  * or other transient failures during streaming execution.
+ *
+ * Note: Checkpoint progress is stored in-memory for now.
+ * A manifest JSON column can be added to the Run model for persistence.
  */
 
-import { db } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 
 export type CheckpointPhase =
   | "INITIALIZE"
@@ -33,17 +36,25 @@ export interface PipelineCheckpoint {
   timestamp: string;
 }
 
+// In-memory checkpoint store (until manifest column is added to Run model)
+const checkpointStore = new Map<string, Record<string, unknown>>();
+
 /**
  * Save a checkpoint for a pipeline run.
- * Stores intermediate results in the database manifest for resume capability.
+ * Updates the run status and stores progress in memory.
  */
 export async function saveCheckpoint(checkpoint: PipelineCheckpoint): Promise<void> {
   const { runId, phase, progress } = checkpoint;
 
-  await db.run.update(runId, {
-    status: phase,
-    manifest: progress,
-    updatedAt: new Date().toISOString(),
+  // Store progress in memory
+  checkpointStore.set(runId, progress as Record<string, unknown>);
+
+  await prisma.run.update({
+    where: { id: runId },
+    data: {
+      status: phase,
+      updatedAt: new Date(),
+    },
   });
 }
 
@@ -51,7 +62,7 @@ export async function saveCheckpoint(checkpoint: PipelineCheckpoint): Promise<vo
  * Load the last checkpoint for a run to resume execution.
  */
 export async function loadCheckpoint(runId: string): Promise<PipelineCheckpoint | null> {
-  const run = await db.run.findUnique(runId);
+  const run = await prisma.run.findUnique({ where: { id: runId } });
 
   if (!run) return null;
 
@@ -63,17 +74,19 @@ export async function loadCheckpoint(runId: string): Promise<PipelineCheckpoint 
     "PRESENT",
   ];
 
+  const stored = checkpointStore.get(runId) ?? {};
+
   return {
     runId: run.id,
     phase: run.status as CheckpointPhase,
     resumable: resumablePhases.includes(run.status as CheckpointPhase),
-    progress: (typeof run.manifest === "object" && run.manifest !== null ? run.manifest : {}) as {
+    progress: stored as {
       blueprint?: unknown;
       agentResults?: unknown;
       synthesis?: unknown;
       presentation?: unknown;
     },
-    timestamp: run.updatedAt,
+    timestamp: run.updatedAt.toISOString(),
   };
 }
 
@@ -89,7 +102,5 @@ export async function canResume(runId: string): Promise<boolean> {
  * Clear checkpoint data after successful completion.
  */
 export async function clearCheckpoint(runId: string): Promise<void> {
-  await db.run.update(runId, {
-    manifest: null,
-  });
+  checkpointStore.delete(runId);
 }

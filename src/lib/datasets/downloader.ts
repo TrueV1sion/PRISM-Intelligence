@@ -180,11 +180,6 @@ export async function downloadAndSnapshot(sourceId: string): Promise<SnapshotRes
       blobUrl: uploadResult.blobUrl,
       recordCount: records.length,
       sizeBytes: uploadResult.sizeBytes,
-      metadata: JSON.stringify({
-        fieldCount: records.length > 0 ? Object.keys(records[0]).length : 0,
-        compareFields: source.compareFields,
-        downloadedAt: snapshotAt.toISOString(),
-      }),
       snapshotAt,
     },
   });

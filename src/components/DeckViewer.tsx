@@ -5,7 +5,6 @@ import {
   X,
   Maximize2,
   Minimize2,
-  Download,
   Printer,
   Eye,
   EyeOff,
@@ -13,7 +12,11 @@ import {
   Shield,
   FileText,
   Play,
+  GitBranch,
+  Pencil,
 } from "lucide-react";
+import Link from "next/link";
+import ExportDropdown from "@/components/ExportDropdown";
 import { motion, AnimatePresence } from "framer-motion";
 import { DeckMeta } from "@/lib/deck-data";
 
@@ -28,6 +31,7 @@ interface ProvenanceItem {
   archetype: string;
   confidence: string;
   sources: string;
+  sourceUrl?: string | null;
   color: string;
 }
 
@@ -64,13 +68,6 @@ export default function DeckViewer({ deck, onClose }: DeckViewerProps) {
   }, [isFullscreen, onClose]);
 
   const toggleFullscreen = useCallback(() => setIsFullscreen((prev) => !prev), []);
-
-  const handleDownload = useCallback(() => {
-    const a = document.createElement("a");
-    a.href = `/decks/${deck.filename}`;
-    a.download = deck.filename;
-    a.click();
-  }, [deck.filename]);
 
   const handlePrint = useCallback(() => {
     iframeRef.current?.contentWindow?.print();
@@ -144,9 +141,21 @@ export default function DeckViewer({ deck, onClose }: DeckViewerProps) {
               {showProvenance ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
               <span className="hidden sm:inline">Provenance</span>
             </button>
-            <button onClick={handleDownload} className={iconButtonClass} title="Download HTML">
-              <Download className="w-4 h-4" />
-            </button>
+            <ExportDropdown runId={deck.id} compact />
+            <Link
+              href={`/scenarios/${deck.id}`}
+              className={iconButtonClass}
+              title="Explore Scenarios"
+            >
+              <GitBranch className="w-4 h-4" />
+            </Link>
+            <Link
+              href={`/briefs/${deck.id}/edit`}
+              className={iconButtonClass}
+              title="Edit Presentation"
+            >
+              <Pencil className="w-4 h-4" />
+            </Link>
             <button onClick={handlePrint} className={iconButtonClass} title="Print to PDF">
               <Printer className="w-4 h-4" />
             </button>
@@ -166,7 +175,8 @@ export default function DeckViewer({ deck, onClose }: DeckViewerProps) {
               src={`/decks/${deck.filename}`}
               className="w-full h-full border-0"
               title={deck.title}
-              sandbox="allow-scripts"
+              sandbox="allow-scripts allow-same-origin"
+              referrerPolicy="no-referrer"
             />
 
             {!showProvenance && (
@@ -250,7 +260,13 @@ export default function DeckViewer({ deck, onClose }: DeckViewerProps) {
                           </div>
                           <p className="text-[10px] text-prism-muted leading-relaxed">
                             <FileText className="w-3 h-3 inline mr-1 opacity-60" />
-                            {item.sources}
+                            {item.sourceUrl ? (
+                              <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer" className="hover:text-prism-sky hover:underline transition-colors">
+                                {item.sources}
+                              </a>
+                            ) : (
+                              item.sources
+                            )}
                           </p>
                         </div>
                       ))}

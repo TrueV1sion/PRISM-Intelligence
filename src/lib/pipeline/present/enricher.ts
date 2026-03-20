@@ -18,13 +18,8 @@ export function enrichToolCalls(
   let idCounter = 0;
 
   for (const call of capturedCalls) {
-    let parsed: unknown;
-    try {
-      parsed = typeof call.rawResponse === "string"
-        ? JSON.parse(call.rawResponse)
-        : call.rawResponse;
-    } catch {
-      // Unparseable response — skip enrichment, raw is still in tool_call_log
+    const parsed = parseCapturedResponse(call);
+    if (!parsed) {
       continue;
     }
 
@@ -59,6 +54,142 @@ export function enrichToolCalls(
   // NOTE: Entity resolution is not yet implemented. The entities array
   // will be populated in a future iteration when EntityRegistry lookup is added.
   return { runId, datasets, entities: [] };
+}
+
+function parseCapturedResponse(call: CapturedToolCall): unknown {
+  if (call.structuredData !== undefined) {
+    return normalizeParsedResponse(call.structuredData);
+  }
+
+  try {
+    return normalizeParsedResponse(JSON.parse(call.rawResponse));
+  } catch {
+    return parseMarkdownTables(call.rawResponse);
+  }
+}
+
+function normalizeParsedResponse(parsed: unknown): unknown {
+  if (Array.isArray(parsed)) {
+    return { results: parsed };
+  }
+  return parsed;
+}
+
+function parseMarkdownTables(raw: string): Record<string, Array<Record<string, unknown>>> | null {
+  if (typeof raw !== "string" || !raw.includes("|")) return null;
+
+  const lines = raw.split(/\r?\n/);
+  const tables: Record<string, Array<Record<string, unknown>>> = {};
+  let tableIndex = 0;
+
+  for (let i = 0; i < lines.length - 1; i++) {
+    const headerLine = lines[i]?.trim();
+    const separatorLine = lines[i + 1]?.trim();
+    if (!headerLine || !separatorLine) continue;
+    if (!headerLine.includes("|")) continue;
+    if (!/^\|?[\s:-]+\|[\s|:-]*$/.test(separatorLine)) continue;
+
+    const headers = splitMarkdownRow(headerLine).map(normalizeHeader);
+    if (headers.length < 2) continue;
+
+    const labelIndex = headers.findIndex(isLabelHeader);
+    const rawRows: string[][] = [];
+    let rowCursor = i + 2;
+
+    while (rowCursor < lines.length && lines[rowCursor]?.includes("|")) {
+      const cells = splitMarkdownRow(lines[rowCursor] ?? "");
+      if (cells.length === 0) break;
+      if (cells.length !== headers.length) {
+        rowCursor++;
+        continue;
+      }
+      rawRows.push(cells);
+      rowCursor++;
+    }
+
+    const valueIndex = selectValueColumn(headers, rawRows);
+    if (valueIndex === -1) {
+      i = rowCursor - 1;
+      continue;
+    }
+
+    const rows = rawRows.reduce<Array<Record<string, unknown>>>((acc, cells, rowIndex) => {
+        const value = parseNumeric(cells[valueIndex]);
+        if (value === null) return acc;
+        const labelCell =
+          labelIndex >= 0 ? cells[labelIndex] : cells.find((_cell, idx) => idx !== valueIndex);
+        acc.push({
+          label: labelCell || `Row ${rowIndex + 1}`,
+          period: labelCell || `Row ${rowIndex + 1}`,
+          value,
+        });
+        return acc;
+      }, []);
+
+    if (rows.length >= 2) {
+      tables[`table_${tableIndex++}`] = rows;
+    }
+
+    i = rowCursor - 1;
+  }
+
+  return Object.keys(tables).length > 0 ? tables : null;
+}
+
+function splitMarkdownRow(line: string): string[] {
+  return line
+    .trim()
+    .replace(/^\|/, "")
+    .replace(/\|$/, "")
+    .split("|")
+    .map(cell => cell.trim());
+}
+
+function normalizeHeader(header: string): string {
+  return header
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "_");
+}
+
+function isNumericHeader(header: string): boolean {
+  return ["value", "count", "amount", "total", "pct", "percent", "percentage"].some(
+    token => header.includes(token),
+  );
+}
+
+function isLabelHeader(header: string): boolean {
+  return ["year", "period", "date", "quarter", "month", "label", "name", "term", "category"].some(
+    token => header.includes(token),
+  );
+}
+
+function parseNumeric(value: string | undefined): number | null {
+  if (!value) return null;
+  const normalized = value.replace(/[$,%\s]/g, "").replace(/,/g, "");
+  const parsed = Number.parseFloat(normalized);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function selectValueColumn(headers: string[], rows: string[][]): number {
+  let bestIndex = -1;
+  let bestScore = -1;
+
+  for (let col = 0; col < headers.length; col++) {
+    const numericMatches = rows.reduce((count, row) => {
+      return count + (parseNumeric(row[col]) !== null ? 1 : 0);
+    }, 0);
+
+    if (numericMatches < 2) continue;
+
+    const score = numericMatches + (isNumericHeader(headers[col] ?? "") ? 2 : 0);
+    if (score > bestScore) {
+      bestScore = score;
+      bestIndex = col;
+    }
+  }
+
+  return bestIndex;
 }
 
 function computeMetrics(values: DataRegistryPoint[]): ComputedMetrics {

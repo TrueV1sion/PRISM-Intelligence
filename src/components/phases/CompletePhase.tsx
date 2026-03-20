@@ -10,8 +10,10 @@ import {
   ChevronRight,
   Library,
   Sparkles,
-  Download,
+  GitBranch,
 } from "lucide-react";
+import Link from "next/link";
+import ExportDropdown from "@/components/ExportDropdown";
 import type { SynthesisLayer } from "@/lib/types";
 import type { StreamEmergence, QualityReport } from "@/hooks/use-research-stream";
 
@@ -31,9 +33,9 @@ interface CompletePhaseProps {
   quality: QualityReport | null;
   completionData: CompletionData | null;
   emergences: StreamEmergence[];
+  runId: string | null;
   onNewAnalysis: () => void;
   onViewBrief: () => void;
-  onDownloadBrief: () => void;
   onBrowseLibrary: () => void;
 }
 
@@ -46,9 +48,9 @@ export default function CompletePhase({
   quality,
   completionData,
   emergences,
+  runId,
   onNewAnalysis,
   onViewBrief,
-  onDownloadBrief,
   onBrowseLibrary,
 }: CompletePhaseProps) {
   return (
@@ -211,11 +213,18 @@ export default function CompletePhase({
             </button>
           )}
 
-          {!hasError && (
-            <button onClick={onDownloadBrief} className="prism-button-secondary px-5 py-2.5 text-sm">
-              <Download className="w-4 h-4" />
-              Download Brief
-            </button>
+          {!hasError && runId && (
+            <ExportDropdown runId={runId} />
+          )}
+
+          {!hasError && runId && (
+            <Link
+              href={`/scenarios/${runId}`}
+              className="prism-button-secondary px-5 py-2.5 text-sm inline-flex items-center gap-2"
+            >
+              <GitBranch className="w-4 h-4" />
+              Explore Scenarios
+            </Link>
           )}
 
           {!hasError && (

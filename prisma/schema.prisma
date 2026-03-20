@@ -28,6 +28,11 @@ model Run {
   updatedAt       DateTime @updatedAt
   completedAt     DateTime?
 
+  // Ownership (nullable for backward compatibility with pre-auth runs)
+  createdById     String?
+  teamId          String?
+  visibility      String   @default("team")   // private | team | public
+
   // Relations
   agents               Agent[]
   findings             Finding[]
@@ -40,6 +45,14 @@ model Run {
   toolCallLogs         ToolCallLog[]
   enrichedMetrics      EnrichedMetric[]
   agentDataRefs        AgentDataRef[]
+  scenarios            Scenario[]
+  createdBy            User?    @relation("UserRuns", fields: [createdById], references: [id], onDelete: SetNull)
+  team                 Team?    @relation("TeamRuns", fields: [teamId], references: [id], onDelete: SetNull)
+
+  @@index([createdById])
+  @@index([teamId])
+  @@index([status, createdAt(sort: Desc)])
+  @@index([tier])
 }
 
 // ─── Dimension ───────────────────────────────────────────
@@ -50,6 +63,8 @@ model Dimension {
   description String
   runId       String
   run         Run    @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId])
 }
 
 // ─── Agent ───────────────────────────────────────────────
@@ -68,6 +83,9 @@ model Agent {
   run       Run      @relation(fields: [runId], references: [id], onDelete: Cascade)
 
   findings  Finding[]
+
+  @@unique([runId, name])
+  @@index([runId])
 }
 
 // ─── Finding ─────────────────────────────────────────────
@@ -79,15 +97,21 @@ model Finding {
   confidence   String @default("MEDIUM") // HIGH | MEDIUM | LOW
   evidenceType String @default("direct") // direct | inferred | analogical | modeled
   source       String
+  sourceUrl    String?
   sourceTier   String @default("SECONDARY") // PRIMARY | SECONDARY | TERTIARY
   implication  String
   action       String @default("keep")   // keep | dismiss | boost | flag
   tags         String @default("[]")     // JSON array
+  metrics      String @default("[]")     // JSON array of metrics
 
   agentId String
   agent   Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
   runId   String
   run     Run   @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId])
+  @@index([agentId])
+  @@index([confidence])
 }
 
 // ─── Synthesis ───────────────────────────────────────────
@@ -102,20 +126,100 @@ model Synthesis {
 
   runId String
   run   Run    @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId])
 }
 
 // ─── Presentation ────────────────────────────────────────
 // Stores the generated HTML5 brief
 model Presentation {
-  id         String   @id @default(cuid())
-  title      String
-  subtitle   String   @default("")
-  htmlPath   String                    // path in public/decks/
-  slideCount Int      @default(0)
-  createdAt  DateTime @default(now())
+  id                 String   @id @default(cuid())
+  title              String
+  subtitle           String   @default("")
+  htmlPath           String                    // path in public/decks/
+  slideCount         Int      @default(0)
+  currentVersionId   String?                   // Active draft version
+  publishedVersionId String?                   // Last published version
+  createdAt          DateTime @default(now())
 
-  runId String @unique
-  run   Run    @relation(fields: [runId], references: [id], onDelete: Cascade)
+  runId    String @unique
+  run      Run    @relation(fields: [runId], references: [id], onDelete: Cascade)
+  versions PresentationVersion[]
+}
+
+// ─── PresentationVersion ────────────────────────────────
+// Versioned snapshot of the presentation's structured content
+model PresentationVersion {
+  id               String   @id @default(cuid())
+  presentationId   String
+  versionNumber    Int      @default(1)
+  status           String   @default("draft")  // draft | review | approved | published
+  label            String?                      // e.g. "AI-generated", "Post-edit v2"
+  createdById      String?
+  createdAt        DateTime @default(now())
+  publishedAt      DateTime?
+
+  presentation Presentation @relation(fields: [presentationId], references: [id], onDelete: Cascade)
+  slides       SlideVersion[]
+
+  @@unique([presentationId, versionNumber])
+  @@index([presentationId])
+}
+
+// ─── SlideVersion ───────────────────────────────────────
+// Structured content for a single slide in a version
+model SlideVersion {
+  id               String   @id @default(cuid())
+  versionId        String
+  slideNumber      Int
+  templateId       String?                     // Template used (e.g. "SF-01", "DV-03")
+  backgroundVariant String  @default("gradient-dark")
+  animationType    String   @default("stagger")
+  content          Json                        // Structured SlideContent (headline, body, stats, charts, findings, sources)
+  sourceAgentIds   String[] @default([])       // Agents that contributed to this slide
+  sourceFindingIds String[] @default([])       // Finding IDs referenced
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  version     PresentationVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  annotations SlideAnnotation[]
+
+  @@unique([versionId, slideNumber])
+  @@index([versionId])
+}
+
+// ─── SlideAnnotation ──────────────────────────────────────
+// Threaded comments/annotations on specific slide content
+model SlideAnnotation {
+  id          String   @id @default(cuid())
+  slideId     String
+  authorId    String?
+  authorName  String   @default("Anonymous")
+  content     String
+  targetField String?                      // e.g. "headline", "body", "stats[0]", "findings[1]"
+  resolved    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  slide   SlideVersion      @relation(fields: [slideId], references: [id], onDelete: Cascade)
+  replies AnnotationReply[]
+
+  @@index([slideId])
+}
+
+// ─── AnnotationReply ──────────────────────────────────────
+// Reply within an annotation thread
+model AnnotationReply {
+  id           String   @id @default(cuid())
+  annotationId String
+  authorId     String?
+  authorName   String   @default("Anonymous")
+  content      String
+  createdAt    DateTime @default(now())
+
+  annotation SlideAnnotation @relation(fields: [annotationId], references: [id], onDelete: Cascade)
+
+  @@index([annotationId])
 }
 
 // ─── MemoryBusSnapshot ──────────────────────────────────
@@ -131,6 +235,8 @@ model MemoryBusSnapshot {
   createdAt         DateTime @default(now())
   runId             String
   run               Run      @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId, phase])
 }
 
 // ─── IR Graph ───────────────────────────────────────────
@@ -281,6 +387,64 @@ model EntityRegistry {
   @@map("entity_registry")
 }
 
+// ─── Scenario ───────────────────────────────────────────────
+// Fork of a completed run for "what-if" exploration
+model Scenario {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  runId       String                      // Base run this scenario forks from
+  parentId    String?                     // Fork from another scenario (scenario trees)
+  createdById String?                     // User who created this scenario
+  status      String    @default("draft") // draft | computing | complete | failed
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  run         Run        @relation(fields: [runId], references: [id], onDelete: Cascade)
+  parent      Scenario?  @relation("ScenarioTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children    Scenario[] @relation("ScenarioTree")
+  levers      ScenarioLever[]
+  result      ScenarioResult?
+  createdBy   User?      @relation("UserScenarios", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([runId])
+  @@index([parentId])
+}
+
+// ─── ScenarioLever ──────────────────────────────────────────
+// Individual adjustment ("lever") within a scenario
+model ScenarioLever {
+  id          String  @id @default(cuid())
+  scenarioId  String
+  leverType   String  // tension_flip | gap_resolve | metric_adjust | finding_suppress | finding_amplify
+  targetId    String  // ID of the IRTension, IRGap, EnrichedMetric, or IRFinding
+  targetLabel String  // Human-readable label: "CMS Final Rule Direction"
+  baseline    Json    // Original value/state
+  adjusted    Json    // User's modified value/state
+  impact      String? // After re-synthesis: high | medium | low
+
+  scenario    Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+
+  @@index([scenarioId])
+}
+
+// ─── ScenarioResult ─────────────────────────────────────────
+// Computed output of a scenario re-synthesis
+model ScenarioResult {
+  id                String   @id @default(cuid())
+  scenarioId        String   @unique
+  modifiedIrGraph   Json     // Full IRGraph with scenario mutations applied
+  emergencesDelta   Json     // Which emergences changed, appeared, or disappeared
+  tensionsDelta     Json     // Which tensions shifted
+  sensitivityMap    Json     // Which levers had the biggest downstream impact
+  confidenceShift   Float    // Overall confidence change vs baseline
+  briefPath         String?  // Generated scenario brief HTML path
+  memoPath          String?  // Generated scenario memo HTML path
+  computedAt        DateTime @default(now())
+
+  scenario          Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+}
+
 // ─── AgentDataRef ─────────────────────────────────────────
 // Links agent findings to their source data (tool calls)
 model AgentDataRef {
@@ -300,105 +464,190 @@ model AgentDataRef {
 }
 
 // ═══════════════════════════════════════════════════════════
-// Phase 0A: Expansion Foundation Models
+// AUTHENTICATION & TEAMS (NextAuth.js v5 / Auth.js)
 // ═══════════════════════════════════════════════════════════
 
-// ─── FeedSource ─────────────────────────────────────────────
-// RSS/Atom feed registry for continuous news ingestion
+// ─── User ──────────────────────────────────────────────────
+// NextAuth adapter model + Protoprism profile extensions
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  teamMembers   TeamMember[]
+  runs          Run[]        @relation("UserRuns")
+  scenarios     Scenario[]   @relation("UserScenarios")
+}
+
+// ─── Account ──────────────────────────────────────────────
+// OAuth/credential accounts linked to a user
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+// ─── Session ──────────────────────────────────────────────
+// Active user sessions
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── VerificationToken ────────────────────────────────────
+// Email verification / magic link tokens
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── Team ──────────────────────────────────────────────────
+// Organization / team grouping for collaborative access
+model Team {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  image       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members TeamMember[]
+  runs    Run[]        @relation("TeamRuns")
+}
+
+// ─── TeamMember ───────────────────────────────────────────
+// Team membership with role-based access
+model TeamMember {
+  id        String   @id @default(cuid())
+  userId    String
+  teamId    String
+  role      String   @default("analyst") // owner | admin | analyst | viewer
+  joinedAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, teamId])
+  @@index([teamId])
+}
+
+// ─── Phase 0A: Expansion Foundation ─────────────────────────
+
+// RSS/Atom feed registry
 model FeedSource {
-  id               String    @id @default(cuid())
-  url              String    @unique
-  name             String
-  feedType         String    @default("rss")  // rss | atom | google_news_proxy
-  category         String                      // e.g. "healthcare", "ma", "regulatory", "vc"
-  subcategory      String?                     // e.g. "drug-approvals", "cms-updates"
-  pollIntervalHours Int      @default(4)
-  enabled          Boolean   @default(true)
-  lastPolledAt     DateTime?
-  lastError        String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id                String    @id @default(cuid())
+  url               String    @unique
+  name              String
+  feedType          String    @default("rss") // rss | atom | google_news
+  category          String // regulatory, legislative, industry, research, ma-payer, innovation
+  subcategory       String?
+  pollIntervalHours Int       @default(4)
+  enabled           Boolean   @default(true)
+  lastPolledAt      DateTime?
+  lastError         String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   items FeedItem[]
 
   @@index([category])
-  @@index([enabled, lastPolledAt])
-  @@map("feed_sources")
+  @@index([enabled])
 }
 
-// ─── FeedItem ───────────────────────────────────────────────
-// Stored feed articles with extracted entities and signals
+// Stored feed articles with extracted metadata
 model FeedItem {
-  id           String   @id @default(cuid())
-  sourceId     String
-  title        String
-  url          String
-  contentHash  String                          // SHA-256 of (title + url) for dedup
-  summary      String?                         // Feed description/summary
-  author       String?
-  entities     String[] @default([])           // Extracted entity names
-  signals      String[] @default([])           // Signal classifications
-  tags         String[] @default([])           // Keyword tags
-  publishedAt  DateTime
-  ingestedAt   DateTime @default(now())
+  id          String   @id @default(cuid())
+  sourceId    String
+  title       String
+  url         String
+  summary     String?
+  author      String?
+  contentHash String // SHA-256 of title+url for dedup
+  entities    String[] // Extracted entity names
+  signals     String[] // Classified signal types
+  tags        String[] // Additional tags
+  publishedAt DateTime
+  ingestedAt  DateTime @default(now())
 
   source FeedSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
 
   @@unique([sourceId, contentHash])
-  @@index([publishedAt])
   @@index([sourceId])
-  @@map("feed_items")
+  @@index([publishedAt])
+  @@index([signals])
 }
 
-// ─── DatasetSource ──────────────────────────────────────────
-// Government bulk dataset registry (CMS, HHS, etc.)
+// Government dataset registry
 model DatasetSource {
-  id             String    @id @default(cuid())
-  url            String    @unique
-  name           String
-  format         String    @default("csv")     // csv | json | xlsx | api
-  category       String                        // e.g. "cms", "hhs", "dea", "fda"
-  entityKeyField String                        // Primary key field name (e.g. "NPI", "CCN")
-  compareFields  String[]  @default([])        // Fields to track for diffs
-  pollSchedule   String    @default("weekly")  // daily | weekly | monthly | quarterly
-  enabled        Boolean   @default(true)
-  lastPolledAt   DateTime?
-  lastError      String?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id            String    @id @default(cuid())
+  url           String    @unique
+  name          String
+  format        String    @default("csv") // csv | json | excel
+  category      String // cms, fda, dea, general
+  entityKeyField String
+  compareFields String[]
+  pollSchedule  String    @default("weekly") // daily | weekly | monthly
+  enabled       Boolean   @default(true)
+  lastPolledAt  DateTime?
+  lastError     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   snapshots DatasetSnapshot[]
 
   @@index([category])
-  @@map("dataset_sources")
 }
 
-// ─── DatasetSnapshot ────────────────────────────────────────
-// Point-in-time snapshots of bulk government datasets
+// Bulk dataset snapshots stored in blob storage
 model DatasetSnapshot {
   id          String   @id @default(cuid())
   sourceId    String
-  blobUrl     String                           // Vercel Blob URL for raw data
-  recordCount Int      @default(0)
-  sizeBytes   Int      @default(0)
-  metadata    String   @default("{}")          // JSON: column stats, date range, etc.
+  blobUrl     String // Vercel Blob URL
+  recordCount Int
+  sizeBytes   Int
   snapshotAt  DateTime @default(now())
 
-  source DatasetSource  @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  source DatasetSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
   deltas DatasetDelta[]
 
-  @@index([sourceId, snapshotAt])
-  @@map("dataset_snapshots")
+  @@index([sourceId])
+  @@index([snapshotAt])
 }
 
-// ─── DatasetDelta ───────────────────────────────────────────
-// Diff records between consecutive dataset snapshots
+// Snapshot diff records
 model DatasetDelta {
   id         String   @id @default(cuid())
   snapshotId String
-  changeType String                            // added | removed | modified
-  entityKey  String                            // Value of the entityKeyField
-  fieldName  String                            // Which field changed
+  changeType String // added | removed | modified
+  entityKey  String
+  fieldName  String?
   oldValue   String?
   newValue   String?
   detectedAt DateTime @default(now())
@@ -408,52 +657,46 @@ model DatasetDelta {
   @@index([snapshotId])
   @@index([entityKey])
   @@index([changeType])
-  @@map("dataset_deltas")
 }
 
-// ─── Signal ─────────────────────────────────────────────────
-// Cross-source correlation signals detected by SIGNAL-CORRELATOR / SENTINEL
+// Cross-source correlation signals
 model Signal {
-  id          String   @id @default(cuid())
-  signalType  String                           // e.g. "ma_indicator", "regulatory_shift", "market_entry"
-  title       String
-  description String
-  sources     String[] @default([])            // Source references (feed item IDs, delta IDs, etc.)
-  entityRefs  String[] @default([])            // Related entity keys (company names, NPIs, etc.)
-  confidence  Float    @default(0.5)           // 0.0 - 1.0 Bayesian confidence
-  severity    String   @default("medium")      // low | medium | high | critical
-  pattern     String?                          // Which correlation pattern matched
-  metadata    String   @default("{}")          // JSON: pattern-specific data
-  detectedAt  DateTime @default(now())
-  expiresAt   DateTime?                        // Signal relevance expiry
+  id           String   @id @default(cuid())
+  signalType   String // e.g., ma_convergence, regulatory_shift
+  title        String
+  description  String?
+  sources      String[] // Source references
+  confidence   Float // 0.0 to 1.0
+  severity     String    @default("medium") // low | medium | high | critical
+  entityRefs   String[] // Referenced entities
+  patternId    String? // ID of the pattern that generated this signal
+  metadata     Json?
+  detectedAt   DateTime  @default(now())
 
   alerts Alert[]
 
   @@index([signalType])
   @@index([severity])
   @@index([detectedAt])
-  @@map("signals")
 }
 
-// ─── Alert ──────────────────────────────────────────────────
-// SENTINEL notifications triggered by signals or direct detection
+// SENTINEL notifications
 model Alert {
-  id           String    @id @default(cuid())
-  signalId     String?
-  alertType    String                          // signal | threshold | anomaly | scheduled
-  title        String
-  message      String
-  severity     String    @default("medium")    // low | medium | high | critical
-  acknowledged Boolean   @default(false)
+  id             String    @id @default(cuid())
+  signalId       String?
+  alertType      String // signal_detected, source_error, threshold_breach
+  title          String
+  message        String
+  severity       String    @default("medium") // low | medium | high | critical
+  acknowledged   Boolean   @default(false)
   acknowledgedBy String?
   acknowledgedAt DateTime?
-  metadata     String    @default("{}")        // JSON: alert-specific context
-  createdAt    DateTime  @default(now())
+  createdAt      DateTime  @default(now())
 
   signal Signal? @relation(fields: [signalId], references: [id], onDelete: SetNull)
 
   @@index([alertType])
-  @@index([severity, acknowledged])
-  @@index([createdAt])
-  @@map("alerts")
+  @@index([severity])
+  @@index([acknowledged])
+  @@index([signalId])
 }

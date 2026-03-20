@@ -62,6 +62,8 @@ describe("Data-Aware Planner", () => {
             {
               index: 0,
               templateId: "SF-05",
+              title: "Cover",
+              type: "title",
               slideIntent: "transition",
               narrativePosition: "Opening",
               datasetBindings: { chartSlots: {}, statSources: {} },
@@ -73,6 +75,8 @@ describe("Data-Aware Planner", () => {
             {
               index: 1,
               templateId: "DV-01",
+              title: "Revenue Trajectory",
+              type: "data-metrics",
               slideIntent: "trend",
               narrativePosition: "Revenue trajectory",
               datasetBindings: {
@@ -99,8 +103,13 @@ describe("Data-Aware Planner", () => {
       datasetRegistry: registry,
     });
 
-    expect(manifest.slides.length).toBeGreaterThanOrEqual(2);
-    // First slide should be title
+    expect(manifest.slides.length).toBeGreaterThanOrEqual(4);
     expect(manifest.slides[0].templateId).toBe("SF-05");
+    expect(manifest.slides[0].type).toBe("title");
+    expect(manifest.slides[1].templateId).toBe("CL-08");
+    expect(manifest.slides[1].type).toBe("findings-toc");
+    expect(manifest.slides[2].templateId).toBe("CO-06");
+    expect(manifest.slides[2].type).toBe("executive-summary");
+    expect(manifest.slides.at(-1)?.type).toBe("closing");
   });
 });

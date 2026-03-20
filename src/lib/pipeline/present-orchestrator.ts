@@ -1,31 +1,34 @@
 /**
  * Agentic Presentation Orchestrator
  *
- * Coordinates two presentation pipelines:
+ * Coordinates three presentation pipelines (in priority order):
  *
- * NEW (Template Pipeline — Stages 1-10):
+ * PRIMARY (Agent Presenter — skill-powered agentic generation):
+ *   Stage 1:  Data Enrichment   — enrichToolCalls()              → DatasetRegistry (best-effort)
+ *   Stage 2:  Agent Generation  — generatePresentationWithAgent() → SlideHTML[]
+ *   Stages 3-7: Assemble → Validate → Review → Remediate → Finalize (shared)
+ *
+ * FALLBACK 1 (Template Pipeline — Stages 1-10):
  *   Stage 1:  Data Enrichment   — enrichToolCalls()       → DatasetRegistry
  *   Stage 2:  Planning           — planSlidesWithData()    → TemplateSlideManifest
  *   Stage 3:  Chart Compilation  — compileChartFromDataset()→ Map<slideIdx, Map<slotName, svgFragment>>
  *   Stage 4:  Content Generation — generateSlideContent()  → ContentGeneratorOutput[]
  *   Stage 5:  Template Rendering — renderSlide()           → string[]
- *   Stages 6-10: Assemble → Validate → Review → Remediate → Finalize (shared with legacy)
+ *   Stages 6-10: Assemble → Validate → Review → Remediate → Finalize (shared)
  *
- * LEGACY (8-stage pipeline):
+ * FALLBACK 2 (Legacy Pipeline — 8-stage):
  *   Stage 1: Plan      — planSlides()         → SlideManifest
  *   Stage 2: Compile   — compileCharts()       → ChartDataMap
  *   Stage 3: Generate  — generateSlidesBatch() → SlideHTML[]
- *   Stage 4: Assemble  — assemble()            → AssemblerOutput
- *   Stage 5: Validate  — validate()            → QualityScorecard
- *   Stage 6: Review    — reviewDesign()        → DesignReview | null
- *   Stage 7: Remediate — remediateSlides()     → SlideHTML[]
- *   Stage 8: Return    — PresentationResult
+ *   Stage 4: Assemble  → Validate → Review → Remediate → Finalize (shared)
  *
- * The template pipeline is attempted first when capturedCalls are available.
- * On any failure, falls back to the legacy pipeline.
+ * Production safety default:
+ *   - legacy is the default mode until the newer presenters beat it consistently
+ *   - template / agent presenters are opt-in via PRISM_PRESENTATION_MODE
  */
 
-import { planSlides, planSlidesWithData } from "./present/planner";
+import { generatePresentationWithAgent } from "./present/agent-presenter";
+import { planSlides, planSlidesWithData, buildCompositionSpecs } from "./present/planner";
 import { compileCharts, compileChartFromDataset } from "./present/chart-compiler";
 import { generateSlidesBatch } from "./present/slide-generator";
 import { generateSlideContent } from "./present/content-generator";
@@ -38,18 +41,24 @@ import { reviewDesign } from "./present/design-reviewer";
 import { remediateSlides } from "./present/remediator";
 import { finalize } from "./present/finalizer";
 import { ComponentCatalog } from "./present/component-catalog";
+import { assertPresentationQuality, PresentationQualityError } from "./present/quality-gate";
 import { present } from "./present";
+import { DEFAULT_COMPOSITION_SPECS, validateComposition, reviewDeckComposition } from "./present/composition-validator";
 import type {
+  ChartData,
   ChartDataMap,
   SlideGeneratorInput,
   SlideHTML,
   RemediationInput,
+  RemediationChartFragment,
   DesignReview,
   PipelineTimings,
   DatasetRegistry,
   TemplateSlideManifest,
   ContentGeneratorInput,
   ContentGeneratorOutput,
+  SlideCompositionSpec,
+  SlideType,
 } from "./present/types";
 import type { PresentationResult, AgentResult } from "./types";
 import type { PresentInput } from "./present";
@@ -62,14 +71,118 @@ const CONFIDENCE_ORDER: Record<string, number> = {
   LOW: 2,
 };
 
+interface FinishPipelineContext {
+  compositionSpecs?: Map<number, SlideCompositionSpec>;
+  chartFragmentsBySlide?: Map<number, RemediationChartFragment[]>;
+}
+
+type PresentationPipelineMode = "legacy" | "template" | "agent" | "auto";
+
+export function resolvePresentationPipelineMode(
+  env: NodeJS.ProcessEnv = process.env,
+): PresentationPipelineMode {
+  const raw = env.PRISM_PRESENTATION_MODE?.trim().toLowerCase();
+  if (raw === "template" || raw === "agent" || raw === "auto" || raw === "legacy") {
+    return raw;
+  }
+  return "legacy";
+}
+
+function hasTemplateReadyDatasets(datasets: DatasetRegistry): boolean {
+  if (datasets.datasets.length < 2) return false;
+
+  const strongDatasetCount = datasets.datasets.filter((dataset) => dataset.chartWorthiness >= 40).length;
+  const temporalDatasetCount = datasets.datasets.filter(
+    (dataset) => dataset.dataShape === "time_series" && dataset.values.length >= 3,
+  ).length;
+
+  return strongDatasetCount >= 2 || temporalDatasetCount >= 1;
+}
+
+function inferFragmentType(markup: string): string {
+  if (markup.includes("donut-chart")) return "donut";
+  if (markup.includes("line-chart")) return "line";
+  if (markup.includes("sparkline")) return "sparkline";
+  if (markup.includes("bar-chart")) return "bar";
+  if (markup.includes("bar-fill")) return "horizontal-bar";
+  if (markup.includes("stat-number")) return "counter";
+  return "chart";
+}
+
+function chartDataToRemediationFragments(
+  charts: ChartData[],
+): RemediationChartFragment[] {
+  return charts.flatMap((chart): RemediationChartFragment[] => {
+    if ("svgFragment" in chart) {
+      return [{ type: chart.type, markup: chart.svgFragment }];
+    }
+    if ("htmlFragment" in chart) {
+      return [{ type: chart.type, markup: chart.htmlFragment }];
+    }
+    return [];
+  });
+}
+
+function templateChartMapToRemediationFragments(
+  chartMap: Map<string, string>,
+): RemediationChartFragment[] {
+  return [...chartMap.entries()].map(([slotName, markup]) => ({
+    type: inferFragmentType(markup),
+    slotName,
+    markup,
+  }));
+}
+
+function buildTemplateCompositionSpecs(
+  manifest: TemplateSlideManifest,
+): Map<number, SlideCompositionSpec> {
+  const specs = new Map<number, SlideCompositionSpec>();
+  const templateOverrides: Record<string, Partial<SlideCompositionSpec>> = {
+    "SF-05": { requiredComponentClasses: ["hero-title", "hero-stats", "agent-chip"] },
+    "CL-08": { requiredComponentClasses: ["callout", "toc-group-header", "toc-item"] },
+    "CO-06": {
+      requiredComponentClasses: ["callout", "summary-card-stack", "finding-card"],
+      interactiveRequirement: "one",
+      chartRequirement: "none",
+    },
+    "CO-05": { requiredComponentClasses: ["finding-card", "section-intro"] },
+    "DV-01": { requiredComponentClasses: ["chart-container", "stat-block"] },
+    "DV-03": { requiredComponentClasses: ["comparison-bars", "section-intro"] },
+    "DV-04": { requiredComponentClasses: ["stat-block", "section-intro"], chartRequirement: "none" },
+  };
+
+  for (const slide of manifest.slides) {
+    const slideType = slide.type as SlideType;
+    const defaults = DEFAULT_COMPOSITION_SPECS[slideType] ?? DEFAULT_COMPOSITION_SPECS["dimension-deep-dive"];
+    const override = templateOverrides[slide.templateId] ?? {};
+    const chartSlotCount = Object.keys(slide.datasetBindings.chartSlots).length;
+    const chartRequirement = chartSlotCount === 0
+      ? (override.chartRequirement ?? defaults.chartRequirement)
+      : chartSlotCount >= 2
+        ? "multiple"
+        : "one";
+
+    specs.set(slide.index + 1, {
+      ...defaults,
+      ...override,
+      backgroundVariant: slide.slideClass || defaults.backgroundVariant,
+      chartRequirement,
+    });
+  }
+
+  return specs;
+}
+
 // ─── Main Orchestrator ────────────────────────────────────────────────────────
 
 /**
  * Present a slide deck using the agentic pipeline.
  *
- * Attempts the new template pipeline (data capture → enrich → select → render)
- * when capturedCalls are available. Falls back to the legacy pipeline on any
- * failure, or when no captured data is available.
+ * Mode behavior:
+ * - legacy (default): use the proven legacy presenter
+ * - template: attempt template pipeline, then fall back to legacy
+ * - agent: attempt agent presenter, then fall back through template/legacy
+ * - auto: agent presenter only when explicitly enabled, template only when dataset-ready
  */
 export async function presentOrchestrated(
   input: PresentInput,
@@ -77,13 +190,93 @@ export async function presentOrchestrated(
   const { emitEvent } = input;
   const capturedCount = input.capturedCalls?.length ?? 0;
   const hasCapturedData = capturedCount > 0;
+  const mode = resolvePresentationPipelineMode();
 
-  console.log(`[orchestrator] 🎬 Starting presentation pipeline — capturedCalls: ${capturedCount}, hasCapturedData: ${hasCapturedData}`);
+  console.log(
+    `[orchestrator] 🎬 Starting presentation pipeline — mode=${mode}, capturedCalls: ${capturedCount}, hasCapturedData: ${hasCapturedData}`,
+  );
 
+  // ── Stage 1: Data Enrichment (best-effort, non-blocking) ──────────────────
+  let datasets: DatasetRegistry = { runId: input.runId, datasets: [], entities: [] };
   if (hasCapturedData) {
+    try {
+      datasets = enrichToolCalls(input.runId, input.capturedCalls ?? []);
+      console.log(`[orchestrator] Enriched ${datasets.datasets.length} datasets from ${capturedCount} captured calls`);
+    } catch (enrichErr) {
+      console.warn(
+        `[orchestrator] Enrichment failed (non-blocking): ${enrichErr instanceof Error ? enrichErr.message : String(enrichErr)}`,
+      );
+    }
+  }
+
+  const templateReady = hasCapturedData && hasTemplateReadyDatasets(datasets);
+  const agentPresenterEnabled = mode === "agent" || (mode === "auto" && process.env.PRISM_ENABLE_AGENT_PRESENTER === "1");
+
+  if (mode === "legacy") {
+    console.log("[orchestrator] Using legacy presenter by default");
+    return presentLegacy(input);
+  }
+
+  // ── Primary: Agent Presenter ──────────────────────────────────────────────
+  if (agentPresenterEnabled) {
+    try {
+      return await presentWithAgent(input, datasets);
+    } catch (agentErr) {
+      if (agentErr instanceof PresentationQualityError) {
+        console.error(
+          `[orchestrator] Agent presenter failed quality gate: ${agentErr.message}`,
+        );
+        throw agentErr;
+      }
+      const msg = agentErr instanceof Error ? agentErr.message : String(agentErr);
+      console.warn(`[orchestrator] Agent presenter failed, trying fallbacks: ${msg}`);
+      emitEvent({
+        type: "agent_progress",
+        agentName: "orchestrator",
+        progress: 0,
+        message: `Agent presenter failed (${msg}) — falling back`,
+      });
+    }
+  } else if ((mode as string) === "agent") {
+    console.warn(
+      "[orchestrator] Agent presenter requested but disabled; set PRISM_ENABLE_AGENT_PRESENTER=1 to enable it",
+    );
+    emitEvent({
+      type: "agent_progress",
+      agentName: "orchestrator",
+      progress: 0,
+      message: "Agent presenter disabled — falling back",
+    });
+  }
+
+  // ── Fallback 1: Template Pipeline ─────────────────────────────────────────
+  if (mode === "template" || mode === "auto") {
+    if (!templateReady) {
+      const readinessMessage = hasCapturedData
+        ? `only ${datasets.datasets.length} enriched datasets available`
+        : "no captured research data available";
+      console.warn(
+        `[orchestrator] Skipping template pipeline: ${readinessMessage}`,
+      );
+      emitEvent({
+        type: "agent_progress",
+        agentName: "orchestrator",
+        progress: 0,
+        message: `Skipping template pipeline (${readinessMessage}) — using legacy presenter`,
+      });
+    }
+  }
+
+  if ((mode === "template" && hasCapturedData) || (mode === "auto" && templateReady)) {
     try {
       return await presentWithTemplates(input);
     } catch (templateErr) {
+      if (templateErr instanceof PresentationQualityError) {
+        console.error(
+          `[orchestrator] Template pipeline failed quality gate; refusing legacy downgrade: ${templateErr.message}`,
+        );
+        throw templateErr;
+      }
       const msg = templateErr instanceof Error ? templateErr.message : String(templateErr);
       console.warn(`[orchestrator] Template pipeline failed, falling back to legacy: ${msg}`);
       emitEvent({
@@ -95,13 +288,59 @@ export async function presentOrchestrated(
     }
   }
 
+  // ── Fallback 2: Legacy Pipeline ───────────────────────────────────────────
+  console.log("[orchestrator] Falling back to legacy presenter");
   return presentLegacy(input);
 }
 
-// ─── Template Pipeline (New) ──────────────────────────────────────────────────
+// ─── Agent Presenter (Primary) ────────────────────────────────────────────────
 
 /**
- * New data-driven template pipeline.
+ * Skill-powered agent presenter.
+ * Uses the agent-presenter module with full skill knowledge to generate
+ * high-quality presentations via an agentic tool-use loop.
+ */
+async function presentWithAgent(
+  input: PresentInput,
+  datasets: DatasetRegistry,
+): Promise<PresentationResult> {
+  const { emitEvent, runId } = input;
+  const startMs = Date.now();
+
+  console.log(`[orchestrator] 🤖 Agent Presenter: starting with ${datasets.datasets.length} datasets`);
+
+  emitEvent({
+    type: "phase_change",
+    phase: "PRESENT_GENERATING",
+    message: `Generating presentation with agent presenter (${datasets.datasets.length} datasets)...`,
+  });
+
+  const { slides, manifest } = await generatePresentationWithAgent({
+    runId,
+    synthesis: input.synthesis,
+    agentResults: input.agentResults,
+    datasets,
+    blueprint: input.blueprint,
+    emitEvent,
+  });
+
+  const generateMs = Date.now() - startMs;
+  console.log(
+    `[orchestrator] 🤖 Agent Presenter: generated ${slides.length} slides in ${generateMs}ms`,
+  );
+
+  // Continue with shared finish pipeline (assemble → validate → review → remediate → finalize)
+  return finishPipeline(input, slides, manifest, {
+    planMs: 0,
+    chartCompileMs: 0,
+    generateMs,
+  });
+}
+
+// ─── Template Pipeline (Fallback 1) ──────────────────────────────────────────
+
+/**
+ * Data-driven template pipeline.
  * Uses captured MCP tool call data to enrich datasets, select templates,
  * generate content, compile charts, and render slides deterministically.
  */
@@ -190,6 +429,14 @@ async function presentWithTemplates(
   const chartCompileMs = Date.now() - chartCompileStart;
   emitStageEvent("chart-compilation", "complete");
 
+  const chartFragmentsBySlide = new Map<number, RemediationChartFragment[]>();
+  for (const slide of manifest.slides) {
+    const chartMap = slideCharts.get(slide.index) ?? new Map<string, string>();
+    chartFragmentsBySlide.set(slide.index + 1, templateChartMapToRemediationFragments(chartMap));
+  }
+
+  const compositionSpecs = buildTemplateCompositionSpecs(manifest);
+
   console.log(
     `[orchestrator] Stage 3 Chart Compilation complete in ${chartCompileMs}ms`,
   );
@@ -206,6 +453,8 @@ async function presentWithTemplates(
     const contentInput: ContentGeneratorInput = {
       templateId: slide.templateId,
       templateName: templateEntry?.name ?? slide.templateId,
+      slideTitle: slide.title,
+      slideType: slide.type,
       slotSchema: templateEntry?.slots ?? [],
       componentSlotSchemas: templateEntry?.componentSlots ?? [],
       datasets: registry.datasets.filter(d =>
@@ -244,7 +493,11 @@ async function presentWithTemplates(
     const slide = manifest.slides[i];
     const content = contentOutputs[i];
     const charts = slideCharts.get(slide.index) ?? new Map();
-    const html = renderSlide(slide.templateId, content, charts);
+    const html = renderSlide(slide.templateId, content, charts, {
+      slideNumber: i + 1,
+      totalSlides: manifest.slides.length,
+      slideType: slide.type,
+    });
     renderedSlides.push({
       slideNumber: i + 1,
       html,
@@ -267,6 +520,9 @@ async function presentWithTemplates(
     planMs,
     chartCompileMs,
     generateMs: generateMs + renderMs,
+  }, {
+    compositionSpecs,
+    chartFragmentsBySlide,
   });
 }
 
@@ -283,12 +539,6 @@ async function presentLegacy(
   const { emitEvent } = input;
 
   try {
-    // ── Timings accumulator ───────────────────────────────────────────────────
-    const timings: {
-      reviewMs?: number;
-      remediateMs?: number;
-    } = {};
-
     // ── Stage 1: Plan ────────────────────────────────────────────────────────
 
     emitEvent({
@@ -305,6 +555,10 @@ async function presentLegacy(
     console.log(
       `[orchestrator] ✅ Legacy Stage 1 Plan complete: ${manifest.slides.length} slides planned in ${planMs}ms`,
     );
+
+    // ── Stage 1b: Build Composition Specs ────────────────────────────────────
+    const compositionSpecs = buildCompositionSpecs(manifest);
+    console.log(`[orchestrator] Composition specs built for ${compositionSpecs.size} slides`);
 
     // ── Stage 2: Compile Charts ───────────────────────────────────────────────
 
@@ -376,6 +630,7 @@ async function presentLegacy(
             subtitle: manifest.subtitle,
             totalSlides: manifest.totalSlides,
           },
+          compositionSpec: compositionSpecs.get(spec.slideNumber),
         };
       },
     );
@@ -397,12 +652,40 @@ async function presentLegacy(
       `[orchestrator] ✅ Legacy Stage 3 Generate complete: ${successCount} success, ${fallbackCount} fallback in ${generateMs}ms`,
     );
 
+    // ── Stage 3b: Composition Validation (per-slide) ──────────────────────────
+
+    let compositionViolationCount = 0;
+    for (const slide of slides) {
+      const spec = compositionSpecs.get(slide.slideNumber);
+      if (!spec || slide.status === "failed") continue;
+
+      const result = validateComposition(slide.html, spec);
+      if (!result.passed) {
+        compositionViolationCount += result.violations.length;
+        console.warn(
+          `[orchestrator] Slide ${slide.slideNumber} composition: score=${result.score}, violations=${result.violations.length} (${result.violations.map(v => v.type).join(", ")})`,
+        );
+      }
+    }
+
+    if (compositionViolationCount > 0) {
+      console.log(`[orchestrator] Total composition violations across deck: ${compositionViolationCount}`);
+    }
+
     // ── Stages 4-8: Assemble → Validate → Review → Remediate → Finalize ──────
 
     return finishPipeline(input, slides, manifest, {
       planMs,
       chartCompileMs,
       generateMs,
+    }, {
+      compositionSpecs,
+      chartFragmentsBySlide: new Map(
+        Object.entries(chartDataMap).map(([slideNumber, charts]) => [
+          Number(slideNumber),
+          chartDataToRemediationFragments(charts),
+        ]),
+      ),
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -444,6 +727,7 @@ async function finishPipeline(
   slides: SlideHTML[],
   manifest: { title: string; subtitle: string; slides: unknown[] },
   earlyTimings: EarlyTimings,
+  context?: FinishPipelineContext,
 ): Promise<PresentationResult> {
   const { emitEvent } = input;
   const timings: { reviewMs?: number; remediateMs?: number } = {};
@@ -466,13 +750,20 @@ async function finishPipeline(
       const slideType =
         (slideObj && typeof slideObj.type === "string" ? slideObj.type : null) ??
         "data-metrics";
+      const templateId =
+        (slideObj && typeof slideObj.templateId === "string" ? slideObj.templateId : null) ??
+        null;
+      const componentHints = slideObj && Array.isArray(slideObj.componentHints)
+        ? slideObj.componentHints.filter((hint): hint is string => typeof hint === "string")
+        : [];
       return {
         slideNumber: i + 1,
         title: slideTitle,
         type: slideType as "data-metrics",
+        templateId,
         purpose: "",
         agentSources: [] as string[],
-        componentHints: [] as string[],
+        componentHints,
         animationType: "anim" as const,
         dataPoints: [],
       };
@@ -493,6 +784,24 @@ async function finishPipeline(
 
   console.log(
     `[orchestrator] Stage 7 Validate complete: grade=${scorecard.grade}, score=${scorecard.overall} in ${validateMs}ms`,
+  );
+
+  // ── Stage 7b: Deck-Level Composition Review ────────────────────────────────
+
+  const slidesHtml = slides.map(s => s.html);
+  const backgroundVariants = slides.map(s => {
+    const bgMatch = s.html.match(/class="slide\s+([^"]*?)"/);
+    if (!bgMatch) return "gradient-dark";
+    const classes = bgMatch[1].split(/\s+/);
+    return classes.find(c => c.startsWith("gradient-") || c.startsWith("dark-")) ?? "gradient-dark";
+  });
+  const deckReview = reviewDeckComposition(slidesHtml, backgroundVariants);
+
+  console.log(
+    `[orchestrator] Deck composition review: vocabulary=${deckReview.componentVocabulary}, ` +
+    `animation=${deckReview.animationDiversity}, charts=${deckReview.chartTypeDiversity}, ` +
+    `interactive=${deckReview.interactiveRichness}, bgAlt=${deckReview.backgroundAlternation}, ` +
+    `rhythm=${deckReview.visualRhythm}, overall=${deckReview.overallDesignScore}`,
   );
 
   // Emit quality report
@@ -534,6 +843,18 @@ async function finishPipeline(
   const MAX_ITERATIONS = 2;
 
   for (let iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
+    const compositionResults = new Map<number, ReturnType<typeof validateComposition>>();
+    if (context?.compositionSpecs) {
+      for (const slide of slides) {
+        const spec = context.compositionSpecs.get(slide.slideNumber);
+        if (!spec || slide.status === "failed") continue;
+        const result = validateComposition(slide.html, spec);
+        if (!result.passed) {
+          compositionResults.set(slide.slideNumber, result);
+        }
+      }
+    }
+
     // Stage 8: Design Review
     const reviewStart = Date.now();
     const review = await reviewDesign({
@@ -543,34 +864,66 @@ async function finishPipeline(
     });
     timings.reviewMs = (timings.reviewMs ?? 0) + (Date.now() - reviewStart);
 
-    if (!review) break;
-    lastReview = review;
-
-    console.log(
-      `[orchestrator] Stage 8 Design Review (iteration ${iteration + 1}): overallScore=${review.overallScore.toFixed(1)} in ${timings.reviewMs}ms`,
-    );
+    if (review) {
+      lastReview = review;
+      console.log(
+        `[orchestrator] Stage 8 Design Review (iteration ${iteration + 1}): overallScore=${review.overallScore.toFixed(1)} in ${timings.reviewMs}ms`,
+      );
+    } else {
+      console.warn(
+        `[orchestrator] Stage 8 Design Review unavailable on iteration ${iteration + 1}; using validator/composition signals only`,
+      );
+    }
 
     // Collect slides needing remediation
     const slidesToRemediate: RemediationInput[] = [];
 
-    for (const slideReview of review.slides) {
-      const hasValidatorIssues = scorecard.perSlideIssues
-        .filter(i => i.slideNumber === slideReview.slideNumber)
-        .filter(i => i.severity === "error" || i.severity === "warning").length > 0;
+    const reviewBySlide = new Map(
+      (review?.slides ?? []).map((slideReview) => [slideReview.slideNumber, slideReview] as const),
+    );
+    const slideNumbersToEvaluate = new Set<number>();
 
-      if (slideReview.regenerate || hasValidatorIssues) {
-        const slideIdx = slides.findIndex(s => s.slideNumber === slideReview.slideNumber);
+    for (const issue of scorecard.perSlideIssues) {
+      if (issue.severity === "error" || issue.severity === "warning") {
+        slideNumbersToEvaluate.add(issue.slideNumber);
+      }
+    }
+    for (const slideNumber of compositionResults.keys()) {
+      slideNumbersToEvaluate.add(slideNumber);
+    }
+    for (const slideReview of review?.slides ?? []) {
+      if (slideReview.regenerate) {
+        slideNumbersToEvaluate.add(slideReview.slideNumber);
+      }
+    }
 
-        if (slideIdx >= 0) {
-          slidesToRemediate.push({
-            slideNumber: slideReview.slideNumber,
-            originalHtml: slides[slideIdx].html,
-            validatorIssues: scorecard.perSlideIssues.filter(i => i.slideNumber === slideReview.slideNumber),
-            reviewerFeedback: slideReview.feedback,
-            exemplarHtml: catalog.exemplarForSlideType("data-metrics"),
-            chartData: [],
-          });
-        }
+    for (const slideNumber of [...slideNumbersToEvaluate].sort((a, b) => a - b)) {
+      const validatorIssues = scorecard.perSlideIssues.filter((issue) => issue.slideNumber === slideNumber);
+      const compositionViolations = compositionResults.get(slideNumber)?.violations ?? [];
+      const slideReview = reviewBySlide.get(slideNumber);
+      const hasValidatorIssues = validatorIssues.some(
+        (issue) => issue.severity === "error" || issue.severity === "warning",
+      );
+      const shouldRemediate = Boolean(slideReview?.regenerate) || hasValidatorIssues || compositionViolations.length > 0;
+
+      if (!shouldRemediate) continue;
+
+      const slideIdx = slides.findIndex((slide) => slide.slideNumber === slideNumber);
+      const slideMeta = assemblerManifest.slides[slideIdx];
+
+      if (slideIdx >= 0 && slideMeta) {
+        slidesToRemediate.push({
+          slideNumber,
+          slideType: slideMeta.type,
+          templateId: "templateId" in slideMeta ? slideMeta.templateId : null,
+          componentHints: slideMeta.componentHints,
+          originalHtml: slides[slideIdx].html,
+          validatorIssues,
+          reviewerFeedback: slideReview?.feedback,
+          exemplarHtml: catalog.exemplarForSlideType(slideMeta.type),
+          chartFragments: context?.chartFragmentsBySlide?.get(slideNumber) ?? [],
+          compositionViolations,
+        });
       }
     }
 
@@ -617,6 +970,8 @@ async function finishPipeline(
     `[orchestrator] QA loop complete: ${remediationRounds} remediation round(s), final score=${bestScore} (${scorecard.grade})`,
   );
 
+  assertPresentationQuality(scorecard);
+
   // ── Stage 10: Finalize ──────────────────────────────────────────────────────
 
   const pipelineTimings: PipelineTimings = {
@@ -631,6 +986,11 @@ async function finishPipeline(
     totalMs: 0,
   };
 
+  // Extract slide structures for editor persistence (Phase 4a)
+  const slideStructures = slides
+    .filter(s => s.structure)
+    .map(s => s.structure!);
+
   const finalizeStart = Date.now();
   const htmlPath = await finalize(
     bestHtml,
@@ -639,6 +999,7 @@ async function finishPipeline(
     lastReview,
     pipelineTimings,
     remediationRounds,
+    slideStructures.length > 0 ? slideStructures : undefined,
   );
   pipelineTimings.finalizeMs = Date.now() - finalizeStart;
   pipelineTimings.totalMs =
@@ -657,7 +1018,7 @@ async function finishPipeline(
     htmlPath,
   });
 
-  // Read back the finalized HTML (with inlined CSS/JS, baked animations)
+  // Read back the finalized HTML (with inlined CSS/JS and runtime animations intact)
   const { readFileSync } = await import("fs");
   const { resolve } = await import("path");
   const finalizedHtml = readFileSync(resolve(process.cwd(), htmlPath), "utf-8");
@@ -668,6 +1029,7 @@ async function finishPipeline(
     title: manifest.title,
     subtitle: manifest.subtitle,
     slideCount: assemblerOutput.slideCount,
+    slideStructures: slideStructures.length > 0 ? slideStructures : undefined,
     quality: { overall: scorecard.overall, grade: scorecard.grade },
   };
 }

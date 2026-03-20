@@ -5,7 +5,7 @@
  * query size limits and improve performance.
  */
 
-import { db } from "./db";
+import { prisma } from "@/lib/prisma";
 
 const DEFAULT_BATCH_SIZE = 100;
 
@@ -32,7 +32,7 @@ export async function batchInsertFindings(
 
   for (let i = 0; i < findings.length; i += batchSize) {
     const batch = findings.slice(i, i + batchSize);
-    await db.finding.createMany(batch);
+    await prisma.finding.createMany({ data: batch });
   }
 }
 
@@ -53,7 +53,7 @@ export async function batchInsertSynthesis(
 
   for (let i = 0; i < layers.length; i += batchSize) {
     const batch = layers.slice(i, i + batchSize);
-    await db.synthesis.createMany(batch);
+    await prisma.synthesis.createMany({ data: batch });
   }
 }
 

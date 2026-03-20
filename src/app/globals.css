@@ -352,6 +352,32 @@ pre,
   }
 }
 
+/* ─── Reduced Motion ─────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  body::after {
+    animation: none;
+  }
+
+  .scanline::after {
+    animation: none;
+  }
+
+  .prism-status-dot {
+    animation: none;
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.3);
+  }
+}
+
 /* ─── Engine Color Scoping ───────────────────────────────── */
 
 :root {

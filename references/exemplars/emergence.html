@@ -1,44 +1,66 @@
 <!-- EXEMPLAR: Emergence Slide
      Teaches: Emergent insight layout, dual glow for emphasis, emergence-card for
-              novel cross-agent insights, emergent-why explanation block, grid-2
+              novel cross-agent insights, emergent-why explanation block, anim-zoom
+              for dramatic reveal, stagger-children on card grid, gradient-radial background,
+              tab-group for multi-dimension analysis, NO inline styles except glow position
      Key tokens: emergent-slide, emergent-number, emergent-content, emergence-card,
                  emergent-why, emergent-why-label, slide-bg-glow (dual), tag-cyan,
-                 eyebrow, grid-2
+                 eyebrow, grid-2, anim-zoom, stagger-children, gradient-radial,
+                 tab-group, tab-list, tab-button, tab-panel
      Component choices: emergence-card (NOT finding-card) for cross-agent insights,
                         emergent-number for visual impact, emergent-why to explain
-                        multi-agent synthesis methodology -->
-<section class="slide emergent-slide" id="slide-N">
+                        multi-agent synthesis methodology, tabs for multi-faceted analysis -->
+<section class="slide gradient-radial emergent-slide" id="slide-N">
   <div class="slide-bg-glow" style="background:var(--inov-violet);top:-200px;right:-200px;"></div>
   <div class="slide-bg-glow" style="background:var(--inov-sky);bottom:-200px;left:-200px;"></div>
   <div class="slide-inner">
-    <div class="emergent-number">N</div>
+    <div class="emergent-number anim-zoom">N</div>
     <div class="emergent-content">
-      <div class="eyebrow anim"><span class="tag tag-cyan">Emergence Layer</span> Cross-Agent Synthesis</div>
-      <h2 class="slide-title anim d1">N Insights Requiring <span style="color:var(--accent-bright)">Multi-Agent Synthesis</span></h2>
-      <p class="slide-subtitle anim d2">These insights could not be produced by any single agent alone &mdash; they required simultaneous visibility across multiple analytical dimensions.</p>
+      <div class="eyebrow anim d1"><span class="tag tag-cyan">Emergence Layer</span> Cross-Agent Synthesis</div>
+      <h2 class="slide-title anim-blur d2">N Insights Requiring <span class="accent-bright">Multi-Agent Synthesis</span></h2>
+      <p class="slide-subtitle anim d3">These insights could not be produced by any single agent alone &mdash; they required simultaneous visibility across multiple analytical dimensions.</p>
 
-      <div class="grid-2 anim d3">
-        <div class="emergence-card">
-          <h4>1 &mdash; First Emergent Pattern Title</h4>
-          <p>Describe the cross-agent insight with specificity. Explain which agents contributed what data, and why the combined view reveals something invisible to individual agents. Include specific evidence: numbers, entities, mechanisms. <em>Pattern type: Structural Pattern Recognition &mdash; Agent A Findings N/N, Agent B Findings N/N.</em></p>
+      <div class="tab-group anim d4">
+        <div class="tab-list">
+          <button class="tab-button active">Structural Patterns</button>
+          <button class="tab-button">Temporal Convergence</button>
+          <button class="tab-button">Hidden Dependencies</button>
         </div>
-        <div class="emergence-card">
-          <h4>2 &mdash; Second Emergent Pattern Title</h4>
-          <p>Another cross-agent insight requiring multi-dimensional visibility. Explain the compound effect or hidden dependency. Note any conditional factors that could change the analysis. <em>Conditional on specific external factor or assumption.</em></p>
+        <div class="tab-panel active">
+          <div class="grid-2 stagger-children">
+            <div class="emergence-card">
+              <h4>1 &mdash; First Emergent Pattern Title</h4>
+              <p>Describe the cross-agent insight with specificity. Explain which agents contributed what data, and why the combined view reveals something invisible to individual agents. <em>Pattern type: Structural Pattern Recognition &mdash; Agent A Findings N/N, Agent B Findings N/N.</em></p>
+            </div>
+            <div class="emergence-card">
+              <h4>2 &mdash; Second Emergent Pattern Title</h4>
+              <p>Another cross-agent insight requiring multi-dimensional visibility. Explain the compound effect or hidden dependency. <em>Conditional on specific external factor or assumption.</em></p>
+            </div>
+          </div>
         </div>
-        <div class="emergence-card">
-          <h4>3 &mdash; Third Emergent Pattern Title</h4>
-          <p>Describe a time-sensitive or structural insight. Include window of opportunity, lock-in dynamics, or first-mover effects that only become visible through multi-agent analysis. Reference the specific analytical dimensions required. <em>Favors Entity X given existing footprint.</em></p>
+        <div class="tab-panel">
+          <div class="grid-2 stagger-children">
+            <div class="emergence-card">
+              <h4>3 &mdash; Third Emergent Pattern Title</h4>
+              <p>Describe a time-sensitive or structural insight. Include window of opportunity, lock-in dynamics, or first-mover effects that only become visible through multi-agent analysis.</p>
+            </div>
+            <div class="emergence-card">
+              <h4>4 &mdash; Fourth Emergent Pattern Title</h4>
+              <p>Present a reinforcing-mechanism insight where multiple independent factors compound. List the specific mechanisms (a), (b), (c) and explain how they interlock.</p>
+            </div>
+          </div>
         </div>
-        <div class="emergence-card">
-          <h4>4 &mdash; Fourth Emergent Pattern Title</h4>
-          <p>Present a reinforcing-mechanism insight where multiple independent factors compound. List the specific mechanisms (a), (b), (c) and explain how they interlock. This pattern of enumerated sub-mechanisms is ideal for complex emergent insights.</p>
+        <div class="tab-panel">
+          <div class="emergence-card">
+            <h4>5 &mdash; Fifth Emergent Pattern Title</h4>
+            <p>A hidden dependency that only appears when comparing across multiple agent dimensions simultaneously. Explain the cascading effect chain.</p>
+          </div>
         </div>
       </div>
 
-      <div class="emergent-why anim d4">
+      <div class="emergent-why anim-spring d6">
         <div class="emergent-why-label">Why Only Multi-Agent Analysis Finds These</div>
-        <div class="finding-body">Explain which agents contributed which pieces and why no single agent could see the full picture. Reference specific finding numbers from individual agents that combine to produce the emergent insight. This methodological transparency builds trust in the multi-agent synthesis process.</div>
+        <div class="finding-body">Explain which agents contributed which pieces and why no single agent could see the full picture. Reference specific finding numbers from individual agents that combine to produce the emergent insight.</div>
       </div>
     </div>
   </div>

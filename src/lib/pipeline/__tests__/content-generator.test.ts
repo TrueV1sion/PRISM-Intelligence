@@ -44,6 +44,8 @@ describe("Content Generator", () => {
     const input: ContentGeneratorInput = {
       templateId: "DV-01",
       templateName: "Trend Hero",
+      slideTitle: "Revenue trajectory",
+      slideType: "data-metrics",
       slotSchema: [
         { name: "headline", type: "text", required: true, constraints: { maxLength: 60 } },
       ],
@@ -80,6 +82,8 @@ describe("Content Generator", () => {
     const output = await generateSlideContent({
       templateId: "SF-05",
       templateName: "Title Slide",
+      slideTitle: "Opening",
+      slideType: "title",
       slotSchema: [],
       componentSlotSchemas: [],
       datasets: [],
@@ -95,5 +99,70 @@ describe("Content Generator", () => {
         expect(val).not.toMatch(/<[a-z]/i);
       }
     }
+  });
+
+  it("sanitizes and truncates component slot payloads to template constraints", async () => {
+    mockCreate.mockResolvedValue({
+      content: [{
+        type: "text",
+        text: JSON.stringify({
+          slots: {
+            headline: "Executive summary headline that is far too long for the slot",
+            feature_1: {
+              icon: "<b>📈</b>",
+              title: "This title is much too long for a compact executive summary card",
+              description: "This description is also too long and includes <i>HTML</i> that should be stripped before it reaches the renderer.",
+              color_class: "cyan",
+            },
+          },
+          chartDataRefs: {},
+        }),
+      }],
+      usage: { input_tokens: 200, output_tokens: 180 },
+    });
+
+    const output = await generateSlideContent({
+      templateId: "CL-02",
+      templateName: "Three Column Features",
+      slideTitle: "Executive summary",
+      slideType: "executive-summary",
+      slotSchema: [
+        { name: "headline", type: "text", required: true, constraints: { maxLength: 20 } },
+      ],
+      componentSlotSchemas: [
+        {
+          name: "feature_1",
+          component: "feature-card",
+          required: true,
+          fields: [
+            { name: "icon", type: "text", required: true, constraints: { maxLength: 5 } },
+            { name: "title", type: "text", required: true, constraints: { maxLength: 18 } },
+            { name: "description", type: "text", required: true, constraints: { maxLength: 32 } },
+            { name: "color_class", type: "enum", required: true, constraints: { enumValues: ["cyan", "green", "purple", "orange"] } },
+          ],
+        },
+      ],
+      datasets: [],
+      slideIntent: "Executive summary",
+      narrativePosition: "Slide 2",
+      deckThesis: "Test",
+      priorSlideHeadlines: [],
+    });
+
+    expect(typeof output.slots.headline).toBe("string");
+    expect((output.slots.headline as string).length).toBeLessThanOrEqual(20);
+    expect(output.slots.headline).not.toMatch(/<[a-z]/i);
+
+    const feature = output.slots.feature_1;
+    expect(Array.isArray(feature)).toBe(false);
+    expect(typeof feature).toBe("object");
+    expect(feature).toMatchObject({
+      icon: "📈",
+      color_class: "cyan",
+    });
+    expect((feature as Record<string, string>).title.length).toBeLessThanOrEqual(18);
+    expect((feature as Record<string, string>).description.length).toBeLessThanOrEqual(32);
+    expect((feature as Record<string, string>).title).not.toMatch(/<[a-z]/i);
+    expect((feature as Record<string, string>).description).not.toMatch(/<[a-z]/i);
   });
 });

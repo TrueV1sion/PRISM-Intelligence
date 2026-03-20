@@ -1,49 +1,54 @@
 <!-- EXEMPLAR: Findings Slide
      Teaches: Semantic finding card variants, confidence badges, grid-2 layout,
-              mixing finding types for balanced perspective, stat-blocks with counters
+              anim-slide-left/right for opposing columns, stagger-children on card lists,
+              accordion for expandable methodology, tooltip for domain terms,
+              NO inline styles except glow position
      Key tokens: finding-card (.opportunity, .risk, .emergent, .regulatory, .caution),
                  confidence-badge (.high, .medium, .low), grid-2, stat-block,
-                 stat-number, stat-eyebrow, stat-trend, source-list, toc-group-header
+                 stat-number, stat-eyebrow, stat-trend, source-list, toc-group-header,
+                 accordion-item, accordion-trigger, accordion-content, tooltip-wrap,
+                 anim-slide-left, anim-slide-right, stagger-children, gradient-blue
      Component choices: finding-card semantic variants for qualitative insights,
-                        stat-block for quantitative anchors, grid-2 for juxtaposition -->
-<section class="slide" id="slide-N">
+                        stat-block for quantitative anchors, grid-2 for juxtaposition,
+                        accordion for detailed methodology, tooltip for acronyms -->
+<section class="slide gradient-blue" id="slide-N">
   <div class="slide-bg-glow" style="background:var(--inov-cerulean);top:-200px;right:-200px;"></div>
   <div class="slide-inner">
     <div class="eyebrow anim"><span class="tag tag-cyan">Dimension N</span> Agent Name</div>
-    <h2 class="slide-title anim d1">Capability Assessment &amp; <span style="color:var(--accent-bright)">Strategic Gaps</span></h2>
+    <h2 class="slide-title anim-blur d1">Capability Assessment &amp; <span class="accent-bright">Strategic Gaps</span></h2>
     <p class="section-intro anim d2">Brief framing: what this agent analyzed, the key tension discovered, and why it matters for strategic decisions.</p>
 
-    <div class="grid-2 anim d3">
-      <div>
-        <div class="toc-group-header" style="color:var(--accent-success);">Core Strengths</div>
+    <div class="grid-2">
+      <div class="anim-slide-left d3 stagger-children">
+        <div class="toc-group-header accent-success">Core Strengths</div>
 
-        <div class="stat-block" style="text-align:left;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;">
+        <div class="stat-block">
           <span class="stat-eyebrow">KEY METRIC</span>
-          <div style="display:flex;align-items:baseline;gap:6px;">
+          <div class="stat-row">
             <span class="stat-number cyan" data-target="192">192</span><span class="stat-suffix cyan">M+</span>
           </div>
           <span class="stat-trend positive">Trend context or benchmark comparison</span>
         </div>
 
-        <div class="stat-block" style="text-align:left;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;">
+        <div class="stat-block">
           <span class="stat-eyebrow">SECOND METRIC</span>
-          <div style="display:flex;align-items:baseline;gap:6px;">
+          <div class="stat-row">
             <span class="stat-number blue" data-target="25">25</span><span class="stat-suffix blue"> consecutive</span>
           </div>
           <span class="stat-trend positive">Industry recognition or validation</span>
         </div>
 
-        <div class="stat-block" style="text-align:left;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:16px;">
+        <div class="stat-block">
           <span class="stat-eyebrow">THIRD METRIC</span>
-          <div style="display:flex;align-items:baseline;gap:6px;">
+          <div class="stat-row">
             <span class="stat-number green" data-target="23">23</span><span class="stat-suffix green"> / 25</span>
           </div>
           <span class="stat-trend positive">Scale indicator or market share</span>
         </div>
       </div>
 
-      <div>
-        <div class="toc-group-header" style="color:var(--accent-error);">Structural Gaps</div>
+      <div class="anim-slide-right d3 stagger-children">
+        <div class="toc-group-header accent-error">Structural Gaps</div>
 
         <div class="finding-card risk">
           <div class="finding-title">Gap Area One: Specific Weakness</div>
@@ -53,19 +58,26 @@
 
         <div class="finding-card risk">
           <div class="finding-title">Gap Area Two: Architecture Limitation</div>
-          <div class="finding-body">Analysis of a structural or technical limitation. Reference specific technology constraints and their competitive implications.</div>
+          <div class="finding-body">Analysis of a structural or technical limitation with competitive implications. References specific technology constraints.</div>
           <span class="confidence-badge medium">MEDIUM &mdash; Agent Finding N</span>
         </div>
 
         <div class="finding-card risk">
           <div class="finding-title">Gap Area Three: Market Absence</div>
-          <div class="finding-body">Analysis of a market segment where the entity has no presence. Include evidence of competitor strength in this segment and strategic cost of absence.</div>
+          <div class="finding-body">Analysis of a market segment where the entity has no presence, with evidence of competitor strength and strategic cost of absence.</div>
           <span class="confidence-badge high">HIGH &mdash; Agent Finding N</span>
         </div>
       </div>
     </div>
 
-    <div class="source-list anim d5">
+    <div class="accordion-item anim d5">
+      <div class="accordion-trigger">Methodology &amp; Source Details</div>
+      <div class="accordion-content">
+        <p>This analysis combined <span class="tooltip-wrap">HEDIS<span class="tooltip-text">Healthcare Effectiveness Data and Information Set</span></span> quality metrics with SEC EDGAR filings and industry analyst reports. Primary sources verified via cross-agent convergence.</p>
+      </div>
+    </div>
+
+    <div class="source-list anim d6">
       <strong>Sources:</strong>
       <span class="source-item">&bull; PRIMARY &mdash; Official filings and documentation</span> |
       <span class="source-item">&cir; SECONDARY &mdash; Industry reports and analysis</span>

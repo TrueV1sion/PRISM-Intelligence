@@ -655,7 +655,26 @@ async function executeAgent(
           }
 
           try {
-            const toolResult = await toolRegistry.executeTool(toolName, toolInput);
+            let toolResult: string;
+            if (capture) {
+              const wrappedExecute = capture.wrapWithData(
+                "data-sources",
+                toolName,
+                async (params) => {
+                  const { formatted, raw } = await toolRegistry.executeToolWithData(
+                    toolName,
+                    params as Record<string, unknown>,
+                  );
+                  return {
+                    rawResponse: formatted,
+                    structuredData: raw.structuredData,
+                  };
+                },
+              );
+              toolResult = await wrappedExecute(toolInput);
+            } else {
+              toolResult = await toolRegistry.executeTool(toolName, toolInput);
+            }
             toolResultContents.push({
               type: "tool_result",
               tool_use_id: toolBlock.id,
@@ -724,7 +743,23 @@ async function executeAgent(
       messages.push({ role: "assistant", content: response.content });
 
       if (toolResultContents.length > 0) {
-        messages.push({ role: "user", content: toolResultContents });
+        // At turn 12 (3 turns before limit), inject a strong nudge to wrap up
+        const NUDGE_TURN = MAX_TURNS - 3;
+        if (turn === NUDGE_TURN) {
+          const nudgeContent: Anthropic.Messages.ToolResultBlockParam[] = [
+            ...toolResultContents,
+          ];
+          messages.push({ role: "user", content: nudgeContent });
+          messages.push({ role: "assistant", content: [{ type: "text", text: "I have gathered sufficient data. Let me compile and submit my findings now." }] });
+          messages.push({
+            role: "user",
+            content:
+              "IMPORTANT: You are approaching the research turn limit. You MUST call the submit_findings tool on your NEXT response with all findings gathered so far. " +
+              "Do NOT make any more research tool calls. Synthesize what you have and submit immediately.",
+          });
+        } else {
+          messages.push({ role: "user", content: toolResultContents });
+        }
       }
 
       continue; // Next turn

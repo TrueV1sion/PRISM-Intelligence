@@ -246,9 +246,9 @@ describe("compile-presentation-spec", () => {
       expect(compiledSpec).toContain(".anim-blur");
     });
 
-    it("includes stagger system with d1-d7", () => {
+    it("includes stagger system with d1-d12", () => {
       expect(compiledSpec).toContain(".d1");
-      expect(compiledSpec).toContain(".d7");
+      expect(compiledSpec).toContain(".d12");
     });
   });
 

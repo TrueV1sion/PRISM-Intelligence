@@ -16,6 +16,10 @@ import {
   formatDate,
 } from "../format";
 
+function sanitizeMetricKey(value: string): string {
+  return value.replace(/[^a-zA-Z0-9]+/g, "_").replace(/^_+|_+$/g, "").toLowerCase();
+}
+
 // ─── search_sec_filings ───────────────────────────────────────
 
 const searchSecFilings: DataSourceTool = {
@@ -137,6 +141,34 @@ const getCompanyFacts: DataSourceTool = {
       vintage: response.vintage,
       confidence: total_facts > 0 ? "HIGH" : "MEDIUM",
       truncated: facts.length > MAX_TABLE_ROWS_LAYER_2,
+      structuredData: Object.fromEntries(
+        facts.flatMap((fact) => {
+          const firstNumericUnit = Object.entries(fact.units).find(([, dataPoints]) =>
+            dataPoints.some((point) => typeof point.value === "number"),
+          );
+          if (!firstNumericUnit) return [];
+
+          const [unit, dataPoints] = firstNumericUnit;
+          const points = dataPoints
+            .filter((point) => typeof point.value === "number")
+            .sort((a, b) =>
+              (a.fiscal_year || 0) - (b.fiscal_year || 0) ||
+              a.end_date.localeCompare(b.end_date),
+            )
+            .map((point) => ({
+              label: fact.label,
+              period: point.fiscal_year
+                ? `FY${point.fiscal_year}${point.fiscal_period ? ` ${point.fiscal_period}` : ""}`
+                : point.end_date || point.filed_date,
+              year: point.fiscal_year ? String(point.fiscal_year) : undefined,
+              value: point.value as number,
+              unit,
+            }));
+
+          if (points.length < 2) return [];
+          return [[`${sanitizeMetricKey(fact.namespace)}_${sanitizeMetricKey(fact.fact_name)}`, points] as const];
+        }),
+      ),
     };
   },
 };

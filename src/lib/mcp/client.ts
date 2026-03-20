@@ -51,6 +51,34 @@ const MCP_ARCHETYPE_SERVERS: Partial<Record<ArchetypeFamily, string[]>> = {
   "MACRO-CONTEXT": ["biorxiv"],
 };
 
+// ─── Tool Call Timeouts ─────────────────────────────────────
+// Servers that return large datasets (filings, full-text articles, bulk
+// search results) get longer timeouts.  Everything else uses the default.
+
+const MCP_DEFAULT_TIMEOUT_MS = 30_000; // 30s — fast lookups, code searches, metadata
+
+const MCP_TOOL_TIMEOUTS: Partial<Record<string, number>> = {
+  // Large-payload servers — EDGAR XBRL filings, full-text articles, bulk searches
+  sec_edgar:         90_000,  // 10-K filings can be multi-MB XBRL
+  pubmed:            60_000,  // batch article retrieval with full abstracts
+  clinical_trials:   60_000,  // full eligibility criteria, multi-site trials
+  gpo_govinfo:       60_000,  // full-text CFR sections, public laws
+  census_bureau:     60_000,  // ACS table queries with many variables
+
+  // Medium-payload servers — structured but potentially large result sets
+  openfda:           45_000,  // adverse event searches can return 100+ records
+  federal_register:  45_000,  // rule text can be lengthy
+  biorxiv:           45_000,  // preprint search with abstracts
+  cms_coverage:      45_000,  // NCD/LCD full text
+  who_gho:           45_000,  // multi-country indicator queries
+  oecd_health:       45_000,  // cross-country datasets
+  uspto_patents:     45_000,  // patent search with claims text
+
+  // Default-timeout servers (30s is fine) — omitted, use MCP_DEFAULT_TIMEOUT_MS
+  // icd10, npi_registry, congress_gov, bls_data, sam_gov, cbo,
+  // fda_orange_book, grants_gov, ahrq_hcup
+};
+
 // ─── Types ──────────────────────────────────────────────────
 
 interface ConnectedServer {
@@ -282,9 +310,21 @@ export class MCPManager {
       );
     }
 
-    const result = await server.client.callTool({
-      name: toolName,
-      arguments: input,
+    const timeoutMs = MCP_TOOL_TIMEOUTS[serverName] ?? MCP_DEFAULT_TIMEOUT_MS;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const result = await Promise.race([
+      server.client.callTool({
+        name: toolName,
+        arguments: input,
+      }),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(
+          () => reject(new Error(`MCP tool "${qualifiedName}" timed out after ${timeoutMs / 1000}s`)),
+          timeoutMs,
+        );
+      }),
+    ]).finally(() => {
+      if (timer) clearTimeout(timer);
     });
 
     // Extract text content from the MCP result

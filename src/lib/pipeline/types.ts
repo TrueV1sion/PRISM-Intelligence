@@ -141,8 +141,15 @@ export const AgentFindingSchema = z.object({
   sourceTier: SourceTierEnum,
   evidenceType: EvidenceTypeEnum,
   source: z.string(),
+  sourceUrl: z.string().url().optional(),
   implication: z.string(),
   tags: z.array(z.string()),
+  metrics: z.array(z.object({
+    label: z.string(),
+    value: z.number().or(z.string()),
+    trend: z.enum(["up", "down", "flat"]).optional(),
+    format: z.enum(["currency", "percentage", "number", "text"]).optional()
+  })).optional(),
 });
 export type AgentFinding = z.infer<typeof AgentFindingSchema>;
 
@@ -227,6 +234,9 @@ export const PresentationResultSchema = z.object({
   slideCount: z.number(),
   // Set by orchestrator when finalize() already handled post-processing + file write
   htmlPath: z.string().optional(),
+  // Structured slide content for editor persistence (Phase 4a)
+   
+  slideStructures: z.array(z.any()).optional(),
   // Optional quality/telemetry fields from agentic pipeline
   quality: z.object({
     overall: z.number(),

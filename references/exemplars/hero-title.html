@@ -1,28 +1,31 @@
 <!-- EXEMPLAR: Hero/Title Slide
-     Teaches: Brand presence, hero stats grid, agent chips, validation box, dual glow
+     Teaches: Brand presence, hero stats grid, agent chips, validation box, dual glow,
+              background variant class, anim-blur for hero text, anim-spring for stats,
+              stagger-children for agent roster, NO inline styles except glow position + dots
      Key tokens: hero-title, hero-sub, hero-date, hero-stats, hero-stat, agent-chip,
-                 validation-box, validation-card, framework-card, slide-bg-glow
+                 validation-box, validation-card, framework-card, slide-bg-glow,
+                 anim-blur, anim-spring, stagger-children, gradient-dark
      Component choices: hero-stat for key metrics, agent-chip for swarm roster,
                         validation-card for methodology proof, framework-card for pipeline viz -->
-<section class="slide" id="slide-1">
+<section class="slide gradient-dark" id="slide-1">
   <div class="slide-bg-glow" style="background:var(--inov-cerulean);top:-200px;right:-200px;"></div>
   <div class="slide-bg-glow" style="background:var(--inov-violet);bottom:-150px;left:-150px;"></div>
-  <div class="slide-inner" style="text-align:center;">
-    <div class="anim">
-      <div class="hero-badge">PRISM Extended Intelligence Brief — N-Agent Swarm</div>
+  <div class="slide-inner text-center">
+    <div class="anim-fade">
+      <div class="hero-badge">PRISM Extended Intelligence Brief &mdash; N-Agent Swarm</div>
     </div>
-    <h1 class="hero-title anim d1">Topic Name<br><span style="color:var(--inov-sky);">Intelligence Brief Subtitle</span></h1>
-    <p class="hero-sub anim d2">Strategic Assessment: Domain A &middot; Domain B &middot; Domain C</p>
+    <h1 class="hero-title anim-blur d1">Topic Name<br><span class="accent-bright">Intelligence Brief Subtitle</span></h1>
+    <p class="hero-sub anim-spring d2">Strategic Assessment: Domain A &middot; Domain B &middot; Domain C</p>
     <p class="hero-date anim d3">PRISM Intelligence | N-Agent Swarm | EXTENDED Tier | Overall Confidence: MEDIUM</p>
 
-    <div class="anim d3" style="margin-top:1.5rem;">
+    <div class="stagger-children d3">
       <span class="agent-chip"><span class="dot" style="background:var(--accent-bright)"></span>Agent Alpha</span>
       <span class="agent-chip"><span class="dot" style="background:var(--accent-violet)"></span>Agent Beta</span>
       <span class="agent-chip"><span class="dot" style="background:var(--accent-success)"></span>Agent Gamma</span>
       <span class="agent-chip"><span class="dot" style="background:var(--accent-warning)"></span>Agent Delta</span>
     </div>
 
-    <div class="hero-stats anim d4" style="margin-top:2.5rem;">
+    <div class="hero-stats anim-spring d5">
       <div class="hero-stat">
         <div class="value cyan">28</div>
         <div class="label">Total Findings</div>
@@ -41,7 +44,7 @@
       </div>
     </div>
 
-    <div class="validation-box anim d5" style="margin-top:2rem;">
+    <div class="validation-box anim d6">
       <div class="validation-card">
         <h4>&#10003; Validation Methodology</h4>
         <div class="val-row"><span class="val-icon green">&#10003;</span>28 findings across 4 independent analytical agents</div>
@@ -50,7 +53,7 @@
       </div>
       <div class="validation-card framework-card">
         <h4>&#9670; PRISM Processing Framework</h4>
-        <p style="font-size:var(--text-xs);color:var(--text-secondary);margin-bottom:8px;">5-layer intelligence pyramid: Foundation &rarr; Convergence &rarr; Tension &rarr; Emergence &rarr; Gap</p>
+        <p class="text-xs text-secondary mb-sm">5-layer intelligence pyramid: Foundation &rarr; Convergence &rarr; Tension &rarr; Emergence &rarr; Gap</p>
         <div class="framework-visual">
           <span class="fw-node">Agent Alpha</span>
           <span class="fw-node">Agent Beta</span>
@@ -59,7 +62,7 @@
           <span class="fw-arrow">&#8594;</span>
           <span class="fw-center">Cross-Agent Synthesis</span>
           <span class="fw-arrow">&#8594;</span>
-          <span class="fw-node" style="border-color:rgba(0,228,159,0.4);color:var(--accent-success)">N Emergent Insights</span>
+          <span class="fw-node accent-success-border">N Emergent Insights</span>
         </div>
       </div>
     </div>

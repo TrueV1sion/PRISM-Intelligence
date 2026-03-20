@@ -257,7 +257,7 @@ export const datasetIntelligenceResearchTool: DataSourceTool = {
         d.detectedAt.toISOString().slice(0, 10),
         d.snapshot.source.name.slice(0, 20),
         d.entityKey.slice(0, 15),
-        d.fieldName.slice(0, 20),
+        (d.fieldName ?? "—").slice(0, 20),
         (d.oldValue ?? "\u2014").slice(0, 20),
         (d.newValue ?? "\u2014").slice(0, 20),
       ]);

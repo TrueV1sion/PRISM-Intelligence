@@ -7,7 +7,7 @@
 
 import { readdirSync, statSync, unlinkSync } from "fs";
 import { join } from "path";
-import { db } from "./db";
+import { prisma } from "@/lib/prisma";
 
 export interface CleanupOptions {
   maxAge?: number; // Maximum age in days
@@ -28,9 +28,9 @@ export async function cleanupOldPresentations(
     const files = readdirSync(decksDir).filter((f) => f.endsWith(".html"));
 
     // Get all presentation records from database
-    const runs = await db.run.findMany({ includeRelations: true });
+    const runs = await prisma.run.findMany({ include: { presentation: true } });
     const validPaths = new Set(
-      runs.runs
+      runs
         .map((r) => r.presentation?.htmlPath)
         .filter((p): p is string => p !== undefined && p !== null),
     );
@@ -79,11 +79,11 @@ export async function cleanupOldPresentations(
  */
 export async function cleanupOrphanedRecords(): Promise<{ deleted: number }> {
   // Find runs that failed during initialization and have no agents
-  const allRuns = await db.run.findMany({ includeRelations: true });
+  const allRuns = await prisma.run.findMany({ include: { agents: true } });
 
   let deleted = 0;
 
-  for (const run of allRuns.runs) {
+  for (const run of allRuns) {
     // Delete runs stuck in INITIALIZE for more than 24 hours with no agents
     if (
       run.status === "INITIALIZE" &&

@@ -53,9 +53,9 @@ export const legislativeStatusResearchTool: DataSourceTool = {
     ]);
 
     // ─── Extract insights ──────────────────────────────────────
-    const billsBody = billsResult?.data.data as Record<string, unknown> | null;
+    const billsBody = billsResult?.data.data as unknown as Record<string, unknown> | null;
     const billsList = (
-      (billsBody?.bills as Record<string, unknown>[]) ?? []
+      (billsBody?.bills as unknown as Record<string, unknown>[]) ?? []
     ).slice(0, 5);
     const billsCount = (billsResult?.data.pagination?.count ?? billsList.length) as number;
 
@@ -66,7 +66,7 @@ export const legislativeStatusResearchTool: DataSourceTool = {
     const cboItems = cboResult?.data.items ?? [];
 
     // First bill details
-    const firstBill = billsList[0] as Record<string, unknown> | undefined;
+    const firstBill = billsList[0] as unknown as Record<string, unknown> | undefined;
     const recentBillTitle = firstBill
       ? String(dig(firstBill, "title", "Untitled")).slice(0, 80)
       : "No bills found";
@@ -112,7 +112,7 @@ export const legislativeStatusResearchTool: DataSourceTool = {
     // Recent bills table
     if (billsList.length > 0) {
       const billRows = billsList.slice(0, 5).map((b) => {
-        const bill = b as Record<string, unknown>;
+        const bill = b as unknown as Record<string, unknown>;
         const billType = String(bill.type ?? "—");
         const billNumber = String(bill.number ?? "—");
         const billTitle = String(dig(bill, "title", "Untitled")).slice(0, 50);

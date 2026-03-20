@@ -61,10 +61,10 @@ export const companyPositionResearchTool: DataSourceTool = {
     // ─── Extract insights ──────────────────────────────────────
     const totalFilings = edgarResult?.data.total ?? 0;
     const recentFilings = edgarResult?.data.results ?? [];
-    const filingTypes = [...new Set(recentFilings.map((f) => (f as Record<string, unknown>).form_type as string).filter(Boolean))];
+    const filingTypes = [...new Set(recentFilings.map((f) => (f as unknown as Record<string, unknown>).form_type as string).filter(Boolean))];
 
     const entityCount = samEntitiesResult?.data.count ?? 0;
-    const firstEntity = samEntitiesResult?.data.results?.[0] as Record<string, unknown> | undefined;
+    const firstEntity = samEntitiesResult?.data.results?.[0] as unknown as Record<string, unknown> | undefined;
     const entityName = dig(firstEntity, "entityRegistration.legalBusinessName", "—");
     const registrationStatus = dig(firstEntity, "entityRegistration.registrationStatus", "Unknown");
 
@@ -110,7 +110,7 @@ export const companyPositionResearchTool: DataSourceTool = {
     // Recent filings table
     if (recentFilings.length > 0) {
       const rows = recentFilings.map((f) => {
-        const filing = f as Record<string, unknown>;
+        const filing = f as unknown as Record<string, unknown>;
         return [
           String(filing.filed_date ?? "—").slice(0, 10),
           String(filing.form_type ?? "—"),

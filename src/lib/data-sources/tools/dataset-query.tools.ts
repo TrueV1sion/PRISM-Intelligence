@@ -140,7 +140,7 @@ const searchDatasetDeltas: DataSourceTool = {
       d.snapshot.source.name.slice(0, 25),
       d.entityKey.slice(0, 20),
       d.changeType,
-      d.fieldName.slice(0, 25),
+      (d.fieldName ?? "—").slice(0, 25),
       (d.oldValue ?? "\u2014").slice(0, 30),
       (d.newValue ?? "\u2014").slice(0, 30),
     ]);

@@ -12,9 +12,8 @@ import type Anthropic from "@anthropic-ai/sdk";
 import type { ArchetypeFamily } from "@/lib/pipeline/types";
 import type { DataSourceTool, ToolResult } from "./types";
 import { ResultCache } from "./cache";
-import { CrossRunCache, CACHE_TTL } from "@/lib/cache/cross-run-cache";
 import { formatCitations } from "./format";
-// Layer 2: Granular tool imports (22 modules)
+// Layer 2: Granular tool imports (15 modules)
 import { openfdaTools } from "./tools/openfda.tools";
 import { secEdgarTools } from "./tools/sec-edgar.tools";
 import { federalRegisterTools } from "./tools/federal-register.tools";
@@ -30,16 +29,8 @@ import { samGovTools } from "./tools/sam-gov.tools";
 import { fdaOrangeBookTools } from "./tools/fda-orange-book.tools";
 import { grantsGovTools } from "./tools/grants-gov.tools";
 import { ahrqHcupTools } from "./tools/ahrq-hcup.tools";
-import { datasetQueryTools } from "./tools/dataset-query.tools";
-import { feedSearchTools } from "./tools/feed-search.tools";
-import { openSecretsTools } from "./tools/opensecrets.tools";
-import { cmsOpenPaymentsTools } from "./tools/cms-open-payments.tools";
-import { hospitalCompareTools } from "./tools/hospital-compare.tools";
-import { sbirGovTools } from "./tools/sbir-gov.tools";
-import { leapfrogTools } from "./tools/leapfrog.tools";
-import { signalQueryTools } from "./tools/signal-query.tools";
 
-// Layer 3: Research tool imports (19 modules)
+// Layer 3: Research tool imports (13 modules)
 import { drugSafetyResearchTool } from "./research/drug-safety";
 import { clinicalEvidenceResearchTool } from "./research/clinical-evidence";
 import { coveragePolicyResearchTool } from "./research/coverage-policy";
@@ -53,66 +44,6 @@ import { globalHealthResearchTool } from "./research/global-health";
 import { competitiveIntelResearchTool } from "./research/competitive-intel";
 import { fundingLandscapeResearchTool } from "./research/funding-landscape";
 import { qualityBenchmarksResearchTool } from "./research/quality-benchmarks";
-import { datasetIntelligenceResearchTool } from "./research/dataset-intelligence";
-import { newsIntelligenceResearchTool } from "./research/news-intelligence";
-import { lobbyingInfluenceResearchTool } from "./research/lobbying-influence";
-import { providerQualityResearchTool } from "./research/provider-quality";
-import { innovationFundingResearchTool } from "./research/innovation-funding";
-import { crossSourceCorrelationResearchTool } from "./research/cross-source-correlation";
-
-// ─── Tag-Based Router ───────────────────────────────────────
-
-/** Maximum tools returned by tag-based matching for a single archetype. */
-const MAX_TOOLS_PER_ARCHETYPE = 8;
-
-/**
- * Tag-based tool routing. Computes tool sets by intersecting
- * archetype tags with tool routingTags. ARCHETYPE_TOOL_ROUTING
- * is the explicit override layer — if an entry exists there,
- * it takes precedence over tag-based matching.
- */
-export class TagBasedRouter {
-  private tagIndex = new Map<string, Set<string>>(); // tag → tool names
-
-  /** Build index from registered tools. */
-  buildIndex(tools: Map<string, DataSourceTool>): void {
-    this.tagIndex.clear();
-    for (const [name, tool] of tools) {
-      for (const tag of tool.routingTags ?? []) {
-        let toolSet = this.tagIndex.get(tag);
-        if (!toolSet) {
-          toolSet = new Set();
-          this.tagIndex.set(tag, toolSet);
-        }
-        toolSet.add(name);
-      }
-    }
-  }
-
-  /** Find tools matching ANY of the given tags, scored by overlap count. */
-  matchTools(tags: string[], tools: Map<string, DataSourceTool>): DataSourceTool[] {
-    const scores = new Map<string, number>();
-    for (const tag of tags) {
-      const matchingTools = this.tagIndex.get(tag);
-      if (matchingTools) {
-        for (const toolName of matchingTools) {
-          scores.set(toolName, (scores.get(toolName) ?? 0) + 1);
-        }
-      }
-    }
-
-    // Sort by: score descending, then layer 3 before layer 2
-    return Array.from(scores.entries())
-      .sort((a, b) => {
-        if (b[1] !== a[1]) return b[1] - a[1]; // Higher score first
-        const toolA = tools.get(a[0])!;
-        const toolB = tools.get(b[0])!;
-        return toolB.layer - toolA.layer; // Layer 3 before Layer 2
-      })
-      .map(([name]) => tools.get(name)!)
-      .filter(Boolean);
-  }
-}
 
 // ─── Archetype Routing ───────────────────────────────────────
 
@@ -136,16 +67,6 @@ export const WEB_SEARCH_ARCHETYPES: Set<ArchetypeFamily> = new Set([
   "LEGISLATIVE-PIPELINE",
   "REGULATORY-RADAR",
   "RED-TEAM",
-  // Phase 1 additions
-  "MA-SIGNAL-HUNTER",
-  "VC-SCOUT",
-  "TALENT-TRACKER",
-  "INFLUENCE-MAPPER",
-  "SUPPLY-CHAIN-TRACKER",
-  "SENTINEL",
-  "BENCHMARKER",
-  "DILIGENCE-AUDITOR",
-  "ECOSYSTEM-MAPPER",
 ]);
 
 // ─── Archetype Tool Routing ──────────────────────────────────
@@ -158,8 +79,8 @@ export const ARCHETYPE_TOOL_ROUTING: Record<string, {
   granular: string[];
 }> = {
   "RESEARCHER-DATA": {
-    research: ["research_dataset_trends", "research_clinical_evidence", "research_global_health", "research_market_dynamics"],
-    granular: ["search_dataset_deltas", "query_cms_data", "search_bls_series", "search_census_data"],
+    research: ["research_clinical_evidence", "research_global_health", "research_market_dynamics"],
+    granular: ["search_bls_series", "search_census_data", "search_who_indicators"],
   },
   "RESEARCHER-DOMAIN": {
     research: ["research_drug_safety", "research_coverage_policy", "research_clinical_evidence"],
@@ -174,28 +95,28 @@ export const ARCHETYPE_TOOL_ROUTING: Record<string, {
     granular: ["search_sec_filings", "get_company_facts", "search_bls_series"],
   },
   "ANALYST-STRATEGIC": {
-    research: ["research_news_intelligence", "research_company_position", "research_competitive_intel", "research_regulatory_landscape"],
-    granular: ["search_feed_items", "search_sec_filings", "search_federal_register", "search_congress_bills"],
+    research: ["research_company_position", "research_competitive_intel", "research_regulatory_landscape"],
+    granular: ["search_sec_filings", "search_federal_register", "search_congress_bills"],
   },
   "ANALYST-TECHNICAL": {
     research: ["research_clinical_evidence", "research_patent_landscape", "research_drug_safety"],
     granular: ["search_clinical_trials", "search_patents", "search_drug_labels"],
   },
   "ANALYST-QUALITY": {
-    research: ["research_quality_benchmarks", "research_dataset_trends", "research_coverage_policy", "research_global_health"],
-    granular: ["search_hcup_statistics", "search_dataset_deltas", "query_cms_data", "search_ncd"],
+    research: ["research_quality_benchmarks", "research_coverage_policy", "research_global_health"],
+    granular: ["search_hcup_statistics", "search_ncd", "search_who_indicators"],
   },
   "LEGISLATIVE-PIPELINE": {
-    research: ["research_news_intelligence", "research_legislative_status", "research_regulatory_landscape", "research_coverage_policy"],
-    granular: ["search_feed_items", "search_congress_bills", "search_cbo_reports", "search_govinfo"],
+    research: ["research_legislative_status", "research_regulatory_landscape", "research_coverage_policy"],
+    granular: ["search_congress_bills", "search_cbo_reports", "search_govinfo"],
   },
   "REGULATORY-RADAR": {
-    research: ["research_news_intelligence", "research_regulatory_landscape", "research_drug_safety", "research_coverage_policy"],
-    granular: ["search_feed_items", "search_federal_register", "search_drug_labels", "search_govinfo"],
+    research: ["research_regulatory_landscape", "research_drug_safety", "research_coverage_policy"],
+    granular: ["search_federal_register", "search_drug_labels", "search_govinfo"],
   },
   "MACRO-CONTEXT": {
-    research: ["research_news_intelligence", "research_global_health", "research_market_dynamics", "research_quality_benchmarks"],
-    granular: ["search_feed_items", "search_bls_series", "search_census_data", "search_oecd_indicators"],
+    research: ["research_global_health", "research_market_dynamics", "research_quality_benchmarks"],
+    granular: ["search_bls_series", "search_census_data", "search_oecd_indicators"],
   },
   "FUTURIST": {
     research: ["research_clinical_evidence", "research_patent_landscape", "research_competitive_intel"],
@@ -205,129 +126,157 @@ export const ARCHETYPE_TOOL_ROUTING: Record<string, {
     research: ["research_provider_landscape", "research_market_dynamics"],
     granular: ["search_npi_providers", "search_census_data"],
   },
-  "DATA-CURATOR": {
-    research: ["research_dataset_trends", "research_quality_benchmarks"],
-    granular: ["search_dataset_deltas", "query_cms_data"],
-  },
-  "MA-SIGNAL-HUNTER": {
-    research: ["research_dataset_trends", "research_market_dynamics", "research_competitive_intel"],
-    granular: ["search_dataset_deltas", "query_cms_data", "search_sec_filings", "search_signals"],
-  },
-  "PAYER-ANALYST": {
-    research: ["research_dataset_trends", "research_coverage_policy", "research_market_dynamics"],
-    granular: ["search_dataset_deltas", "query_cms_data", "search_ncd"],
-  },
-  "PROVIDER-MAPPER": {
-    research: ["research_provider_quality", "research_dataset_trends", "research_provider_landscape"],
-    granular: ["search_hospital_quality", "search_hospital_safety_grades", "search_dataset_deltas", "query_cms_data", "search_npi_providers"],
-  },
-  "SENTINEL": {
-    research: ["research_cross_source_patterns", "research_news_intelligence", "research_dataset_trends", "research_regulatory_landscape"],
-    granular: ["search_signals", "search_alerts", "search_feed_items", "search_dataset_deltas"],
-  },
-  // Phase 5: New API-powered archetypes
-  "INFLUENCE-MAPPER": {
-    research: ["research_lobbying_influence", "research_competitive_intel"],
-    granular: ["search_lobbying_activity", "search_pac_contributions", "search_campaign_contributions"],
-  },
-  "VC-SCOUT": {
-    research: ["research_innovation_funding", "research_patent_landscape"],
-    granular: ["search_sbir_awards", "search_health_innovation_grants", "search_patents"],
-  },
-  "DILIGENCE-AUDITOR": {
-    research: ["research_company_position", "research_lobbying_influence", "research_provider_quality"],
-    granular: ["search_sec_filings", "search_lobbying_activity", "search_physician_payments"],
-  },
-  "BENCHMARKER": {
-    research: ["research_quality_benchmarks", "research_provider_quality"],
-    granular: ["search_hospital_quality", "search_hospital_safety_grades", "search_patient_experience"],
-  },
-  "ECOSYSTEM-MAPPER": {
-    research: ["research_competitive_intel", "research_innovation_funding"],
-    granular: ["search_sec_filings", "search_sbir_awards", "search_feed_items"],
-  },
-  "NETWORK-ANALYST": {
-    research: ["research_lobbying_influence", "research_provider_quality"],
-    granular: ["search_physician_payments", "search_lobbying_activity", "search_company_payments"],
-  },
-  // Phase 2/3: Feed + Dataset archetypes
-  "SIGNAL-CORRELATOR": {
-    research: ["research_cross_source_patterns", "research_news_intelligence", "research_dataset_trends"],
-    granular: ["search_signals", "search_alerts", "search_feed_items", "search_dataset_deltas"],
-  },
-  "MA-INTEGRATOR": {
-    research: ["research_dataset_trends", "research_market_dynamics"],
-    granular: ["search_dataset_deltas", "query_cms_data", "search_sec_filings"],
-  },
-  "TALENT-TRACKER": {
-    research: ["research_news_intelligence"],
-    granular: ["search_feed_items"],
-  },
-  "RESEARCHER-WEB": {
-    research: ["research_news_intelligence"],
-    granular: ["search_feed_items"],
-  },
-  "HISTORIAN": {
-    research: ["research_dataset_trends"],
-    granular: ["search_dataset_deltas", "query_cms_data"],
-  },
-  "SUPPLY-CHAIN-TRACKER": {
-    research: ["research_drug_safety", "research_patent_landscape"],
-    granular: ["search_drug_labels", "search_510k", "search_feed_items"],
-  },
-  "PRICING-STRATEGIST": {
-    research: ["research_market_dynamics", "research_coverage_policy"],
-    granular: ["search_bls_series", "query_cms_data", "search_census_data"],
-  },
 };
 
-// ─── TTL Resolution ──────────────────────────────────────────
+export function buildStructuredDataFromResult(
+  result: ToolResult,
+): Record<string, unknown> | undefined {
+  const merged: Record<string, unknown> = result.structuredData
+    ? { ...result.structuredData }
+    : {};
 
-/**
- * Maps tool name prefixes to TTL categories for cross-run caching.
- * Tools matching these prefixes get the corresponding TTL when cached in Redis.
- * Default TTL (4h) applies when no prefix matches.
- */
-export const TOOL_TTL_MAP: Record<string, keyof typeof CACHE_TTL> = {
-  // Government data sources — slow-changing (24h)
-  "search_congress": "government",
-  "search_federal_register": "government",
-  "search_govinfo": "government",
-  "search_cbo": "government",
-  "search_grants": "government",
-  "search_sam_": "government",
-  "search_ncd": "government",
-  "search_hospital_quality": "government",
-  "search_hospital_safety": "government",
-  "search_sbir": "government",
-  "search_physician_payments": "government",
-  "search_company_payments": "government",
-  "query_cms_data": "government",
-  // Feed tools — update frequently (1h)
-  "search_feed_items": "rss",
-  "research_news_intelligence": "rss",
-  // Dataset tools — snapshot-based (6h)
-  "search_dataset_deltas": "dataset",
-  "research_dataset_trends": "dataset",
-  // Signal tools — real-time (15m)
-  "search_signals": "realtime",
-  "search_alerts": "realtime",
-  // Cross-source research — update frequently (1h)
-  "research_cross_source_patterns": "rss",
-  // Real-time tools — short TTL (15m)
-  "search_adverse_events": "realtime",
-  "search_sec_filings": "realtime",
-  "search_lobbying": "realtime",
-  "search_pac_contributions": "realtime",
-  "search_campaign_contributions": "realtime",
-};
+  const citationCounts = result.citations.reduce<Array<Record<string, unknown>>>((acc, citation) => {
+    if (typeof citation.resultCount !== "number" || !Number.isFinite(citation.resultCount)) {
+      return acc;
+    }
 
-/** Resolve TTL category for a tool by matching its name against prefix map. */
-function resolveToolTTL(toolName: string): keyof typeof CACHE_TTL {
-  for (const [prefix, category] of Object.entries(TOOL_TTL_MAP)) {
-    if (toolName.startsWith(prefix)) return category;
+    const label = citation.source.trim() || citation.query.trim() || `Source ${acc.length + 1}`;
+    acc.push({
+      label,
+      period: label,
+      value: citation.resultCount,
+      query: citation.query,
+    });
+    return acc;
+  }, []);
+
+  if (citationCounts.length >= 2) {
+    merged.citation_result_counts = citationCounts;
   }
-  return "default";
+
+  const markdownTables = parseMarkdownTables(result.content);
+  if (markdownTables) {
+    Object.assign(merged, markdownTables);
+  }
+
+  return Object.keys(merged).length > 0 ? merged : undefined;
+}
+
+function parseMarkdownTables(raw: string): Record<string, Array<Record<string, unknown>>> | null {
+  if (typeof raw !== "string" || !raw.includes("|")) return null;
+
+  const lines = raw.split(/\r?\n/);
+  const tables: Record<string, Array<Record<string, unknown>>> = {};
+  let tableIndex = 0;
+
+  for (let i = 0; i < lines.length - 1; i++) {
+    const headerLine = lines[i]?.trim();
+    const separatorLine = lines[i + 1]?.trim();
+    if (!headerLine || !separatorLine) continue;
+    if (!headerLine.includes("|")) continue;
+    if (!/^\|?[\s:-]+\|[\s|:-]*$/.test(separatorLine)) continue;
+
+    const headers = splitMarkdownRow(headerLine).map(normalizeHeader);
+    if (headers.length < 2) continue;
+
+    const labelIndex = headers.findIndex(isLabelHeader);
+    const rawRows: string[][] = [];
+    let rowCursor = i + 2;
+
+    while (rowCursor < lines.length && lines[rowCursor]?.includes("|")) {
+      const cells = splitMarkdownRow(lines[rowCursor] ?? "");
+      if (cells.length === 0) break;
+      if (cells.length !== headers.length) {
+        rowCursor++;
+        continue;
+      }
+      rawRows.push(cells);
+      rowCursor++;
+    }
+
+    const valueIndex = selectValueColumn(headers, rawRows);
+    if (valueIndex === -1) {
+      i = rowCursor - 1;
+      continue;
+    }
+
+    const rows = rawRows.reduce<Array<Record<string, unknown>>>((acc, cells, rowIndex) => {
+      const value = parseNumeric(cells[valueIndex]);
+      if (value === null) return acc;
+      const labelCell =
+        labelIndex >= 0 ? cells[labelIndex] : cells.find((_cell, idx) => idx !== valueIndex);
+      acc.push({
+        label: labelCell || `Row ${rowIndex + 1}`,
+        period: labelCell || `Row ${rowIndex + 1}`,
+        value,
+      });
+      return acc;
+    }, []);
+
+    if (rows.length >= 2) {
+      tables[`table_${tableIndex++}`] = rows;
+    }
+
+    i = rowCursor - 1;
+  }
+
+  return Object.keys(tables).length > 0 ? tables : null;
+}
+
+function splitMarkdownRow(line: string): string[] {
+  return line
+    .trim()
+    .replace(/^\|/, "")
+    .replace(/\|$/, "")
+    .split("|")
+    .map((cell) => cell.trim());
+}
+
+function normalizeHeader(header: string): string {
+  return header
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "_");
+}
+
+function isNumericHeader(header: string): boolean {
+  return ["value", "count", "amount", "total", "pct", "percent", "percentage"].some(
+    (token) => header.includes(token),
+  );
+}
+
+function isLabelHeader(header: string): boolean {
+  return ["year", "period", "date", "quarter", "month", "label", "name", "term", "category"].some(
+    (token) => header.includes(token),
+  );
+}
+
+function parseNumeric(value: string | undefined): number | null {
+  if (!value) return null;
+  const normalized = value.replace(/[$,%\s]/g, "").replace(/,/g, "");
+  const parsed = Number.parseFloat(normalized);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function selectValueColumn(headers: string[], rows: string[][]): number {
+  let bestIndex = -1;
+  let bestScore = -1;
+
+  for (let col = 0; col < headers.length; col++) {
+    const numericMatches = rows.reduce((count, row) => {
+      return count + (parseNumeric(row[col]) !== null ? 1 : 0);
+    }, 0);
+
+    if (numericMatches < 2) continue;
+
+    const score = numericMatches + (isNumericHeader(headers[col] ?? "") ? 2 : 0);
+    if (score > bestScore) {
+      bestScore = score;
+      bestIndex = col;
+    }
+  }
+
+  return bestIndex;
 }
 
 // ─── ToolRegistry ────────────────────────────────────────────
@@ -336,24 +285,9 @@ export class ToolRegistry {
   private tools = new Map<string, DataSourceTool>();
   private cache: ResultCache;
   private archetypeRouting = new Map<ArchetypeFamily, ArchetypeToolSet>();
-  private tagRouter = new TagBasedRouter();
-  /** Per-TTL CrossRunCache instances — shared across tools with same TTL */
-  private crossRunCaches = new Map<string, CrossRunCache>();
 
   constructor() {
-    // Default cache uses CrossRunCache for L1+L2 persistence
-    const defaultCrossRun = new CrossRunCache(CACHE_TTL.default);
-    this.cache = ResultCache.withCrossRunCache(defaultCrossRun);
-    this.crossRunCaches.set("default", defaultCrossRun);
-  }
-
-  /** Get or create a CrossRunCache for a specific TTL category. */
-  private getCrossRunCache(ttlCategory: keyof typeof CACHE_TTL): CrossRunCache {
-    const existing = this.crossRunCaches.get(ttlCategory);
-    if (existing) return existing;
-    const cache = new CrossRunCache(CACHE_TTL[ttlCategory]);
-    this.crossRunCaches.set(ttlCategory, cache);
-    return cache;
+    this.cache = new ResultCache();
   }
 
   /** Register a single tool. Validates naming convention. */
@@ -386,11 +320,6 @@ export class ToolRegistry {
     }
   }
 
-  /** Build the tag-based routing index from all registered tools. */
-  buildTagIndex(): void {
-    this.tagRouter.buildIndex(this.tools);
-  }
-
   /** Check if a tool name belongs to this registry. */
   hasToolName(name: string): boolean {
     return this.tools.has(name);
@@ -398,50 +327,27 @@ export class ToolRegistry {
 
   /**
    * Get Anthropic-format tool definitions for an archetype.
-   *
-   * 1. Check ARCHETYPE_TOOL_ROUTING first (explicit override takes precedence).
-   * 2. If no explicit routing, look up archetype tags from ARCHETYPE_REGISTRY
-   *    and use tagRouter.matchTools() for tag-based matching.
-   * 3. Cap at MAX_TOOLS_PER_ARCHETYPE tools, research tools first.
+   * Research tools listed first (Claude preferentially selects earlier tools).
    */
   getToolsForArchetype(archetype: ArchetypeFamily): Anthropic.Messages.Tool[] {
-    // 1. Explicit routing — takes precedence
     const routing = this.archetypeRouting.get(archetype);
-    if (routing) {
-      const toolNames = [...routing.research, ...routing.granular];
-      const result: Anthropic.Messages.Tool[] = [];
+    if (!routing) return [];
 
-      for (const name of toolNames) {
-        const tool = this.tools.get(name);
-        if (tool) {
-          result.push({
-            name: tool.name,
-            description: tool.description,
-            input_schema: tool.inputSchema as Anthropic.Messages.Tool.InputSchema,
-          });
-        }
+    const toolNames = [...routing.research, ...routing.granular];
+    const result: Anthropic.Messages.Tool[] = [];
+
+    for (const name of toolNames) {
+      const tool = this.tools.get(name);
+      if (tool) {
+        result.push({
+          name: tool.name,
+          description: tool.description,
+          input_schema: tool.inputSchema as Anthropic.Messages.Tool.InputSchema,
+        });
       }
-
-      return result;
     }
 
-    // 2. Tag-based matching — lazy import of archetype registry
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { ARCHETYPE_REGISTRY } = require("@/lib/pipeline/archetypes");
-      const profile = ARCHETYPE_REGISTRY[archetype];
-      if (!profile?.tags || profile.tags.length === 0) return [];
-
-      const matched = this.tagRouter.matchTools(profile.tags, this.tools);
-      return matched.slice(0, MAX_TOOLS_PER_ARCHETYPE).map((tool) => ({
-        name: tool.name,
-        description: tool.description,
-        input_schema: tool.inputSchema as Anthropic.Messages.Tool.InputSchema,
-      }));
-    } catch {
-      // ARCHETYPE_REGISTRY not available — return empty
-      return [];
-    }
+    return result;
   }
 
   /**
@@ -472,47 +378,47 @@ export class ToolRegistry {
   }
 
   /**
-   * Execute a tool by name. Results are cached per pipeline run with
-   * TTL-aware cross-run caching (L1 in-memory + L2 Redis).
+   * Execute a tool by name. Results are cached per pipeline run.
    * Returns the formatted content string (markdown + citations).
    */
   async executeTool(name: string, input: Record<string, unknown>): Promise<string> {
+    const { formatted } = await this.executeToolWithData(name, input);
+    return formatted;
+  }
+
+  /**
+   * Execute a tool by name and return both the formatted agent-facing
+   * response and the raw structured payload for downstream enrichment.
+   */
+  async executeToolWithData(
+    name: string,
+    input: Record<string, unknown>,
+  ): Promise<{ formatted: string; raw: ToolResult }> {
     const tool = this.tools.get(name);
     if (!tool) {
       throw new Error(`Unknown tool "${name}" in ToolRegistry`);
     }
 
-    // Resolve TTL-appropriate cross-run cache for this tool
-    const ttlCategory = resolveToolTTL(name);
-    const crossRunCache = this.getCrossRunCache(ttlCategory);
-    const ttlCache = ResultCache.withCrossRunCache(crossRunCache);
-
-    const result = await ttlCache.getOrCompute(name, input, () =>
+    const result = await this.cache.getOrCompute(name, input, () =>
       tool.handler(input, this.cache),
     );
 
-    return this.formatResult(result);
+    const structuredData = buildStructuredDataFromResult(result);
+
+    return {
+      formatted: this.formatResult(result),
+      raw: structuredData ? { ...result, structuredData } : result,
+    };
   }
 
-  /** Reset cache (call between pipeline runs). Clears per-run L0 caches only. */
+  /** Reset cache (call between pipeline runs). */
   resetCache(): void {
     this.cache.clear();
   }
 
-  /** Cache stats for observability — includes per-TTL cross-run stats. */
-  cacheStats(): {
-    hits: number;
-    misses: number;
-    entries: number;
-    crossRun?: { l1Hits: number; l2Hits: number; misses: number; l1Entries: number };
-    ttlCaches: Record<string, { l1Hits: number; l2Hits: number; misses: number; l1Entries: number }>;
-  } {
-    const base = this.cache.stats();
-    const ttlCaches: Record<string, { l1Hits: number; l2Hits: number; misses: number; l1Entries: number }> = {};
-    for (const [category, cache] of this.crossRunCaches) {
-      ttlCaches[category] = cache.stats();
-    }
-    return { ...base, ttlCaches };
+  /** Cache stats for observability. */
+  cacheStats(): { hits: number; misses: number; entries: number } {
+    return this.cache.stats();
   }
 
   /** Format a ToolResult into the final string returned to the agent. */
@@ -530,7 +436,7 @@ export class ToolRegistry {
 // ─── Tool Initialization ────────────────────────────────────
 
 function initializeAllTools(registry: ToolRegistry): void {
-  // Layer 2: Register all 17 granular tool sets
+  // Layer 2: Register all 15 granular tool sets
   registry.registerTools(openfdaTools);
   registry.registerTools(secEdgarTools);
   registry.registerTools(federalRegisterTools);
@@ -546,16 +452,8 @@ function initializeAllTools(registry: ToolRegistry): void {
   registry.registerTools(fdaOrangeBookTools);
   registry.registerTools(grantsGovTools);
   registry.registerTools(ahrqHcupTools);
-  registry.registerTools(datasetQueryTools);
-  registry.registerTools(feedSearchTools);
-  registry.registerTools(openSecretsTools);
-  registry.registerTools(cmsOpenPaymentsTools);
-  registry.registerTools(hospitalCompareTools);
-  registry.registerTools(sbirGovTools);
-  registry.registerTools(leapfrogTools);
-  registry.registerTools(signalQueryTools);
 
-  // Layer 3: Register all 19 research tools
+  // Layer 3: Register all 13 research tools
   registry.registerTool(drugSafetyResearchTool);
   registry.registerTool(clinicalEvidenceResearchTool);
   registry.registerTool(coveragePolicyResearchTool);
@@ -569,18 +467,9 @@ function initializeAllTools(registry: ToolRegistry): void {
   registry.registerTool(competitiveIntelResearchTool);
   registry.registerTool(fundingLandscapeResearchTool);
   registry.registerTool(qualityBenchmarksResearchTool);
-  registry.registerTool(datasetIntelligenceResearchTool);
-  registry.registerTool(newsIntelligenceResearchTool);
-  registry.registerTool(lobbyingInfluenceResearchTool);
-  registry.registerTool(providerQualityResearchTool);
-  registry.registerTool(innovationFundingResearchTool);
-  registry.registerTool(crossSourceCorrelationResearchTool);
 
   // Load archetype routing
   registry.loadDefaultRouting(ARCHETYPE_TOOL_ROUTING);
-
-  // Build tag-based routing index
-  registry.buildTagIndex();
 }
 
 // ─── Singleton ───────────────────────────────────────────────

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { createToolCallCapture, type CapturedToolCall } from "../present/data-capture";
 
 describe("MCP Data Capture", () => {
@@ -39,9 +39,6 @@ describe("MCP Data Capture", () => {
   });
 
   it("does not slow down tool execution", async () => {
-    const onCapture = vi.fn();
-    const capture = createToolCallCapture("run-1", "agent-1", onCapture);
-
     const slowCapture = vi.fn().mockImplementation(() => {
       return new Promise(resolve => setTimeout(resolve, 1000));
     });
@@ -55,5 +52,33 @@ describe("MCP Data Capture", () => {
     const elapsed = Date.now() - start;
 
     expect(elapsed).toBeLessThan(500); // generous threshold for CI environments
+  });
+
+  it("captures structured data alongside the formatted response", async () => {
+    const captured: CapturedToolCall[] = [];
+    const capture = createToolCallCapture("run-1", "agent-1", (call) => {
+      captured.push(call);
+    });
+
+    const wrappedExecute = capture.wrapWithData("data-sources", "search_bls_series", async () => ({
+      rawResponse: "## BLS Time Series",
+      structuredData: {
+        revenue: [
+          { year: "2023", value: 100 },
+          { year: "2024", value: 120 },
+        ],
+      },
+    }));
+
+    const result = await wrappedExecute({ series_ids: ["CUUR0000SAM"] });
+
+    expect(result).toBe("## BLS Time Series");
+    expect(captured).toHaveLength(1);
+    expect(captured[0].structuredData).toEqual({
+      revenue: [
+        { year: "2023", value: 100 },
+        { year: "2024", value: 120 },
+      ],
+    });
   });
 });

@@ -89,13 +89,13 @@ async function makeRequest(
     }
 
     if (!response.ok) {
-      const body = await response.json().catch(() => ({})) as Record<string, unknown>;
+      const body = await response.json().catch(() => ({})) as unknown as Record<string, unknown>;
       throw new Error(
         `SAM.gov API error (HTTP ${response.status}): ${JSON.stringify(body)}`,
       );
     }
 
-    const body = (await response.json()) as Record<string, unknown>;
+    const body = (await response.json()) as unknown as Record<string, unknown>;
     return {
       data: body as unknown as SAMResult,
       status: response.status,
@@ -112,7 +112,7 @@ function normalizeOpportunitiesResponse(
   limit: number,
 ): SAMResult {
   const totalRecords = body.totalRecords as number | undefined;
-  const opportunities = (body.opportunitiesData as Record<string, unknown>[]) ?? [];
+  const opportunities = (body.opportunitiesData as unknown as Record<string, unknown>[]) ?? [];
   const total = totalRecords ?? opportunities.length;
   const hasMore = offset + opportunities.length < total;
 
@@ -133,7 +133,7 @@ function normalizeEntitiesResponse(
   limit: number,
 ): SAMResult {
   const totalRecords = body.totalRecords as number | undefined;
-  const entities = (body.entityData as Record<string, unknown>[]) ?? [];
+  const entities = (body.entityData as unknown as Record<string, unknown>[]) ?? [];
   const total = totalRecords ?? entities.length;
   const hasMore = offset + entities.length < total;
 

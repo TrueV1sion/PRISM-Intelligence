@@ -3,13 +3,12 @@ import {
   getTemplate,
   selectTemplate,
   getAllTemplates,
-  type TemplateRegistryEntry,
 } from "../present/template-registry";
 
 describe("Template Registry", () => {
-  it("returns all 25 templates", () => {
+  it("returns all 27 templates", () => {
     const all = getAllTemplates();
-    expect(all).toHaveLength(25);
+    expect(all).toHaveLength(27);
   });
 
   it("selects DV-01 for time_series + medium density", () => {
@@ -39,6 +38,23 @@ describe("Template Registry", () => {
     const template = getTemplate("SF-05");
     expect(template).toBeDefined();
     expect(template!.name).toBe("Title Slide");
+  });
+
+  it("aligns scorecard, bullet-insight, and closing templates to their slot contracts", () => {
+    const scorecard = getTemplate("CO-02")!;
+    expect(scorecard.chartSlots.map(slot => slot.name)).toContain("chart_primary");
+    expect(scorecard.slots.map(slot => slot.name)).toEqual(expect.arrayContaining(["grade", "grade_label"]));
+
+    const bulletInsights = getTemplate("CL-07")!;
+    expect(bulletInsights.componentSlots.map(slot => slot.name)).toEqual(
+      expect.arrayContaining(["item_1", "item_2", "item_3"]),
+    );
+
+    const closing = getTemplate("CO-05")!;
+    expect(closing.slots.map(slot => slot.name)).toContain("closing");
+
+    expect(getTemplate("CL-08")?.name).toBe("Brief Map");
+    expect(getTemplate("CO-06")?.name).toBe("Executive Summary Board");
   });
 
   it("has correct data shape mappings for data-viz templates", () => {

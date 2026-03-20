@@ -56,14 +56,14 @@ export const providerLandscapeResearchTool: DataSourceTool = {
     let providers: Array<{ name?: string; city?: string; state?: string; taxonomy?: string }> = [];
     if (npiResult.available && npiResult.data) {
       try {
-        const parsed = JSON.parse(npiResult.data) as Record<string, unknown>;
-        const results = (parsed.results ?? parsed.providers ?? []) as Record<string, unknown>[];
+        const parsed = JSON.parse(npiResult.data) as unknown as Record<string, unknown>;
+        const results = (parsed.results ?? parsed.providers ?? []) as unknown as Record<string, unknown>[];
         providerCount = Number(parsed.result_count ?? parsed.total ?? results.length);
         providers = results.slice(0, 8).map((p) => {
-          const basic = (p.basic ?? p) as Record<string, unknown>;
-          const addresses = (p.addresses ?? []) as Record<string, unknown>[];
+          const basic = (p.basic ?? p) as unknown as Record<string, unknown>;
+          const addresses = (p.addresses ?? []) as unknown as Record<string, unknown>[];
           const primaryAddr = addresses[0] ?? {};
-          const taxonomies = (p.taxonomies ?? []) as Record<string, unknown>[];
+          const taxonomies = (p.taxonomies ?? []) as unknown as Record<string, unknown>[];
           const taxonomy = taxonomies[0] ?? {};
           return {
             name: [basic.first_name, basic.last_name ?? basic.organization_name].filter(Boolean).join(" ") || String(basic.name ?? "—"),

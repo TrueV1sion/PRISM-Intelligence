@@ -61,8 +61,8 @@ export const regulatoryLandscapeResearchTool: DataSourceTool = {
     const frTotal = frResult?.data.total ?? 0;
     const frDocs = frResult?.data.results ?? [];
 
-    const congressData = congressResult?.data?.data as Record<string, unknown> | null;
-    const bills = (congressData?.bills ?? []) as Record<string, unknown>[];
+    const congressData = congressResult?.data?.data as unknown as Record<string, unknown> | null;
+    const bills = (congressData?.bills ?? []) as unknown as Record<string, unknown>[];
     const billCount = congressResult?.data?.pagination?.count ?? bills.length;
 
     const gpoTotal = gpoResult?.data.totalCount ?? gpoResult?.data.count ?? 0;
@@ -71,7 +71,7 @@ export const regulatoryLandscapeResearchTool: DataSourceTool = {
     let cmsCount = 0;
     if (cmsResult.available && cmsResult.data) {
       try {
-        const parsed = JSON.parse(cmsResult.data) as Record<string, unknown>;
+        const parsed = JSON.parse(cmsResult.data) as unknown as Record<string, unknown>;
         const results = (parsed.results ?? parsed.ncds ?? []) as unknown[];
         cmsCount = Array.isArray(results) ? results.length : 0;
       } catch {
@@ -129,7 +129,7 @@ export const regulatoryLandscapeResearchTool: DataSourceTool = {
       const rows = bills.slice(0, 5).map((b) => [
         String(b.number ?? "—"),
         String(b.title ?? "—").slice(0, 60),
-        String(b.latestAction?.actionDate ?? "—").slice(0, 10),
+        String((b.latestAction as Record<string, unknown> | undefined)?.actionDate ?? "—").slice(0, 10),
       ]);
       sections.push(`### Congressional Bills\n${markdownTable(["Number", "Title", "Latest Action"], rows, 5, billCount)}`);
     }

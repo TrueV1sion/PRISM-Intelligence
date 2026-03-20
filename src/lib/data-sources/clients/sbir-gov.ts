@@ -76,12 +76,12 @@ async function makeRequest(
     // SBIR API may return an array directly or an object with results
     let results: Record<string, unknown>[];
     if (Array.isArray(data)) {
-      results = data as Record<string, unknown>[];
+      results = data as unknown as Record<string, unknown>[];
     } else if (data && typeof data === "object") {
-      const obj = data as Record<string, unknown>;
-      results = (obj.results as Record<string, unknown>[]) ??
-        (obj.awards as Record<string, unknown>[]) ??
-        (obj.data as Record<string, unknown>[]) ??
+      const obj = data as unknown as Record<string, unknown>;
+      results = (obj.results as unknown as Record<string, unknown>[]) ??
+        (obj.awards as unknown as Record<string, unknown>[]) ??
+        (obj.data as unknown as Record<string, unknown>[]) ??
         [];
     } else {
       results = [];

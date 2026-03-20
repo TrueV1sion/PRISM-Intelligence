@@ -12,24 +12,52 @@ import type {
   EnrichedDataset,
 } from "./types";
 
-const CHART_COLORS = [
-  "var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)",
-  "var(--chart-5)", "var(--chart-6)", "var(--chart-7)", "var(--chart-8)",
+/**
+ * PRISM Design-System Chart Colors — hex values that match CSS design tokens.
+ * Used directly in ECharts configs (ECharts accepts hex natively).
+ */
+const CHART_HEX = [
+  "#00d4ff", // --chart-1  cyan
+  "#7c5cfc", // --chart-2  purple
+  "#00e68a", // --chart-3  green
+  "#ff6b6b", // --chart-4  red
+  "#ffbe0b", // --chart-5  yellow
+  "#ff7eb3", // --chart-6  pink
+  "#4ecdc4", // --chart-7  teal
+  "#a78bfa", // --chart-8  lavender
 ];
 
-const DONUT_RADIUS = 80;
-const DONUT_CIRCUMFERENCE = 2 * Math.PI * DONUT_RADIUS; // 502.6548...
+/** PRISM dark theme constants for ECharts configs */
+const THEME = {
+  fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif",
+  textPrimary: "hsl(210, 30%, 88%)",
+  textSecondary: "hsl(210, 20%, 62%)",
+  textMuted: "hsl(210, 15%, 45%)",
+  gridColor: "rgba(78, 132, 196, 0.12)",
+  splitLineColor: "rgba(78, 132, 196, 0.08)",
+  bgTransparent: "transparent",
+};
 
 let chartIdCounter = 0;
 
-function nextChartId(prefix: string): string {
-  return `${prefix}-${++chartIdCounter}`;
+function nextChartId(): string {
+  return `prism-echart-${++chartIdCounter}`;
+}
+
+/**
+ * Escape a JSON config string for safe embedding in an HTML data attribute.
+ */
+function toDataAttr(config: Record<string, unknown>): string {
+  return JSON.stringify(config)
+    .replace(/&/g, "&amp;")
+    .replace(/'/g, "&#39;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
 
 export function compileCharts(dataPoints: DataPoint[]): ChartData[] {
   const results: ChartData[] = [];
 
-  // Group by chartRole
   const groups = new Map<string, DataPoint[]>();
   for (const pt of dataPoints) {
     const existing = groups.get(pt.chartRole) ?? [];
@@ -37,51 +65,29 @@ export function compileCharts(dataPoints: DataPoint[]): ChartData[] {
     groups.set(pt.chartRole, existing);
   }
 
-  // Process donut segments
   const donutPoints = groups.get("donut-segment");
-  if (donutPoints?.length) {
-    results.push(compileDonut(donutPoints));
-  }
+  if (donutPoints?.length) results.push(compileDonut(donutPoints));
 
-  // Process bar-value (vertical bar chart)
   const barPoints = groups.get("bar-value");
-  if (barPoints?.length) {
-    results.push(compileBar(barPoints));
-  }
+  if (barPoints?.length) results.push(compileBar(barPoints));
 
-  // Process sparkline-point (sparkline chart)
   const sparkPoints = groups.get("sparkline-point");
-  if (sparkPoints?.length) {
-    results.push(compileSparkline(sparkPoints));
-  }
+  if (sparkPoints?.length) results.push(compileSparkline(sparkPoints));
 
-  // Process counter-target (each point becomes its own CounterData)
   const counterPoints = groups.get("counter-target");
   if (counterPoints?.length) {
-    for (const pt of counterPoints) {
-      results.push(compileCounter(pt));
-    }
+    for (const pt of counterPoints) results.push(compileCounter(pt));
   }
 
-  // Process line-point (line chart with clip-path reveal animation)
   const linePoints = groups.get("line-point");
-  if (linePoints?.length) {
-    results.push(compileLine(linePoints));
-  }
+  if (linePoints?.length) results.push(compileLine(linePoints));
 
-  // Process bar-fill-percent (horizontal bars — all grouped into one HorizontalBarData)
   const hbarPoints = groups.get("bar-fill-percent");
-  if (hbarPoints?.length) {
-    results.push(compileHorizontalBar(hbarPoints));
-  }
+  if (hbarPoints?.length) results.push(compileHorizontalBar(hbarPoints));
 
   return results;
 }
 
-/**
- * Adapter: compile a chart from an EnrichedDataset.
- * Converts dataset values to DataPoint[] format and delegates to compileCharts().
- */
 export function compileChartFromDataset(
   dataset: EnrichedDataset,
   chartType: string,
@@ -111,37 +117,70 @@ function mapChartTypeToRole(chartType: string): ChartRole {
   }
 }
 
+// ─── ECharts Config Generators ───────────────────────────────────────────────
+
 function compileDonut(points: DataPoint[]): DonutChartData {
   const total = points.reduce((sum, p) => sum + p.value, 0);
-  let offset = 0;
+  const chartId = nextChartId();
 
-  const segments: DonutSegment[] = points.map((pt, i) => {
-    const pct = pt.value / total;
-    const dashLen = +(pct * DONUT_CIRCUMFERENCE).toFixed(2);
-    const seg: DonutSegment = {
-      label: pt.label,
-      percentage: +(pct * 100).toFixed(1),
-      dashArray: `${dashLen} ${+DONUT_CIRCUMFERENCE.toFixed(2)}`,
-      dashOffset: offset === 0 ? "0" : `-${offset.toFixed(2)}`,
-      color: CHART_COLORS[i % CHART_COLORS.length],
-    };
-    offset += dashLen;
-    return seg;
-  });
+  const segments: DonutSegment[] = points.map((pt, i) => ({
+    label: pt.label,
+    percentage: +(pt.value / total * 100).toFixed(1),
+    dashArray: "",  // legacy — not used with ECharts
+    dashOffset: "",
+    color: CHART_HEX[i % CHART_HEX.length],
+  }));
 
-  // Generate SVG fragment
-  const circles = segments.map(s =>
-    `<circle class="segment" cx="100" cy="100" r="${DONUT_RADIUS}" stroke="${s.color}" stroke-width="24" stroke-dasharray="${s.dashArray}" stroke-dashoffset="${s.dashOffset}" fill="none" />`
-  ).join("\n    ");
+  const option = {
+    tooltip: {
+      trigger: "item",
+      backgroundColor: "rgba(10, 18, 30, 0.95)",
+      borderColor: "rgba(78, 132, 196, 0.3)",
+      borderWidth: 1,
+      textStyle: {
+        color: THEME.textPrimary,
+        fontFamily: THEME.fontFamily,
+        fontSize: 13,
+      },
+      formatter: "{b}: {c} ({d}%)",
+    },
+    series: [{
+      type: "pie",
+      radius: ["55%", "80%"],
+      center: ["50%", "50%"],
+      avoidLabelOverlap: true,
+      itemStyle: {
+        borderRadius: 6,
+        borderColor: "rgba(10, 18, 30, 0.8)",
+        borderWidth: 3,
+      },
+      label: { show: false },
+      emphasis: {
+        scale: true,
+        scaleSize: 8,
+        itemStyle: {
+          shadowBlur: 20,
+          shadowColor: "rgba(0, 212, 255, 0.3)",
+        },
+      },
+      animationType: "scale",
+      animationEasing: "elasticOut",
+      animationDuration: 1400,
+      animationDelay: 200,
+      data: points.map((pt, i) => ({
+        name: pt.label,
+        value: pt.value,
+        itemStyle: { color: CHART_HEX[i % CHART_HEX.length] },
+      })),
+    }],
+  };
 
   const legendItems = segments.map(s =>
     `<div class="legend-item"><span class="legend-dot" style="background:${s.color}"></span> ${s.label} (${s.percentage}%)</div>`
   ).join("\n      ");
 
-  const svgFragment = `<div style="display:flex;align-items:center;gap:2rem;">
-  <svg class="donut-chart" viewBox="0 0 200 200" style="max-width:200px">
-    ${circles}
-  </svg>
+  const svgFragment = `<div class="chart-with-legend" style="display:flex;align-items:center;gap:2rem">
+  <div data-echart='${toDataAttr(option)}' id="${chartId}" style="width:220px;height:220px;flex-shrink:0"></div>
   <div class="chart-legend">
       ${legendItems}
   </div>
@@ -150,99 +189,159 @@ function compileDonut(points: DataPoint[]): DonutChartData {
   return {
     type: "donut",
     segments,
-    circumference: +DONUT_CIRCUMFERENCE.toFixed(2),
+    circumference: 2 * Math.PI * 80,
     svgFragment,
   };
 }
 
 function compileBar(points: DataPoint[]): BarChartData {
-  // SVG viewBox: 300 x 200
-  // Layout: chart area y=10 to y=160 (height 150), x margins for N bars
-  const svgWidth = 300;
-  const svgHeight = 200;
-  const chartTop = 10;
-  const chartBottom = 160;
-  const chartHeight = chartBottom - chartTop; // 150
-  const labelAreaHeight = svgHeight - chartBottom; // 40
-
+  const chartId = nextChartId();
   const maxValue = Math.max(...points.map(p => p.value));
-  const barWidth = Math.floor((svgWidth - 20) / points.length) - 8;
-  const xPad = 10;
+
+  const option = {
+    tooltip: {
+      trigger: "axis",
+      backgroundColor: "rgba(10, 18, 30, 0.95)",
+      borderColor: "rgba(78, 132, 196, 0.3)",
+      borderWidth: 1,
+      textStyle: {
+        color: THEME.textPrimary,
+        fontFamily: THEME.fontFamily,
+        fontSize: 13,
+      },
+      axisPointer: {
+        type: "shadow",
+        shadowStyle: { color: "rgba(0, 212, 255, 0.05)" },
+      },
+    },
+    grid: {
+      left: "3%",
+      right: "4%",
+      bottom: "8%",
+      top: "12%",
+      containLabel: true,
+    },
+    xAxis: {
+      type: "category",
+      data: points.map(p => p.label),
+      axisLine: { lineStyle: { color: THEME.gridColor } },
+      axisTick: { show: false },
+      axisLabel: {
+        color: THEME.textSecondary,
+        fontFamily: THEME.fontFamily,
+        fontSize: 11,
+        rotate: points.some(p => p.label.length > 12) ? 30 : 0,
+      },
+    },
+    yAxis: {
+      type: "value",
+      splitLine: { lineStyle: { color: THEME.splitLineColor, type: "dashed" } },
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: {
+        color: THEME.textMuted,
+        fontFamily: THEME.fontFamily,
+        fontSize: 11,
+      },
+    },
+    series: [{
+      type: "bar",
+      barMaxWidth: 40,
+      itemStyle: {
+        borderRadius: [6, 6, 0, 0],
+      },
+      emphasis: {
+        itemStyle: {
+          shadowBlur: 12,
+          shadowColor: "rgba(0, 212, 255, 0.25)",
+        },
+      },
+      animationDuration: 1200,
+      animationEasing: "cubicOut",
+      animationDelay: (idx: number) => idx * 100,
+      data: points.map((pt, i) => ({
+        value: pt.value,
+        itemStyle: {
+          color: {
+            type: "linear",
+            x: 0, y: 0, x2: 0, y2: 1,
+            colorStops: [
+              { offset: 0, color: CHART_HEX[i % CHART_HEX.length] },
+              { offset: 1, color: CHART_HEX[i % CHART_HEX.length] + "88" },
+            ],
+          },
+        },
+      })),
+    }],
+  };
 
   const bars = points.map((pt, i) => {
     const heightRatio = maxValue > 0 ? pt.value / maxValue : 0;
-    const height = +(heightRatio * chartHeight).toFixed(2);
-    const y = +(chartBottom - height).toFixed(2);
-    const x = xPad + i * (barWidth + 8);
     return {
       label: pt.label,
       value: pt.value,
-      height,
-      y,
-      color: CHART_COLORS[i % CHART_COLORS.length],
-      x,
+      height: +(heightRatio * 150).toFixed(2),
+      y: +(160 - heightRatio * 150).toFixed(2),
+      color: CHART_HEX[i % CHART_HEX.length],
     };
   });
 
-  const rects = bars.map(b =>
-    `<rect class="bar" x="${b.x}" y="${b.y}" width="${barWidth}" height="${b.height}" fill="${b.color}" rx="2" />`
-  ).join("\n    ");
+  const svgFragment = `<div class="chart-container" style="max-width:500px;margin:0 auto">
+  <div data-echart='${toDataAttr(option)}' id="${chartId}" style="width:100%;height:280px"></div>
+</div>`;
 
-  const valueLabels = bars.map(b =>
-    `<text x="${b.x + barWidth / 2}" y="${b.y - 4}" text-anchor="middle" fill="var(--text-primary)" font-size="10">${b.value}${points[bars.indexOf(b)]?.unit ?? ""}</text>`
-  ).join("\n    ");
-
-  const catLabels = bars.map(b =>
-    `<text x="${b.x + barWidth / 2}" y="${chartBottom + 14}" text-anchor="middle" fill="var(--text-secondary)" font-size="9">${b.label}</text>`
-  ).join("\n    ");
-
-  const svgFragment = `<svg class="bar-chart" viewBox="0 0 ${svgWidth} ${svgHeight}" style="width:100%;max-width:${svgWidth}px">
-    ${rects}
-    ${valueLabels}
-    ${catLabels}
-</svg>`;
-
-  return {
-    type: "bar",
-    bars: bars.map(({ label, value, height, y, color }) => ({ label, value, height, y, color })),
-    svgFragment,
-  };
+  return { type: "bar", bars, svgFragment };
 }
 
 function compileSparkline(points: DataPoint[]): SparklineData {
-  // SVG viewBox: 80 x 24
-  const svgWidth = 80;
-  const svgHeight = 24;
-  const padX = 4;
-  const padY = 3;
+  const chartId = nextChartId();
 
+  const option = {
+    grid: { left: 0, right: 0, top: 2, bottom: 2 },
+    xAxis: { type: "category", show: false, data: points.map(p => p.label) },
+    yAxis: { type: "value", show: false },
+    series: [{
+      type: "line",
+      data: points.map(p => p.value),
+      smooth: 0.4,
+      symbol: "none",
+      lineStyle: { width: 2, color: "#00d4ff" },
+      areaStyle: {
+        color: {
+          type: "linear",
+          x: 0, y: 0, x2: 0, y2: 1,
+          colorStops: [
+            { offset: 0, color: "rgba(0, 212, 255, 0.15)" },
+            { offset: 1, color: "rgba(0, 212, 255, 0)" },
+          ],
+        },
+      },
+      animationDuration: 1000,
+      animationEasing: "cubicOut",
+    }],
+    tooltip: { show: false },
+  };
+
+  const svgFragment = `<div class="sparkline-container" style="max-width:120px">
+  <div data-echart='${toDataAttr(option)}' id="${chartId}" style="width:120px;height:36px"></div>
+</div>`;
+
+  // Legacy coordinate string for type compatibility
   const values = points.map(p => p.value);
   const minVal = Math.min(...values);
   const maxVal = Math.max(...values);
   const range = maxVal - minVal || 1;
-
-  const n = points.length;
   const coordPairs = points.map((pt, i) => {
-    const x = +(padX + (i / (n - 1)) * (svgWidth - 2 * padX)).toFixed(2);
-    const y = +(padY + (1 - (pt.value - minVal) / range) * (svgHeight - 2 * padY)).toFixed(2);
-    return { x, y };
+    const x = +(4 + (i / (points.length - 1)) * 72).toFixed(2);
+    const y = +(3 + (1 - (pt.value - minVal) / range) * 18).toFixed(2);
+    return `${x},${y}`;
   });
-
-  const pointsStr = coordPairs.map(p => `${p.x},${p.y}`).join(" ");
-  const lastPt = coordPairs[coordPairs.length - 1];
-
-  const svgFragment = `<div class="sparkline-container">
-  <svg class="sparkline" viewBox="0 0 ${svgWidth} ${svgHeight}" style="width:100%;max-width:${svgWidth}px">
-    <polyline class="sparkline-line" points="${pointsStr}" fill="none" stroke="var(--chart-1)" stroke-width="1.5" />
-    <circle class="sparkline-dot" cx="${lastPt.x}" cy="${lastPt.y}" r="2.5" fill="var(--chart-1)" />
-  </svg>
-</div>`;
 
   return {
     type: "sparkline",
-    points: pointsStr,
-    endX: lastPt.x,
-    endY: lastPt.y,
+    points: coordPairs.join(" "),
+    endX: 76,
+    endY: 3,
     svgFragment,
   };
 }
@@ -268,81 +367,206 @@ function compileCounter(pt: DataPoint): CounterData {
 }
 
 function compileLine(points: DataPoint[]): LineChartData {
-  const svgWidth = 400;
-  const svgHeight = 200;
-  const padX = 20;
-  const padY = 20;
+  const chartId = nextChartId();
 
+  const option = {
+    tooltip: {
+      trigger: "axis",
+      backgroundColor: "rgba(10, 18, 30, 0.95)",
+      borderColor: "rgba(78, 132, 196, 0.3)",
+      borderWidth: 1,
+      textStyle: {
+        color: THEME.textPrimary,
+        fontFamily: THEME.fontFamily,
+        fontSize: 13,
+      },
+      axisPointer: {
+        type: "cross",
+        crossStyle: { color: THEME.gridColor },
+        lineStyle: { color: "#00d4ff", width: 1, type: "dashed" },
+      },
+    },
+    grid: {
+      left: "3%",
+      right: "4%",
+      bottom: "8%",
+      top: "10%",
+      containLabel: true,
+    },
+    xAxis: {
+      type: "category",
+      data: points.map(p => p.label),
+      axisLine: { lineStyle: { color: THEME.gridColor } },
+      axisTick: { show: false },
+      axisLabel: {
+        color: THEME.textSecondary,
+        fontFamily: THEME.fontFamily,
+        fontSize: 11,
+      },
+    },
+    yAxis: {
+      type: "value",
+      splitLine: { lineStyle: { color: THEME.splitLineColor, type: "dashed" } },
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: {
+        color: THEME.textMuted,
+        fontFamily: THEME.fontFamily,
+        fontSize: 11,
+      },
+    },
+    series: [{
+      type: "line",
+      data: points.map(p => p.value),
+      smooth: 0.35,
+      symbol: "circle",
+      symbolSize: 8,
+      showSymbol: true,
+      lineStyle: {
+        width: 2.5,
+        color: "#00d4ff",
+        shadowColor: "rgba(0, 212, 255, 0.3)",
+        shadowBlur: 8,
+      },
+      itemStyle: {
+        color: "#00d4ff",
+        borderColor: "#0a121e",
+        borderWidth: 2,
+      },
+      emphasis: {
+        itemStyle: {
+          borderWidth: 3,
+          shadowBlur: 12,
+          shadowColor: "rgba(0, 212, 255, 0.5)",
+        },
+      },
+      areaStyle: {
+        color: {
+          type: "linear",
+          x: 0, y: 0, x2: 0, y2: 1,
+          colorStops: [
+            { offset: 0, color: "rgba(0, 212, 255, 0.12)" },
+            { offset: 1, color: "rgba(0, 212, 255, 0)" },
+          ],
+        },
+      },
+      animationDuration: 1400,
+      animationEasing: "cubicOut",
+    }],
+  };
+
+  // Legacy coordinate string
   const values = points.map(p => p.value);
   const minVal = Math.min(...values);
   const maxVal = Math.max(...values);
   const range = maxVal - minVal || 1;
-
-  const n = points.length;
   const coordPairs = points.map((pt, i) => {
-    const x = +(padX + (i / (n - 1)) * (svgWidth - 2 * padX)).toFixed(0);
-    const y = +(padY + (1 - (pt.value - minVal) / range) * (svgHeight - 2 * padY)).toFixed(0);
-    return { x, y };
+    const x = +(20 + (i / (points.length - 1)) * 360).toFixed(0);
+    const y = +(20 + (1 - (pt.value - minVal) / range) * 160).toFixed(0);
+    return `${x},${y}`;
   });
 
-  const pointsStr = coordPairs.map(p => `${p.x},${p.y}`).join(" ");
+  const svgFragment = `<div class="chart-container" style="max-width:500px;margin:0 auto">
+  <div data-echart='${toDataAttr(option)}' id="${chartId}" style="width:100%;height:280px"></div>
+</div>`;
 
-  // Show data-point circles at every other point (or all if ≤ 5)
-  const showAll = points.length <= 5;
-  const dotCircles = coordPairs
-    .filter((_, i) => showAll || i % 2 === 0 || i === coordPairs.length - 1)
-    .map(p => `<circle cx="${p.x}" cy="${p.y}" r="4" fill="var(--accent-bright)" />`)
-    .join("\n      ");
-
-  // Generate unique clipPath ID for this chart instance
-  const clipPathId = nextChartId("line-reveal");
-
-  const svgFragment = `<svg class="line-chart" viewBox="0 0 ${svgWidth} ${svgHeight}" style="max-width:100%">
-  <defs>
-    <clipPath id="${clipPathId}">
-      <rect class="clip-rect" x="0" y="0" width="0" height="${svgHeight}" />
-    </clipPath>
-  </defs>
-  <polyline points="${pointsStr}"
-    fill="none" stroke="var(--accent-bright)" stroke-width="2.5"
-    clip-path="url(#${clipPathId})" />
-  <g class="data-points">
-      ${dotCircles}
-  </g>
-</svg>`;
-
-  return {
-    type: "line",
-    points: pointsStr,
-    svgFragment,
-  };
+  return { type: "line", points: coordPairs.join(" "), svgFragment };
 }
 
 function compileHorizontalBar(points: DataPoint[]): HorizontalBarData {
+  const chartId = nextChartId();
+
   const rows = points.map((pt, i) => ({
     label: pt.label,
     value: pt.value,
-    percentage: pt.value, // treat value as percentage directly for bar-fill-percent
-    color: CHART_COLORS[i % CHART_COLORS.length],
+    percentage: pt.value,
+    color: CHART_HEX[i % CHART_HEX.length],
   }));
 
-  const rowsHtml = rows.map(row =>
-    `<div class="bar-row">
-    <span class="bar-label">${row.label}</span>
-    <div class="bar-track">
-      <div class="bar-fill" style="width:${row.percentage}%;background:${row.color}"></div>
-    </div>
-    <span class="bar-fill-value">${row.percentage}%</span>
-  </div>`
-  ).join("\n  ");
+  const option = {
+    tooltip: {
+      trigger: "axis",
+      backgroundColor: "rgba(10, 18, 30, 0.95)",
+      borderColor: "rgba(78, 132, 196, 0.3)",
+      borderWidth: 1,
+      textStyle: {
+        color: THEME.textPrimary,
+        fontFamily: THEME.fontFamily,
+        fontSize: 13,
+      },
+      formatter: (params: Array<{ name: string; value: number }>) =>
+        `${params[0].name}: ${params[0].value}%`,
+      axisPointer: {
+        type: "shadow",
+        shadowStyle: { color: "rgba(0, 212, 255, 0.04)" },
+      },
+    },
+    grid: {
+      left: "3%",
+      right: "8%",
+      bottom: "5%",
+      top: "5%",
+      containLabel: true,
+    },
+    xAxis: {
+      type: "value",
+      max: 100,
+      splitLine: { lineStyle: { color: THEME.splitLineColor, type: "dashed" } },
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: {
+        color: THEME.textMuted,
+        fontFamily: THEME.fontFamily,
+        fontSize: 11,
+        formatter: "{value}%",
+      },
+    },
+    yAxis: {
+      type: "category",
+      data: points.map(p => p.label).reverse(),
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: {
+        color: THEME.textPrimary,
+        fontFamily: THEME.fontFamily,
+        fontSize: 12,
+        fontWeight: 500,
+      },
+    },
+    series: [{
+      type: "bar",
+      barMaxWidth: 24,
+      itemStyle: {
+        borderRadius: [0, 4, 4, 0],
+      },
+      emphasis: {
+        itemStyle: {
+          shadowBlur: 10,
+          shadowColor: "rgba(0, 212, 255, 0.2)",
+        },
+      },
+      animationDuration: 1200,
+      animationEasing: "cubicOut",
+      animationDelay: (idx: number) => idx * 120,
+      data: points.map((pt, i) => ({
+        value: pt.value,
+        itemStyle: {
+          color: {
+            type: "linear",
+            x: 0, y: 0, x2: 1, y2: 0,
+            colorStops: [
+              { offset: 0, color: CHART_HEX[i % CHART_HEX.length] + "88" },
+              { offset: 1, color: CHART_HEX[i % CHART_HEX.length] },
+            ],
+          },
+        },
+      })).reverse(),
+    }],
+  };
 
-  const htmlFragment = `<div class="comparison-bars">
-  ${rowsHtml}
+  const htmlFragment = `<div class="chart-container" style="max-width:500px;margin:0 auto">
+  <div data-echart='${toDataAttr(option)}' id="${chartId}" style="width:100%;height:${Math.max(180, points.length * 48)}px"></div>
 </div>`;
 
-  return {
-    type: "horizontal-bar",
-    rows,
-    htmlFragment,
-  };
+  return { type: "horizontal-bar", rows, htmlFragment };
 }

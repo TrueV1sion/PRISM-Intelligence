@@ -54,11 +54,11 @@ const searchAdverseEvents: DataSourceTool = {
       dig(r, "safetyreportid"),
       dig(r, "patient.drug.0.openfda.brand_name.0", dig(r, "patient.drug.0.openfda.generic_name.0", "Unknown")),
       ((dig(r, "patient.reaction") === "—") ? "—" :
-        (r.patient as Record<string, unknown>)?.reaction
-          ? ((r.patient as Record<string, unknown>).reaction as Array<Record<string, string>>)
+        (r.patient as unknown as Record<string, unknown>)?.reaction
+          ? ((r.patient as unknown as Record<string, unknown>).reaction as Array<Record<string, string>>)
               .map((rx) => rx.reactionmeddrapt).slice(0, 3).join(", ")
           : "—"),
-      (r as Record<string, unknown>).serious === 1 ? "Yes" : "No",
+      (r as unknown as Record<string, unknown>).serious === 1 ? "Yes" : "No",
       formatDate(dig(r, "receivedate")),
     ]);
 
@@ -114,8 +114,8 @@ const countAdverseEvents: DataSourceTool = {
 
     const headers = ["Value", "Count"];
     const rows = response.data.results.map((r) => [
-      String((r as Record<string, unknown>).term ?? "Unknown"),
-      formatNumber((r as Record<string, unknown>).count as number ?? 0),
+      String((r as unknown as Record<string, unknown>).term ?? "Unknown"),
+      formatNumber((r as unknown as Record<string, unknown>).count as number ?? 0),
     ]);
 
     const table = markdownTable(headers, rows, MAX_TABLE_ROWS_LAYER_2, response.data.total);
@@ -134,6 +134,20 @@ const countAdverseEvents: DataSourceTool = {
       vintage: response.vintage,
       confidence: response.data.total > 0 ? "HIGH" : "MEDIUM",
       truncated: false,
+      structuredData: {
+        counts: response.data.results.reduce<Array<Record<string, unknown>>>((points, result) => {
+          const row = result as unknown as Record<string, unknown>;
+          const count = typeof row.count === "number" ? row.count : Number(row.count);
+          if (!Number.isFinite(count)) return points;
+          const label = String(row.term ?? "Unknown");
+          points.push({
+            label,
+            period: label,
+            value: count,
+          });
+          return points;
+        }, []),
+      },
     };
   },
 };

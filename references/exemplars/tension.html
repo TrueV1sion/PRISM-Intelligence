@@ -1,45 +1,49 @@
 <!-- EXEMPLAR: Tension/Comparison Slide
      Teaches: Balanced opposing views, caution-variant finding cards, grid-2 for
-              left/right debate structure, numbered tensions, resolution principle
+              left/right debate structure, anim-slide-left + anim-slide-right for
+              physically opposing animations, dark-mesh background for tension,
+              callout for key takeaway, NO inline styles except glow position
      Key tokens: finding-card .caution, grid-2, eyebrow, tag-gold, section-intro,
-                 confidence-badge, slide-bg-glow with reduced opacity for subtlety
-     Component choices: finding-card.caution for unresolved debates (sand/warning border),
+                 confidence-badge, slide-bg-glow, anim-slide-left, anim-slide-right,
+                 dark-mesh, callout, callout-title
+     Component choices: finding-card.caution for unresolved debates,
                         grid-2 to physically separate opposing tension clusters,
-                        opportunity card for resolution guidance -->
-<section class="slide" id="slide-N">
-  <div class="slide-bg-glow" style="background:var(--inov-sand);top:-100px;left:-100px;opacity:0.04;"></div>
+                        anim-slide-left/right for visual opposition,
+                        callout for resolution guidance -->
+<section class="slide dark-mesh" id="slide-N">
+  <div class="slide-bg-glow" style="background:var(--inov-sand);top:-100px;left:-100px;"></div>
   <div class="slide-inner">
     <div class="eyebrow anim"><span class="tag tag-gold">Tension Layer</span> Unresolved Strategic Debates</div>
-    <h2 class="slide-title anim d1">N Strategic <span style="color:var(--accent-warning)">Tensions</span></h2>
+    <h2 class="slide-title anim-blur d1">N Strategic <span class="accent-warning">Tensions</span></h2>
     <p class="section-intro anim d2">These are NOT artificially resolved &mdash; they reflect genuine strategic uncertainty that decision-makers must navigate. Both sides have legitimate evidentiary support.</p>
 
-    <div class="grid-2 anim d3">
-      <div>
+    <div class="grid-2">
+      <div class="anim-slide-left d3 stagger-children">
         <div class="finding-card caution">
           <div class="finding-title"><span class="gold">T1</span> &mdash; Tension Title: Thesis vs. Antithesis</div>
-          <div class="finding-body">Present both sides of the debate with specific evidence. Explain why this tension is genuinely unresolved and what signals would resolve it. Reference the agents that surfaced each side.</div>
+          <div class="finding-body">Present both sides of the debate with specific evidence. Explain why this tension is genuinely unresolved and what signals would resolve it.</div>
         </div>
         <div class="finding-card caution">
           <div class="finding-title"><span class="gold">T2</span> &mdash; Second Tension: Contrasting Interpretations</div>
-          <div class="finding-body">Analysis showing why reasonable observers disagree. Include quantitative evidence supporting both interpretations. Note methodological limitations that prevent resolution.</div>
+          <div class="finding-body">Analysis showing why reasonable observers disagree. Include quantitative evidence supporting both interpretations.</div>
         </div>
         <div class="finding-card caution">
           <div class="finding-title"><span class="gold">T3</span> &mdash; Third Tension: Competing Strategic Bets</div>
-          <div class="finding-body">Describe the strategic fork and why both paths have merit. Reference specific market dynamics, regulatory forces, or competitive actions that could tip the balance either way.</div>
+          <div class="finding-body">Describe the strategic fork and why both paths have merit. Reference market dynamics or regulatory forces.</div>
         </div>
       </div>
-      <div>
+      <div class="anim-slide-right d3 stagger-children">
         <div class="finding-card caution">
           <div class="finding-title"><span class="gold">T4</span> &mdash; Fourth Tension: Assessment Uncertainty</div>
-          <div class="finding-body">Present a debate where available evidence is insufficient to resolve. Explain what additional data or time horizon would be needed for resolution. Be explicit about information gaps.</div>
+          <div class="finding-body">Present a debate where available evidence is insufficient to resolve. Explain what additional data would be needed.</div>
         </div>
         <div class="finding-card caution">
           <div class="finding-title"><span class="gold">T5</span> &mdash; Fifth Tension: Execution vs. Strategy</div>
-          <div class="finding-body">Contrast strategic intent with execution reality. Note observable signals versus marketing claims. Reference specific evidence that supports each interpretation.</div>
+          <div class="finding-body">Contrast strategic intent with execution reality. Note observable signals versus marketing claims.</div>
         </div>
-        <div class="finding-card opportunity">
-          <div class="finding-title">Key Resolution Principle</div>
-          <div class="finding-body">Strategic planning should hold multiple scenarios simultaneously rather than resolving tensions prematurely. The outcome depends on observable execution signals that have not yet materialized. List the specific signals to monitor.</div>
+        <div class="callout anim-spring d5">
+          <div class="callout-title">Key Resolution Principle</div>
+          <p>Strategic planning should hold multiple scenarios simultaneously rather than resolving tensions prematurely. The outcome depends on observable execution signals that have not yet materialized.</p>
         </div>
       </div>
     </div>

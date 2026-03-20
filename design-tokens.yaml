@@ -479,10 +479,10 @@ components:
 
   # ── Slide Layout ──
   slide:
-    max_width: "960px"
+    max_width: "1200px"
     padding: "2.5rem"
     min_height: "100vh"
-    glow_size: "400px"
+    glow_size: "600px"
     glow_blur: "120px"
     glow_opacity: 0.07
     footer_font_size: "var(--text-xs)"

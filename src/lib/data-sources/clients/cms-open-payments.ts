@@ -80,9 +80,9 @@ async function makeRequest(
       );
     }
 
-    const data = (await response.json()) as Record<string, unknown>;
+    const data = (await response.json()) as unknown as Record<string, unknown>;
 
-    const results = (data.results as Record<string, unknown>[]) ?? [];
+    const results = (data.results as unknown as Record<string, unknown>[]) ?? [];
     const count = (data.count as number) ?? results.length;
 
     return {

@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { enrichToolCalls } from "../present/enricher";
 import type { CapturedToolCall } from "../present/data-capture";
-import type { DatasetRegistry } from "../present/types";
 
 function makeCapturedCall(overrides: Partial<CapturedToolCall>): CapturedToolCall {
   return {
@@ -101,5 +100,44 @@ describe("Deterministic Enricher", () => {
 
     const registry = enrichToolCalls("run-1", [call]);
     expect(registry.datasets).toEqual([]);
+  });
+
+  it("prefers structured tool payloads over formatted markdown", () => {
+    const call = makeCapturedCall({
+      mcpServer: "data-sources",
+      toolName: "search_bls_series",
+      rawResponse: "## BLS Time Series\n\n| Year | Value |\n| --- | --- |\n| 2023 | 100 |\n| 2024 | 120 |",
+      structuredData: {
+        cpi: [
+          { year: "2023", value: 100 },
+          { year: "2024", value: 120 },
+        ],
+      },
+    });
+
+    const registry = enrichToolCalls("run-1", [call]);
+    expect(registry.datasets).toHaveLength(1);
+    expect(registry.datasets[0]?.sourceLabel).toContain("Bureau of Labor Statistics");
+    expect(registry.datasets[0]?.metricName).toBe("cpi");
+  });
+
+  it("extracts datasets from markdown tables when JSON is unavailable", () => {
+    const call = makeCapturedCall({
+      toolName: "count_adverse_events",
+      rawResponse: [
+        "## AE Counts",
+        "",
+        "| Value | Count |",
+        "| --- | --- |",
+        "| Headache | 120 |",
+        "| Nausea | 80 |",
+        "| Fatigue | 60 |",
+      ].join("\n"),
+    });
+
+    const registry = enrichToolCalls("run-1", [call]);
+    expect(registry.datasets).toHaveLength(1);
+    expect(registry.datasets[0]?.values).toHaveLength(3);
+    expect(registry.datasets[0]?.values[0]?.value).toBe(120);
   });
 });

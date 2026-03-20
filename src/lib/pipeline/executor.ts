@@ -5,15 +5,14 @@ import { deploy } from "./deploy";
 import type { AgentDeployResult } from "./deploy";
 import { synthesize } from "./synthesize";
 import { verify } from "./verify";
-import { present } from "./present";
-import { presentOrchestrated } from "./present-orchestrator";
+import { presentClean } from "./present-pipeline";
 import {
   runQualityAssurance,
   getQualityGateSystem,
 } from "./quality-assurance";
 import { withRetry } from "./retry";
 import { CostTracker } from "./cost";
-import { waitForBlueprintApproval, cancelApproval } from "./approval";
+import { waitForBlueprintApproval, waitForTriageApproval, cancelApproval } from "./approval";
 import { getOrCreateBus, removeBus } from "./memory-bus-manager";
 import type { MemoryBus } from "./memory-bus";
 import type {
@@ -25,8 +24,10 @@ import type {
   QualityReport,
   AutonomyMode,
 } from "./types";
-import { readFileSync, writeFileSync, mkdirSync } from "fs";
+import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
+import { createLogger } from "@/lib/logger";
+import { postProcessLegacyHTML } from "./html-post-process";
 import {
   enrichAfterDeploy,
   enrichAfterSynthesize,
@@ -103,6 +104,8 @@ export async function executePipeline(
   const startTime = new Date().toISOString();
   let totalTokens = 0;
   const costTracker = new CostTracker();
+
+  const log = createLogger(runId);
 
   const emitEvent = (event: PipelineEvent) => {
     onEvent?.(event);
@@ -196,10 +199,12 @@ export async function executePipeline(
         confidence: validConfidence.has(finding.confidence) ? finding.confidence : "MEDIUM",
         evidenceType: finding.evidenceType,
         source: finding.source,
+        sourceUrl: finding.sourceUrl,
         sourceTier: validSourceTiers.has(finding.sourceTier) ? finding.sourceTier : "SECONDARY",
         implication: finding.implication,
         action: "keep",
         tags: JSON.stringify(finding.tags),
+        metrics: JSON.stringify(finding.metrics || []),
         agentId,
         runId,
       }));
@@ -227,6 +232,13 @@ export async function executePipeline(
       throw new Error(
         `Only ${agentResults.length} agents succeeded -- minimum 2 required for synthesis.`,
       );
+    }
+
+    currentPhase = "TRIAGE";
+    if (autonomyMode !== "autonomous") {
+      await updateRunStatus(runId, "TRIAGE");
+      emitEvent({ type: "phase_change", phase: "TRIAGE", message: "Awaiting human-in-the-loop triage..." });
+      await waitForTriageApproval(runId);
     }
 
     checkAbort();
@@ -339,9 +351,10 @@ export async function executePipeline(
     }
 
     if (!qaReport.passesAllGates) {
-      console.warn(
-        `[EXECUTOR] QA gates did not all pass (grade: ${qaReport.score.grade}, score: ${qaReport.score.overallScore}%). Continuing to VERIFY phase.`,
-      );
+      log.warn("QA", "QA gates did not all pass, continuing to VERIFY", {
+        grade: qaReport.score.grade,
+        score: qaReport.score.overallScore,
+      });
     }
 
     // NOTE: No checkAbort() after synthesis — once findings and synthesis are
@@ -359,7 +372,7 @@ export async function executePipeline(
     emitEvent({ type: "phase_change", phase: "PRESENT", message: "Generating HTML5 presentation..." });
 
     const presentation = await withRetry(
-      () => presentOrchestrated({ runId, synthesis, agentResults, blueprint, emitEvent, memoryBus, capturedCalls }),
+      () => presentClean({ runId, synthesis, agentResults, blueprint, emitEvent, memoryBus, capturedCalls }),
       { maxRetries: 1, baseDelayMs: 3000, label: "PRESENT" },
     );
 
@@ -374,81 +387,15 @@ export async function executePipeline(
       htmlPath = presentation.htmlPath;
       finalHtml = presentation.html;
     } else {
-      // Legacy fallback — apply post-processing inline
+      // Legacy fallback — apply post-processing
       const decksDir = join(process.cwd(), "public", "decks");
-      mkdirSync(decksDir, { recursive: true });
-      const filename = `${runId}.html`;
-      htmlPath = `/decks/${filename}`;
-      finalHtml = presentation.html;
-
-      const publicDir = join(process.cwd(), "public");
-      const cssPath = join(publicDir, "styles", "presentation.css");
-      const jsPath = join(publicDir, "js", "presentation.js");
-
-      if (!finalHtml.includes("presentation.css") && !finalHtml.includes("<style>")) {
-        try {
-          const css = readFileSync(cssPath, "utf-8");
-          if (finalHtml.includes("</head>")) {
-            finalHtml = finalHtml.replace("</head>", `  <style>\n${css}\n  </style>\n</head>`);
-          }
-        } catch {
-          if (finalHtml.includes("</head>")) {
-            finalHtml = finalHtml.replace("</head>", `  <link rel="stylesheet" href="/styles/presentation.css">\n</head>`);
-          }
-        }
-      }
-
-      if (!finalHtml.includes("presentation.js")) {
-        try {
-          const js = readFileSync(jsPath, "utf-8");
-          if (finalHtml.includes("</body>")) {
-            finalHtml = finalHtml.replace("</body>", `  <script>\n${js}\n  </script>\n</body>`);
-          }
-        } catch {
-          if (finalHtml.includes("</body>")) {
-            finalHtml = finalHtml.replace("</body>", `  <script src="/js/presentation.js" defer></script>\n</body>`);
-          }
-        }
-      }
-
-      finalHtml = finalHtml.replace(
-        /class="([^"]*\b(anim|anim-scale|anim-blur)\b[^"]*)"/g,
-        (match, classes) => classes.includes("visible") ? match : `class="${classes} visible"`,
-      );
-      finalHtml = finalHtml.replace(
-        /class="([^"]*\bbar-fill\b[^"]*)"/g,
-        (match, classes) => classes.includes("animate") ? match : `class="${classes} animate"`,
-      );
-      finalHtml = finalHtml.replace(
-        /class="([^"]*\b(bar-chart|line-chart|donut-chart|sparkline)\b[^"]*)"/g,
-        (match, classes) => classes.includes("is-visible") ? match : `class="${classes} is-visible"`,
-      );
-      finalHtml = finalHtml.replace(
-        /(<span[^>]*class="[^"]*stat-number[^"]*"[^>]*data-target="(\d+)"[^>]*>)(\d+)(<\/span>)/g,
-        (_match, openTag, target, _currentText, closeTag) => `${openTag}${target}${closeTag}`,
-      );
-      finalHtml = finalHtml.replace(
-        /(<span[^>]*class="[^"]*stat-number[^"]*"[^>]*data-target="(\d+)"[^>]*(?:data-prefix="([^"]*)")?[^>]*(?:data-suffix="([^"]*)")?[^>]*>)(\d+)(<\/span>)/g,
-        (_match, openTag, target, prefix, suffix, _currentText, closeTag) => {
-          const val = parseInt(target).toLocaleString();
-          return `${openTag}${prefix || ""}${val}${suffix || ""}${closeTag}`;
-        },
-      );
-
-      if (!finalHtml.includes("</body>")) {
-        const openSections = (finalHtml.match(/<section/g) || []).length;
-        const closedSections = (finalHtml.match(/<\/section>/g) || []).length;
-        const unclosedSections = openSections - closedSections;
-        if (unclosedSections > 0) {
-          finalHtml += `\n</div></div></section>`.repeat(unclosedSections);
-        }
-        finalHtml += `\n</body>\n</html>`;
-      }
-
-      writeFileSync(join(process.cwd(), "public", "decks", `${runId}.html`), finalHtml, "utf-8");
+      await mkdir(decksDir, { recursive: true });
+      htmlPath = `/decks/${runId}.html`;
+      finalHtml = postProcessLegacyHTML(presentation.html);
+      await writeFile(join(process.cwd(), "public", "decks", `${runId}.html`), finalHtml, "utf-8");
     }
 
-    await prisma.presentation.create({
+    const presRecord = await prisma.presentation.create({
       data: {
         title: presentation.title,
         subtitle: presentation.subtitle,
@@ -457,6 +404,42 @@ export async function executePipeline(
         runId,
       },
     });
+
+    // Persist structured slide data for editor (Phase 4a)
+    // This must happen AFTER presentation.create() since persistSlideStructures
+    // looks up the presentation by runId.
+    if (presentation.slideStructures && presentation.slideStructures.length > 0) {
+      try {
+        const version = await prisma.presentationVersion.create({
+          data: {
+            presentationId: presRecord.id,
+            versionNumber: 1,
+            status: "published",
+            label: "AI-generated",
+            publishedAt: new Date(),
+            slides: {
+              create: presentation.slideStructures.map((s: Record<string, unknown>, i: number) => ({
+                slideNumber: (s.slideNumber as number) ?? i + 1,
+                templateId: (s.templateId as string) ?? null,
+                backgroundVariant: (s.backgroundVariant as string) ?? "gradient-dark",
+                animationType: (s.animationType as string) ?? "stagger",
+                 
+                content: (s.content ?? {}) as Record<string, unknown>,
+                sourceAgentIds: (s.sourceAgentIds as string[]) ?? [],
+                sourceFindingIds: (s.sourceFindingIds as string[]) ?? [],
+              })),
+            },
+          },
+        });
+        await prisma.presentation.update({
+          where: { id: presRecord.id },
+          data: { currentVersionId: version.id, publishedVersionId: version.id },
+        });
+        log.info("COMPLETE", `Persisted ${presentation.slideStructures.length} slide structures as v1`);
+      } catch (dbErr) {
+        log.warn("COMPLETE", `Failed to persist slide structures: ${dbErr instanceof Error ? dbErr.message : String(dbErr)}`);
+      }
+    }
 
     const endTime = new Date().toISOString();
 
@@ -485,10 +468,10 @@ export async function executePipeline(
       // Validate
       const validation = validateIRGraph(irGraph);
       if (!validation.valid) {
-        console.warn(`[EXECUTOR] IR validation errors:`, validation.errors);
+        log.warn("IR", "IR validation errors", { errors: validation.errors });
       }
       if (validation.warnings.length > 0) {
-        console.warn(`[EXECUTOR] IR validation warnings:`, validation.warnings);
+        log.warn("IR", "IR validation warnings", { warnings: validation.warnings });
       }
 
       // Persist to DB
@@ -518,20 +501,20 @@ export async function executePipeline(
           },
         });
       } catch (err) {
-        console.warn(`[EXECUTOR] Failed to persist IR graph:`, err);
+        log.warn("IR", "Failed to persist IR graph", { error: String(err) });
       }
 
       // Export to file
       try {
         const irDir = join(process.cwd(), "public", "ir");
-        mkdirSync(irDir, { recursive: true });
-        writeFileSync(
+        await mkdir(irDir, { recursive: true });
+        await writeFile(
           join(irDir, `${runId}.json`),
           JSON.stringify(irGraph, null, 2),
           "utf-8",
         );
       } catch (err) {
-        console.warn(`[EXECUTOR] Failed to write IR file:`, err);
+        log.warn("IR", "Failed to write IR file", { error: String(err) });
       }
 
       // Emit completion event
@@ -560,14 +543,14 @@ export async function executePipeline(
     const isAbort = error instanceof DOMException && error.name === "AbortError";
     const errorMessage = error instanceof Error ? error.message : String(error);
 
-    console.error(`[EXECUTOR] Pipeline ${runId} failed in phase ${currentPhase}:`, errorMessage);
+    log.error(currentPhase, `Pipeline failed: ${errorMessage}`, error instanceof Error ? error : undefined);
 
     cancelApproval(runId);
 
     try {
       await prisma.run.update({ where: { id: runId }, data: { status: isAbort ? "CANCELLED" : "FAILED" } });
     } catch (dbErr) {
-      console.error(`[EXECUTOR] Failed to update run status:`, dbErr);
+      log.error(currentPhase, "Failed to update run status", dbErr instanceof Error ? dbErr : undefined);
     }
 
     if (isAbort) {
@@ -593,6 +576,7 @@ async function persistSnapshot(
   phase: string,
   emitEvent: (event: PipelineEvent) => void,
 ) {
+  const log = createLogger(runId);
   const status = bus.getStatus();
   try {
     await prisma.memoryBusSnapshot.create({
@@ -607,7 +591,7 @@ async function persistSnapshot(
       },
     });
   } catch (err) {
-    console.warn(`[EXECUTOR] Failed to persist MemoryBus snapshot (${phase}):`, err);
+    log.warn("MEMORY_BUS", `Failed to persist snapshot (${phase})`, { error: String(err) });
   }
   emitEvent({
     type: "memory_snapshot",

@@ -32,7 +32,7 @@ export class SignalEmitter {
       // Check for existing recent signal with same pattern + overlapping entities
       const recentDuplicate = await prisma.signal.findFirst({
         where: {
-          pattern: candidate.pattern.id,
+          patternId: candidate.pattern.id,
           detectedAt: {
             gte: new Date(
               Date.now() - candidate.pattern.windowHours * 60 * 60 * 1000,
@@ -59,17 +59,14 @@ export class SignalEmitter {
           entityRefs: candidate.entityRefs,
           confidence: candidate.confidence,
           severity: candidate.pattern.severity,
-          pattern: candidate.pattern.id,
-          metadata: JSON.stringify({
+          patternId: candidate.pattern.id,
+          metadata: {
             sourceCount: candidate.matchedSources.length,
             maxTimeDeltaHours: candidate.maxTimeDeltaHours,
             sourceTypes: [
               ...new Set(candidate.matchedSources.map((s) => s.type)),
             ],
-          }),
-          expiresAt: new Date(
-            Date.now() + candidate.pattern.windowHours * 2 * 60 * 60 * 1000,
-          ),
+          },
         },
       });
       signalsCreated++;
@@ -90,10 +87,6 @@ export class SignalEmitter {
               `Sources: ${candidate.matchedSources.length}\n` +
               `Entities: ${candidate.entityRefs.join(", ")}`,
             severity: candidate.pattern.severity,
-            metadata: JSON.stringify({
-              patternId: candidate.pattern.id,
-              signalId: signal.id,
-            }),
           },
         });
         alertsCreated++;

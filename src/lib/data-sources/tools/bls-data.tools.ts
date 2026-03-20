@@ -12,8 +12,26 @@ import { blsDataClient } from "../clients/bls-data";
 import {
   markdownTable,
   formatCitations,
-  formatNumber,
 } from "../format";
+
+function buildSeriesPoints(
+  seriesId: string,
+  data: Array<{ year: string; period: string; periodName: string; value: string }>,
+): Array<Record<string, unknown>> {
+  const points: Array<Record<string, unknown>> = [];
+  for (const point of data) {
+    const value = Number.parseFloat(point.value);
+    if (!Number.isFinite(value)) continue;
+    const period = point.periodName || point.period;
+    points.push({
+      label: seriesId,
+      period: `${point.year} ${period}`.trim(),
+      year: point.year,
+      value,
+    });
+  }
+  return points;
+}
 
 // ─── Healthcare CPI Series Catalog ───────────────────────────
 // Curated BLS series IDs for healthcare cost tracking
@@ -96,6 +114,11 @@ const searchBlsSeries: DataSourceTool = {
       vintage: response.vintage,
       confidence: response.data.series.length > 0 ? "HIGH" : "MEDIUM",
       truncated: false,
+      structuredData: Object.fromEntries(
+        response.data.series
+          .map((series) => [`series_${series.seriesID}`, buildSeriesPoints(series.seriesID, series.data)] as const)
+          .filter(([, points]) => points.length >= 2),
+      ),
     };
   },
 };
@@ -201,8 +224,35 @@ const getHealthcareCpi: DataSourceTool = {
       source: "Bureau of Labor Statistics",
       query: queryDesc,
       dateRange: `${startYear}–${endYear}`,
-      resultCount: formatNumber(response.data.series.reduce((acc, s) => acc + s.data.length, 0)),
+      resultCount: response.data.series.reduce((acc, s) => acc + s.data.length, 0),
     };
+
+    const structuredData: Record<string, unknown> = Object.fromEntries(
+      response.data.series
+        .map((series) => {
+          const seriesPoints = buildSeriesPoints(
+            seriesLabels[series.seriesID] ?? series.seriesID,
+            series.data,
+          );
+          return [`cpi_${series.seriesID}`, seriesPoints] as const;
+        })
+        .filter(([, points]) => points.length >= 2),
+    );
+
+    if (rows.length >= 2) {
+      const latestPoints: Array<Record<string, unknown>> = [];
+      for (const [label, year, value] of rows) {
+        const parsedValue = Number.parseFloat(value);
+        if (!Number.isFinite(parsedValue)) continue;
+        latestPoints.push({
+          label,
+          period: year,
+          year,
+          value: parsedValue,
+        });
+      }
+      structuredData.healthcare_cpi_latest = latestPoints;
+    }
 
     return {
       content: `## ${queryDesc}\n\n${summaryTable}${trendSection}\n\n${formatCitations([citation])}`,
@@ -210,6 +260,7 @@ const getHealthcareCpi: DataSourceTool = {
       vintage: response.vintage,
       confidence: response.data.series.length > 0 ? "HIGH" : "MEDIUM",
       truncated: false,
+      structuredData,
     };
   },
 };

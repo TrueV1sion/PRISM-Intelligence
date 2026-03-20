@@ -122,7 +122,7 @@ async function makeRequest(
       throw new Error(`openFDA API error: ${data.error.message}`);
     }
 
-    const results = (data.results ?? []) as Record<string, unknown>[];
+    const results = (data.results ?? []) as unknown as Record<string, unknown>[];
     const meta = data.meta?.results;
     const total = meta?.total ?? results.length;
     const skip = meta?.skip ?? params.skip ?? 0;

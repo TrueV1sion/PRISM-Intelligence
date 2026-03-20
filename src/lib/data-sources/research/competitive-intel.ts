@@ -71,8 +71,8 @@ export const competitiveIntelResearchTool: DataSourceTool = {
     let trials: Array<{ nctId?: string; title?: string; phase?: string; status?: string }> = [];
     if (trialsResult.available && trialsResult.data) {
       try {
-        const parsed = JSON.parse(trialsResult.data) as Record<string, unknown>;
-        const rawTrials = (parsed.trials ?? parsed.studies ?? []) as Record<string, unknown>[];
+        const parsed = JSON.parse(trialsResult.data) as unknown as Record<string, unknown>;
+        const rawTrials = (parsed.trials ?? parsed.studies ?? []) as unknown as Record<string, unknown>[];
         trialCount = Array.isArray(rawTrials) ? rawTrials.length : 0;
         trials = rawTrials.slice(0, 5).map((t) => ({
           nctId: String(t.nctId ?? t.nct_id ?? ""),
@@ -151,8 +151,8 @@ export const competitiveIntelResearchTool: DataSourceTool = {
 
     // FDA labels note
     if (fdaLabels.length > 0) {
-      const label = fdaLabels[0] as Record<string, unknown>;
-      const brandNames = ((label.openfda as Record<string, unknown>)?.brand_name as string[] | undefined) ?? [];
+      const label = fdaLabels[0] as unknown as Record<string, unknown>;
+      const brandNames = ((label.openfda as unknown as Record<string, unknown>)?.brand_name as string[] | undefined) ?? [];
       if (brandNames.length > 0) {
         bullets.push(`- FDA brand names: ${brandNames.slice(0, 3).join(", ")}`);
       }

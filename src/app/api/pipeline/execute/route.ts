@@ -8,19 +8,19 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { executePipeline } from "@/lib/pipeline/executor";
-import type { AutonomyMode } from "@/lib/pipeline/types";
+import { PipelineExecuteSchema, validateBody } from "@/lib/api-validation";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { query, runId, autonomyMode = "guided" } = body;
-
-    if (!query || !runId) {
+    const validation = validateBody(PipelineExecuteSchema, body);
+    if (!validation.success) {
       return NextResponse.json(
-        { error: "query and runId are required" },
+        { error: validation.error },
         { status: 400 },
       );
     }
+    const { query, runId, autonomyMode } = validation.data;
 
     // Create the Run record
     await prisma.run.create({
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     const manifest = await executePipeline({
       query,
       runId,
-      autonomyMode: autonomyMode as AutonomyMode,
+      autonomyMode,
     });
 
     return NextResponse.json({

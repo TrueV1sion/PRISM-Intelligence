@@ -100,7 +100,7 @@ export const globalHealthResearchTool: DataSourceTool = {
 
     if (ahrqResults.length > 0) {
       const topResult = ahrqResults[0];
-      const data = topResult.data as Record<string, unknown>;
+      const data = topResult.data as unknown as Record<string, unknown>;
       const conditionName = String(data.name ?? "—");
       const discharges = data.annual_discharges as number | undefined;
       if (discharges !== undefined) {

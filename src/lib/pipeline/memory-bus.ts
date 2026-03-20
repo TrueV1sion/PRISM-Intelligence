@@ -74,6 +74,14 @@ export interface MemoryBusState {
     conflicts: Conflict[];
 }
 
+/** Input for scenario lever application */
+export interface ScenarioLeverInput {
+    leverType: "tension_flip" | "gap_resolve" | "metric_adjust" | "finding_suppress" | "finding_amplify";
+    targetId: string;
+    baseline: unknown;
+    adjusted: unknown;
+}
+
 
 // ─── Memory Bus Implementation ──────────────────────────────
 
@@ -286,6 +294,163 @@ export class MemoryBus {
     exportIR(): IRGraph | null {
         if (!this.irGraph) return null;
         return JSON.parse(JSON.stringify(this.irGraph));
+    }
+
+    // ─── Scenario Operations ─────────────────────────────────
+
+    /**
+     * Create a deep copy of this MemoryBus for scenario exploration.
+     * The fork is fully independent — mutations don't affect the original.
+     */
+    fork(): MemoryBus {
+        const forked = new MemoryBus(this.state.task);
+        forked.state = JSON.parse(JSON.stringify(this.state));
+        if (this.irGraph) {
+            forked.irGraph = JSON.parse(JSON.stringify(this.irGraph));
+        }
+        return forked;
+    }
+
+    /**
+     * Apply a mutation to the MemoryBus state for scenario exploration.
+     * Supports multiple lever types that modify different aspects of the
+     * accumulated intelligence.
+     */
+    applyLever(lever: ScenarioLeverInput): void {
+        switch (lever.leverType) {
+            case "finding_suppress":
+                this.suppressFinding(lever.targetId, lever.adjusted as number);
+                break;
+            case "finding_amplify":
+                this.amplifyFinding(lever.targetId, lever.adjusted as number);
+                break;
+            case "tension_flip":
+                this.flipTension(lever.targetId, lever.adjusted as { winningPosition: number });
+                break;
+            case "gap_resolve":
+                this.resolveGap(lever.targetId, lever.adjusted as { direction: string; assumption: string });
+                break;
+            case "metric_adjust":
+                this.adjustMetric(lever.targetId, lever.adjusted as { multiplier: number });
+                break;
+        }
+    }
+
+    private suppressFinding(targetId: string, weight: number): void {
+        // Reduce confidence on matching blackboard entries
+        this.state.blackboard = this.state.blackboard.map(entry =>
+            entry.id === targetId
+                ? { ...entry, confidence: entry.confidence * Math.max(0, weight) }
+                : entry
+        );
+        // Also suppress in IR graph if present
+        if (this.irGraph) {
+            this.irGraph.findings = this.irGraph.findings.map(f =>
+                f.id === targetId
+                    ? { ...f, confidence: f.confidence * Math.max(0, weight), actionabilityScore: f.actionabilityScore * Math.max(0, weight) }
+                    : f
+            );
+        }
+    }
+
+    private amplifyFinding(targetId: string, weight: number): void {
+        this.state.blackboard = this.state.blackboard.map(entry =>
+            entry.id === targetId
+                ? { ...entry, confidence: Math.min(1.0, entry.confidence * Math.max(1, weight)) }
+                : entry
+        );
+        if (this.irGraph) {
+            this.irGraph.findings = this.irGraph.findings.map(f =>
+                f.id === targetId
+                    ? { ...f, confidence: Math.min(1.0, f.confidence * Math.max(1, weight)), actionabilityScore: Math.min(1.0, f.actionabilityScore * weight) }
+                    : f
+            );
+        }
+    }
+
+    private flipTension(targetId: string, params: { winningPosition: number }): void {
+        // In the MemoryBus, tensions are stored as Conflicts
+        this.state.conflicts = this.state.conflicts.map(c => {
+            if (c.id !== targetId) return c;
+            const winPos = c.positions[params.winningPosition];
+            if (!winPos) return c;
+            return {
+                ...c,
+                status: "resolved" as ConflictStatus,
+                resolution: `Scenario assumption: ${winPos.agent}'s position prevails — "${winPos.position}"`,
+                resolutionStrategy: "scenario_flip",
+            };
+        });
+        // Also flip in IR graph
+        if (this.irGraph) {
+            this.irGraph.tensions = this.irGraph.tensions.map(t => {
+                if (t.id !== targetId) return t;
+                const winPos = t.positions[params.winningPosition];
+                if (!winPos) return t;
+                return {
+                    ...t,
+                    status: "resolved" as const,
+                    resolution: `Scenario assumption: ${winPos.agent}'s position prevails — "${winPos.position}"`,
+                    resolutionStrategy: "scenario_flip",
+                };
+            });
+        }
+    }
+
+    private resolveGap(targetId: string, params: { direction: string; assumption: string }): void {
+        // Add a synthetic finding that fills the gap
+        const syntheticEntry: BlackboardEntry = {
+            id: generateId(),
+            agent: "scenario-assumption",
+            timestamp: new Date().toISOString(),
+            key: `scenario/gap-resolved/${targetId}`,
+            value: `[Scenario Assumption] ${params.assumption} (${params.direction})`,
+            confidence: 0.7, // Scenario assumptions get moderate confidence
+            evidenceType: "inferred",
+            tags: ["scenario", "gap-resolution", params.direction],
+            references: [`gap:${targetId}`],
+        };
+        this.state.blackboard = [...this.state.blackboard, syntheticEntry];
+
+        // Mark gap as resolved in IR graph
+        if (this.irGraph) {
+            this.irGraph.gaps = this.irGraph.gaps.filter(g => g.id !== targetId);
+            // Add synthetic finding to IR graph
+            this.irGraph.findings.push({
+                id: syntheticEntry.id,
+                agent: "scenario-assumption",
+                agentArchetype: "SCENARIO",
+                dimension: "scenario",
+                key: syntheticEntry.key,
+                value: syntheticEntry.value,
+                confidence: syntheticEntry.confidence,
+                evidenceType: "inferred",
+                tags: syntheticEntry.tags,
+                references: syntheticEntry.references,
+                timestamp: syntheticEntry.timestamp,
+                findingIndex: this.irGraph.findings.length,
+                actionabilityScore: 0.5,
+                noveltyScore: 0.3,
+            });
+        }
+    }
+
+    private adjustMetric(targetId: string, params: { multiplier: number }): void {
+        // Metric adjustments are reflected via a synthetic blackboard entry
+        // The actual EnrichedMetric data is separate (in DB), but we signal the
+        // adjustment in the MemoryBus so SYNTHESIZE sees it
+        const adjustmentEntry: BlackboardEntry = {
+            id: generateId(),
+            agent: "scenario-adjustment",
+            timestamp: new Date().toISOString(),
+            key: `scenario/metric-adjusted/${targetId}`,
+            value: `[Scenario Adjustment] Metric ${targetId} adjusted by ${((params.multiplier - 1) * 100).toFixed(1)}%`,
+            confidence: 0.8,
+            evidenceType: "inferred",
+            tags: ["scenario", "metric-adjustment"],
+            references: [`metric:${targetId}`],
+        };
+        this.state.blackboard = [...this.state.blackboard, adjustmentEntry];
     }
 
     // ─── State Management ───────────────────────────────────

@@ -14,8 +14,10 @@ import {
   Hexagon,
   FileText,
   Sparkles,
-  Download,
+  GitBranch,
+  Pencil,
 } from "lucide-react";
+import ExportDropdown from "@/components/ExportDropdown";
 import Link from "next/link";
 
 interface RunSummary {
@@ -243,19 +245,23 @@ export default function HistoryPage() {
                             View Brief
                             <span className="text-[9px] text-prism-sky/70">{run.presentation.slideCount} slides</span>
                           </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const a = document.createElement("a");
-                              a.href = run.presentation!.htmlPath;
-                              a.download = run.presentation!.htmlPath.split("/").pop() || "brief.html";
-                              a.click();
-                            }}
-                            className="p-1.5 rounded-lg border border-white/10 text-prism-muted hover:text-white hover:border-white/20 hover:bg-white/5 transition-colors"
-                            title="Download brief"
+                          <Link
+                            href={`/briefs/${run.presentation!.id}/edit`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="p-1.5 rounded-lg border border-white/10 text-prism-muted hover:text-amber-400 hover:border-amber-500/20 hover:bg-amber-500/5 transition-colors"
+                            title="Edit Presentation"
                           >
-                            <Download className="w-3.5 h-3.5" />
-                          </button>
+                            <Pencil className="w-3.5 h-3.5" />
+                          </Link>
+                          <Link
+                            href={`/scenarios/${run.id}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="p-1.5 rounded-lg border border-white/10 text-prism-muted hover:text-prism-sky hover:border-prism-sky/20 hover:bg-prism-sky/5 transition-colors"
+                            title="Explore Scenarios"
+                          >
+                            <GitBranch className="w-3.5 h-3.5" />
+                          </Link>
+                          <ExportDropdown runId={run.id} compact />
                         </div>
                       )}
                     </div>

@@ -139,7 +139,7 @@ export function useResearchStream() {
         setState({ ...INITIAL_STATE, runId, isStreaming: true, phase: "think", phaseMessage: "Decomposing strategic question..." });
         findingIdRef.current = 0;
 
-        const params = new URLSearchParams({ query, runId, urgency });
+        const params = new URLSearchParams({ query, runId, urgency, autonomyMode: "autonomous" });
         const url = `/api/pipeline/stream?${params}`;
         const es = new EventSource(url);
         eventSourceRef.current = es;

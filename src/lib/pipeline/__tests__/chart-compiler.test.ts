@@ -18,34 +18,26 @@ describe("chart-compiler: donut charts", () => {
     expect(donut.circumference).toBeCloseTo(502.65, 1);
   });
 
-  it("computes correct dashArray for first segment (40%)", () => {
+  it("generates ECharts div with data-echart config and legend", () => {
     const result = compileCharts(donutPoints);
     const donut = result.find((c) => c.type === "donut") as DonutChartData;
-    expect(donut.segments[0].dashArray).toBe("201.06 502.65");
-    expect(donut.segments[0].dashOffset).toBe("0");
-  });
-
-  it("computes correct dashOffset for second segment", () => {
-    const result = compileCharts(donutPoints);
-    const donut = result.find((c) => c.type === "donut") as DonutChartData;
-    expect(donut.segments[1].dashOffset).toBe("-201.06");
-  });
-
-  it("generates valid SVG fragment with chart-legend", () => {
-    const result = compileCharts(donutPoints);
-    const donut = result.find((c) => c.type === "donut") as DonutChartData;
-    expect(donut.svgFragment).toContain('<svg class="donut-chart"');
-    expect(donut.svgFragment).toContain('class="segment"');
+    expect(donut.svgFragment).toContain("data-echart=");
     expect(donut.svgFragment).toContain('class="chart-legend"');
     expect(donut.svgFragment).toContain('class="legend-item"');
     expect(donut.svgFragment).toContain('class="legend-dot"');
   });
 
-  it("assigns chart colors in order", () => {
+  it("embeds pie type in ECharts config", () => {
     const result = compileCharts(donutPoints);
     const donut = result.find((c) => c.type === "donut") as DonutChartData;
-    expect(donut.segments[0].color).toBe("var(--chart-1)");
-    expect(donut.segments[1].color).toBe("var(--chart-2)");
+    expect(donut.svgFragment).toContain('"pie"');
+  });
+
+  it("assigns hex colors to segments", () => {
+    const result = compileCharts(donutPoints);
+    const donut = result.find((c) => c.type === "donut") as DonutChartData;
+    expect(donut.segments[0].color).toBe("#00d4ff");
+    expect(donut.segments[1].color).toBe("#7c5cfc");
   });
 });
 
@@ -63,17 +55,16 @@ describe("chart-compiler: bar charts", () => {
     expect(bar.bars).toHaveLength(3);
   });
 
-  it("generates SVG with bar-chart class and rect elements", () => {
+  it("generates ECharts div with data-echart config", () => {
     const result = compileCharts(barPoints);
     const bar = result.find((c) => c.type === "bar") as BarChartData;
-    expect(bar.svgFragment).toContain('<svg class="bar-chart"');
-    expect(bar.svgFragment).toContain('class="bar"');
+    expect(bar.svgFragment).toContain("data-echart=");
+    expect(bar.svgFragment).toContain('class="chart-container"');
   });
 
   it("computes bar heights proportional to values", () => {
     const result = compileCharts(barPoints);
     const bar = result.find((c) => c.type === "bar") as BarChartData;
-    // 92% should have taller bar than 78%
     expect(bar.bars[0].height).toBeGreaterThan(bar.bars[2].height);
   });
 });
@@ -94,17 +85,10 @@ describe("chart-compiler: sparklines", () => {
     expect(spark.points).toContain(",");
   });
 
-  it("generates SVG with sparkline class and polyline", () => {
+  it("generates ECharts div with sparkline-container", () => {
     const result = compileCharts(sparkPoints);
     const spark = result.find((c) => c.type === "sparkline") as SparklineData;
-    expect(spark.svgFragment).toContain('<svg class="sparkline"');
-    expect(spark.svgFragment).toContain("sparkline-line");
-    expect(spark.svgFragment).toContain("sparkline-dot");
-  });
-
-  it("wraps in sparkline-container div", () => {
-    const result = compileCharts(sparkPoints);
-    const spark = result.find((c) => c.type === "sparkline") as SparklineData;
+    expect(spark.svgFragment).toContain("data-echart=");
     expect(spark.svgFragment).toContain('class="sparkline-container"');
   });
 });
@@ -149,13 +133,11 @@ describe("chart-compiler: horizontal bars", () => {
     expect(hbar.rows).toHaveLength(2);
   });
 
-  it("generates HTML with bar-row and bar-fill classes", () => {
+  it("generates ECharts div with data-echart config", () => {
     const result = compileCharts(hbarPoints);
     const hbar = result.find((c) => c.type === "horizontal-bar") as HorizontalBarData;
-    expect(hbar.htmlFragment).toContain("bar-row");
-    expect(hbar.htmlFragment).toContain("bar-track");
-    expect(hbar.htmlFragment).toContain("bar-fill");
-    expect(hbar.htmlFragment).toContain("bar-fill-value");
+    expect(hbar.htmlFragment).toContain("data-echart=");
+    expect(hbar.htmlFragment).toContain('class="chart-container"');
   });
 });
 
@@ -174,19 +156,11 @@ describe("chart-compiler: line charts", () => {
     expect(line.points).toContain(",");
   });
 
-  it("generates SVG with line-chart class and clip-path reveal", () => {
+  it("generates ECharts div with chart-container", () => {
     const result = compileCharts(linePoints);
     const line = result.find((c) => c.type === "line") as LineChartData;
-    expect(line.svgFragment).toContain('class="line-chart"');
-    expect(line.svgFragment).toContain('class="clip-rect"');
-    expect(line.svgFragment).toContain('class="data-points"');
-  });
-
-  it("includes polyline and data point circles", () => {
-    const result = compileCharts(linePoints);
-    const line = result.find((c) => c.type === "line") as LineChartData;
-    expect(line.svgFragment).toContain("<polyline");
-    expect(line.svgFragment).toContain("<circle");
+    expect(line.svgFragment).toContain("data-echart=");
+    expect(line.svgFragment).toContain('class="chart-container"');
   });
 });
 
@@ -234,8 +208,7 @@ describe("Chart Compiler — DatasetRegistry", () => {
 
     const chart = compileChartFromDataset(dataset, "line");
     expect(chart.type).toBe("line");
-    expect(chart.svgFragment).toContain("<svg");
-    expect(chart.svgFragment).toContain("polyline");
+    expect((chart as LineChartData).svgFragment).toContain("data-echart=");
   });
 
   it("compiles donut chart from composition dataset", () => {
@@ -258,6 +231,6 @@ describe("Chart Compiler — DatasetRegistry", () => {
 
     const chart = compileChartFromDataset(dataset, "donut");
     expect(chart.type).toBe("donut");
-    expect(chart.svgFragment).toContain("<svg");
+    expect((chart as DonutChartData).svgFragment).toContain("data-echart=");
   });
 });

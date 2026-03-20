@@ -13,8 +13,17 @@
       {{component:action-card slot:action_3}}
     </div>
 
+    {{#if slot:impact_1}}
+    <div class="stat-grid strategic-impact-grid anim d3">
+      {{component:stat-block-mini slot:impact_1}}
+      {{#if slot:impact_2}}
+      {{component:stat-block-mini slot:impact_2}}
+      {{/if}}
+    </div>
+    {{/if}}
+
     {{#if slot:closing}}
-    <p class="section-intro anim d3">{{slot:closing}}</p>
+    <p class="section-intro anim d4">{{slot:closing}}</p>
     {{/if}}
   </div>
 </section>

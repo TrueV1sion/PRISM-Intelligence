@@ -15,6 +15,10 @@ import {
   formatNumber,
 } from "../format";
 
+function sanitizeMetricKey(value: string): string {
+  return value.replace(/[^a-zA-Z0-9]+/g, "_").replace(/^_+|_+$/g, "").toLowerCase();
+}
+
 // ─── search_census_data ───────────────────────────────────────
 
 const searchCensusData: DataSourceTool = {
@@ -81,12 +85,37 @@ const searchCensusData: DataSourceTool = {
       resultCount: totalRecords,
     };
 
+    const labelHeader = tableHeaders.find((header) => header === "NAME")
+      ?? tableHeaders.find((header) => records.some((record) => typeof record[header] === "string"));
+    const structuredData: Record<string, unknown> = Object.fromEntries(
+      tableHeaders
+        .map((header) => {
+          const points = records.reduce<Array<Record<string, unknown>>>((acc, record, index) => {
+              const value = record[header];
+              if (typeof value !== "number") return acc;
+              const label = labelHeader && typeof record[labelHeader] === "string"
+                ? String(record[labelHeader])
+                : `Record ${index + 1}`;
+              acc.push({
+                label,
+                period: label,
+                value,
+              });
+              return acc;
+            }, []);
+
+          return [sanitizeMetricKey(header), points] as const;
+        })
+        .filter(([, points]) => points.length >= 2),
+    );
+
     return {
       content: `## Census Data: ${queryDesc}\n\n**${formatNumber(totalRecords)} records**\n\n${table}\n\n${formatCitations([citation])}`,
       citations: [citation],
       vintage: response.vintage,
       confidence: totalRecords > 0 ? "HIGH" : "MEDIUM",
       truncated: records.length > MAX_TABLE_ROWS_LAYER_2,
+      structuredData,
     };
   },
 };
@@ -173,12 +202,28 @@ const getHealthInsurance: DataSourceTool = {
       resultCount: totalRecords,
     };
 
+    const structuredData = {
+      insured_count: records
+        .map((record, index) => createAreaMetricPoint(record, "NIC_PT", index))
+        .filter((point): point is Record<string, unknown> => point !== null),
+      uninsured_count: records
+        .map((record, index) => createAreaMetricPoint(record, "NUI_PT", index))
+        .filter((point): point is Record<string, unknown> => point !== null),
+      insured_pct: records
+        .map((record, index) => createAreaMetricPoint(record, "PCTIC_PT", index))
+        .filter((point): point is Record<string, unknown> => point !== null),
+      uninsured_pct: records
+        .map((record, index) => createAreaMetricPoint(record, "PCTUI_PT", index))
+        .filter((point): point is Record<string, unknown> => point !== null),
+    };
+
     return {
       content: `## Health Insurance Estimates: ${geoDesc}\n\n**${formatNumber(totalRecords)} areas**\n\n${table}\n\n${formatCitations([citation])}`,
       citations: [citation],
       vintage: response.vintage,
       confidence: totalRecords > 0 ? "HIGH" : "MEDIUM",
       truncated: records.length > MAX_TABLE_ROWS_LAYER_2,
+      structuredData,
     };
   },
 };
@@ -189,3 +234,22 @@ export const censusBureauTools: DataSourceTool[] = [
   searchCensusData,
   getHealthInsurance,
 ];
+
+function createAreaMetricPoint(
+  record: Record<string, string | number | null>,
+  key: string,
+  index: number,
+): Record<string, unknown> | null {
+  const value = record[key];
+  if (typeof value !== "number") return null;
+  const label = typeof record.NAME === "string"
+    ? record.NAME
+    : typeof record.STABREV === "string"
+      ? record.STABREV
+      : `Area ${index + 1}`;
+  return {
+    label,
+    period: label,
+    value,
+  };
+}

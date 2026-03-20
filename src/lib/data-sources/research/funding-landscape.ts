@@ -122,7 +122,7 @@ export const fundingLandscapeResearchTool: DataSourceTool = {
     // SAM.gov contract opportunities
     if (samOppsItems.length > 0) {
       const samRows = samOppsItems.slice(0, 5).map((opp) => {
-        const rec = opp as Record<string, unknown>;
+        const rec = opp as unknown as Record<string, unknown>;
         const title = String(
           (rec.title as string) ??
           ((rec.opportunityTitle as string)) ??

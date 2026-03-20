@@ -7,10 +7,14 @@ describe("Template Renderer", () => {
       "SF-05",  // title slide
       { slots: { headline: "Test Title", subhead: "Test Subtitle", badge: "ANALYSIS", date: "March 2026", slide_class: "gradient-dark" }, chartDataRefs: {} },
       new Map(),
+      { slideType: "title", slideNumber: 1, totalSlides: 5 },
     );
     expect(html).toContain("Test Title");
     expect(html).toContain("Test Subtitle");
     expect(html).toContain("gradient-dark");
+    expect(html).toContain("slide-bg-glow");
+    expect(html).toContain("slide-footer");
+    expect(html).toContain('data-slide-type="title"');
     expect(html).not.toContain("{{slot:");
   });
 
@@ -29,9 +33,11 @@ describe("Template Renderer", () => {
         chartDataRefs: {},
       },
       new Map([["chart_primary", chartSvg]]),
+      { slideType: "data-metrics", slideNumber: 4, totalSlides: 8 },
     );
     expect(html).toContain("line-chart");
     expect(html).toContain("polyline");
+    expect(html).toContain("slide-footer");
   });
 
   it("expands component slots into component HTML", () => {
@@ -48,6 +54,7 @@ describe("Template Renderer", () => {
         chartDataRefs: {},
       },
       new Map(),
+      { slideType: "data-metrics", slideNumber: 4, totalSlides: 8 },
     );
     expect(html).toContain("stat-block");
     expect(html).toContain("$100");
@@ -69,6 +76,7 @@ describe("Template Renderer", () => {
         chartDataRefs: {},
       },
       new Map(),
+      { slideType: "data-metrics", slideNumber: 4, totalSlides: 8 },
     );
     expect(html).toContain("+1%");
     expect(html).toContain("stat-trend");
@@ -88,6 +96,7 @@ describe("Template Renderer", () => {
         chartDataRefs: {},
       },
       new Map(),
+      { slideType: "data-metrics", slideNumber: 4, totalSlides: 8 },
     );
     // No delta on any stat, so conditional block should be removed
     expect(html).not.toContain("stat-trend");
@@ -97,6 +106,59 @@ describe("Template Renderer", () => {
     expect(() =>
       renderSlide("SF-05", { slots: {}, chartDataRefs: {} }, new Map()),
     ).toThrow(TemplateRenderError);
+  });
+
+  it("renders dedicated executive-summary templates with semantic metadata", () => {
+    const html = renderSlide(
+      "CO-06",
+      {
+        slots: {
+          eyebrow: "Executive Summary",
+          headline: "Three moves define the brief",
+          subhead: "What matters most, why it matters, and what to do next.",
+          slide_class: "gradient-dark",
+          thesis_label: "Core Thesis",
+          thesis_body: "Market pressure is rising fastest where operational friction is already highest.",
+          source: { text: "Synthesized from source-backed findings" },
+          summary_1: { title: "Margin pressure compounds", description: "Costs are rising faster than revenue quality.", color_class: "orange" },
+          summary_2: { title: "Demand is resilient", description: "Volume remains stronger than sentiment suggests.", color_class: "green" },
+          summary_3: { title: "Timing matters", description: "A six-month delay materially weakens the upside case.", color_class: "purple" },
+          impact_1: { value: "3x", label: "Sensitivity", color_class: "cyan" },
+        },
+        chartDataRefs: {},
+      },
+      new Map(),
+      { slideType: "executive-summary", slideNumber: 3, totalSlides: 10 },
+    );
+
+    expect(html).toContain("summary-card-stack");
+    expect(html).toContain("Core Thesis");
+    expect(html).toContain('data-slide-type="executive-summary"');
+    expect(html).toContain("Synthesized from source-backed findings");
+  });
+
+  it("renders timeline components from registry-shaped step data", () => {
+    const html = renderSlide(
+      "CL-03",
+      {
+        slots: {
+          headline: "Regulatory path",
+          subhead: "Three milestones shape the year.",
+          slide_class: "gradient-dark",
+          source: "Primary timeline synthesis",
+          step_1: { label: "Q1", title: "Draft rule", description: "Initial rulemaking enters review.", color_class: "cyan" },
+          step_2: { label: "Q2", title: "Comment window", description: "Stakeholder feedback drives revisions.", color_class: "green" },
+          step_3: { label: "Q4", title: "Implementation", description: "Operational teams absorb the change.", color_class: "orange" },
+        },
+        chartDataRefs: {},
+      },
+      new Map(),
+      { slideType: "dimension-deep-dive", slideNumber: 5, totalSlides: 10 },
+    );
+
+    expect(html).toContain("timeline-dot cyan");
+    expect(html).toContain("Draft rule");
+    expect(html).toContain("Comment window");
   });
 
   it("escapes HTML in text slots to prevent injection", () => {

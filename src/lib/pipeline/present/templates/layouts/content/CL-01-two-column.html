@@ -9,7 +9,8 @@
 
     <div class="two-col anim d2">
       <div>
-        <p class="section-intro">{{slot:left_content}}</p>
+        <h3 class="section-title">{{slot:col_left_title}}</h3>
+        <p class="section-intro">{{slot:col_left_body}}</p>
         {{#if slot:left_stat}}
         {{component:stat-block slot:left_stat}}
         {{/if}}
@@ -18,14 +19,17 @@
         {{#if slot:chart_primary}}
         <div class="chart-container">{{slot:chart_primary}}</div>
         {{/if}}
-        {{#if slot:right_content}}
-        <p class="section-intro">{{slot:right_content}}</p>
+        <h3 class="section-title">{{slot:col_right_title}}</h3>
+        {{#if slot:col_right_body}}
+        <p class="section-intro">{{slot:col_right_body}}</p>
         {{/if}}
       </div>
     </div>
 
+    {{#if slot:source}}
     <div class="source-list anim d3">
       {{component:source-citation slot:source}}
     </div>
+    {{/if}}
   </div>
 </section>

@@ -1,8 +1,8 @@
 <!-- component: icon-marker -->
-<div style="display: flex; align-items: flex-start; gap: 12px; margin: 8px 0;">
-  <span class="dot {{slot:color_class}}" style="width: 10px; height: 10px; margin-top: 6px; flex-shrink: 0;"></span>
-  <div>
+<div class="icon-marker">
+  <span class="dot icon-marker-dot {{slot:color_class}}"></span>
+  <div class="icon-marker-copy">
     <div class="highlight">{{slot:title}}</div>
-    <div style="color: var(--text-secondary); font-size: var(--text-sm);">{{slot:description}}</div>
+    <div class="icon-marker-desc">{{slot:description}}</div>
   </div>
 </div>

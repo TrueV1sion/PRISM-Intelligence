@@ -7,6 +7,7 @@
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { approveTriageForRun } from "@/lib/pipeline/approval";
 
 const VALID_ACTIONS = ["keep", "dismiss", "boost", "flag"];
 
@@ -45,6 +46,9 @@ export async function POST(request: Request) {
     );
 
     await Promise.all(updates);
+
+    // Release the pipeline
+    approveTriageForRun(runId);
 
     return NextResponse.json({
       success: true,

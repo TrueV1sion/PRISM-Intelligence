@@ -22,6 +22,49 @@ import type {
 const REVIEWER_MODEL = "claude-sonnet-4-20250514";
 const REVIEWER_TIMEOUT_MS = 30_000;
 
+const SLIDE_TYPE_SUCCESS_CRITERIA: Record<string, readonly string[]> = {
+  title: [
+    "Frame the brief immediately with a concrete thesis or stakes-heavy headline",
+    "Orient the audience to what kind of decision or briefing they are entering",
+    "Avoid generic hero copy that could belong to any deck",
+  ],
+  "findings-toc": [
+    "Create a clear mental map of the briefing, not a vague list of topics",
+    "Show why the sequence matters and how the sections connect",
+    "Signal the big tensions or proof points the audience should watch for",
+  ],
+  "executive-summary": [
+    "Surface the 2-3 highest-conviction takeaways in decision-ready language",
+    "Include implications, not just observations",
+    "Avoid repeating the TOC or restating the title without synthesis",
+  ],
+  "dimension-deep-dive": [
+    "Advance one clear analytical thread with evidence and interpretation",
+    "Balance density with readability so the slide feels intelligent, not crowded",
+    "Make the implication of the evidence obvious",
+  ],
+  "data-metrics": [
+    "Use the chart and stats to tell one sharp story, not display disconnected numbers",
+    "Ensure headline, chart, and source point to the same conclusion",
+    "Prefer annotated insight over raw metric dumping",
+  ],
+  emergence: [
+    "Feel genuinely cross-cutting and synthetic, not like another body slide",
+    "Explain why the insight emerges only when multiple threads are combined",
+    "Emphasize novelty and significance",
+  ],
+  tension: [
+    "Make the tradeoff legible and decision-relevant",
+    "Show both sides fairly before resolving toward an implication",
+    "Avoid collapsing into generic caution language",
+  ],
+  closing: [
+    "Land the deck with a decision, implication, or next move",
+    "Create closure rather than introducing fresh analysis",
+    "Leave the audience with a strong final line, not generic summary copy",
+  ],
+};
+
 // ─── Template Pipeline Review Prompt ──────────────────────────────────────────
 
 export const TEMPLATE_REVIEW_PROMPT = `You are a presentation content reviewer. The slide HTML was generated
@@ -96,6 +139,13 @@ Assess whether each slide contributes coherently to the overall deck story:
 - 2: Slide disrupts flow or repeats previous content without adding value
 - 1: Slide is irrelevant or actively confusing in context
 
+### Role-Specific Expectations
+- Title slides must establish stakes and orient the audience immediately
+- Findings/TOC slides must create a clear navigation map for the briefing
+- Executive summary slides must surface the top implications in decision-ready language
+- Closing slides must create closure and point to the decision or next move
+- Data slides must use charts and metrics to support a single clear takeaway, not just display numbers
+
 ### Regenerate Flag
 Set \`regenerate: true\` if the slide has BOTH:
 - componentFit < 3 (poor component usage), OR
@@ -146,9 +196,13 @@ function buildReviewerUserPrompt(
 
   parts.push(`## Slide Manifest Summary`);
   for (const slide of manifest.slides) {
+    const criteria = SLIDE_TYPE_SUCCESS_CRITERIA[slide.type] ?? [];
     parts.push(
       `- Slide ${slide.slideNumber}: "${slide.title}" (type: ${slide.type}) — ${slide.purpose}`,
     );
+    if (criteria.length > 0) {
+      parts.push(`  Success criteria: ${criteria.join("; ")}`);
+    }
   }
   parts.push(``);
 

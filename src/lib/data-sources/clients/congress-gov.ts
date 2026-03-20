@@ -75,7 +75,7 @@ async function makeRequest(
     }
 
     if (!response.ok) {
-      const body = await response.json().catch(() => ({})) as Record<string, unknown>;
+      const body = await response.json().catch(() => ({})) as unknown as Record<string, unknown>;
       const msg =
         (body.error as Record<string, string> | undefined)?.message ??
         (body.message as string | undefined) ??
@@ -83,7 +83,7 @@ async function makeRequest(
       throw new Error(`Congress.gov API error (HTTP ${response.status}): ${msg}`);
     }
 
-    const body = (await response.json()) as Record<string, unknown>;
+    const body = (await response.json()) as unknown as Record<string, unknown>;
 
     // Congress.gov wraps data in various top-level keys
     const pagination = body.pagination as { count: number; next?: string } | undefined;

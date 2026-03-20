@@ -8,9 +8,9 @@
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { present } from "@/lib/pipeline/present";
-import type { PipelineEvent } from "@/lib/pipeline/types";
-import { readFileSync, writeFileSync, mkdirSync } from "fs";
+import { presentOrchestrated } from "@/lib/pipeline/present-orchestrator";
+import { PresentationQualityError } from "@/lib/pipeline/present/quality-gate";
+import { mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
 
 export async function POST(request: Request) {
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Run not found" }, { status: 404 });
     }
 
-    // Reconstruct the data structures needed for present()
+    // Reconstruct the data structures needed for the orchestrated presenter
     const blueprint = {
       query: run.query,
       dimensions: run.dimensions.map((d) => ({
@@ -104,73 +104,21 @@ export async function POST(request: Request) {
       criticRevisions: [] as string[],
     };
 
-    const events: PipelineEvent[] = [];
-    const presentation = await present({
+    const presentation = await presentOrchestrated({
       runId,
       synthesis,
       agentResults,
       blueprint,
-      emitEvent: (e) => events.push(e),
+      emitEvent: () => {},
     });
 
-    // Save to public/decks/ with inlined CSS/JS for self-contained sharing
-    const decksDir = join(process.cwd(), "public", "decks");
-    mkdirSync(decksDir, { recursive: true });
-    const filename = `${runId}.html`;
-
-    let finalHtml = presentation.html;
-    const publicDir = join(process.cwd(), "public");
-
-    if (!finalHtml.includes("presentation.css") && !finalHtml.includes("<style>")) {
-      try {
-        const css = readFileSync(join(publicDir, "styles", "presentation.css"), "utf-8");
-        if (finalHtml.includes("</head>")) {
-          finalHtml = finalHtml.replace("</head>", `  <style>\n${css}\n  </style>\n</head>`);
-        }
-      } catch { /* skip if not found */ }
+    let htmlPath = presentation.htmlPath ?? `/decks/${runId}.html`;
+    if (!presentation.htmlPath) {
+      const decksDir = join(process.cwd(), "public", "decks");
+      mkdirSync(decksDir, { recursive: true });
+      writeFileSync(join(decksDir, `${runId}.html`), presentation.html, "utf-8");
+      htmlPath = `/decks/${runId}.html`;
     }
-
-    if (!finalHtml.includes("presentation.js")) {
-      try {
-        const js = readFileSync(join(publicDir, "js", "presentation.js"), "utf-8");
-        if (finalHtml.includes("</body>")) {
-          finalHtml = finalHtml.replace("</body>", `  <script>\n${js}\n  </script>\n</body>`);
-        }
-      } catch { /* skip if not found */ }
-    }
-
-    // Make all animated elements visible immediately in standalone decks
-    finalHtml = finalHtml.replace(
-      /class="([^"]*\b(anim|anim-scale|anim-blur)\b[^"]*)"/g,
-      (match, classes) => {
-        if (classes.includes("visible")) return match;
-        return `class="${classes} visible"`;
-      }
-    );
-    finalHtml = finalHtml.replace(
-      /class="([^"]*\bbar-fill\b[^"]*)"/g,
-      (match, classes) => {
-        if (classes.includes("animate")) return match;
-        return `class="${classes} animate"`;
-      }
-    );
-    // Add is-visible to chart containers so CSS animations trigger
-    finalHtml = finalHtml.replace(
-      /class="([^"]*\b(bar-chart|line-chart|donut-chart|sparkline)\b[^"]*)"/g,
-      (match, classes) => {
-        if (classes.includes("is-visible")) return match;
-        return `class="${classes} is-visible"`;
-      }
-    );
-    // Bake counter target values directly into text so they show without JS animation
-    finalHtml = finalHtml.replace(
-      /(<span[^>]*class="[^"]*stat-number[^"]*"[^>]*data-target="(\d+)"[^>]*>)(\d+)(<\/span>)/g,
-      (match, openTag, target, _currentText, closeTag) => {
-        return `${openTag}${target}${closeTag}`;
-      }
-    );
-
-    writeFileSync(join(decksDir, filename), finalHtml, "utf-8");
 
     // Update or create presentation record
     const existing = await prisma.presentation.findFirst({ where: { runId } });
@@ -180,7 +128,7 @@ export async function POST(request: Request) {
         data: {
           title: presentation.title,
           subtitle: presentation.subtitle,
-          htmlPath: `/decks/${filename}`,
+          htmlPath,
           slideCount: presentation.slideCount,
         },
       });
@@ -189,7 +137,7 @@ export async function POST(request: Request) {
         data: {
           title: presentation.title,
           subtitle: presentation.subtitle,
-          htmlPath: `/decks/${filename}`,
+          htmlPath,
           slideCount: presentation.slideCount,
           runId,
         },
@@ -200,10 +148,22 @@ export async function POST(request: Request) {
       success: true,
       title: presentation.title,
       slideCount: presentation.slideCount,
-      htmlPath: `/decks/${filename}`,
+      htmlPath,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
+    if (error instanceof PresentationQualityError) {
+      return NextResponse.json(
+        {
+          error: message,
+          quality: {
+            overall: error.scorecard.overall,
+            grade: error.scorecard.grade,
+          },
+        },
+        { status: 422 },
+      );
+    }
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

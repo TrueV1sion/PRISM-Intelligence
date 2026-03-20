@@ -126,7 +126,7 @@ export const lobbyingInfluenceResearchTool: DataSourceTool = {
 
     const billsData = billsResult?.data?.data;
     const bills = (billsData && typeof billsData === "object")
-      ? ((billsData as Record<string, unknown>).bills as Record<string, unknown>[]) ?? []
+      ? ((billsData as unknown as Record<string, unknown>).bills as unknown as Record<string, unknown>[]) ?? []
       : [];
     const totalBills = billsResult?.data?.pagination?.count ?? bills.length;
 
@@ -199,10 +199,10 @@ export const lobbyingInfluenceResearchTool: DataSourceTool = {
     // Related legislation
     if (bills.length > 0) {
       const billRows = bills.slice(0, 5).map((b) => {
-        const bill = b as Record<string, unknown>;
+        const bill = b as unknown as Record<string, unknown>;
         const title = String(bill.title ?? bill.shortTitle ?? "Unknown");
         const number = String(bill.number ?? bill.bill_id ?? "—");
-        const latestAction = bill.latestAction as Record<string, unknown> | undefined;
+        const latestAction = bill.latestAction as unknown as Record<string, unknown> | undefined;
         const actionText = latestAction ? String(latestAction.text ?? "—") : "—";
         return [number, title.slice(0, 50), actionText.slice(0, 40)];
       });

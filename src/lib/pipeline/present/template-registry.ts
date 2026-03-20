@@ -90,6 +90,12 @@ const featureCardFields: ComponentField[] = [
   { name: "color_class", type: "enum", required: true, constraints: { enumValues: ["cyan", "green", "purple", "orange"] } },
 ];
 
+const iconMarkerFields: ComponentField[] = [
+  { name: "title", type: "text", required: true, constraints: { maxLength: 36 } },
+  { name: "description", type: "text", required: true, constraints: { maxLength: 120 } },
+  { name: "color_class", type: "enum", required: true, constraints: { enumValues: ["cyan", "green", "purple", "orange"] } },
+];
+
 // ── Common slot definitions ──
 
 const headlineSlot: SlotSchema = { name: "headline", type: "text", required: true, constraints: { maxLength: 60 } };
@@ -342,12 +348,39 @@ const registry: TemplateRegistryEntry[] = [
   {
     id: "CL-07", name: "Bullet Insights", category: "content",
     dataShapes: [], densityRange: [3, 6],
+    slots: [headlineSlot, subheadSlot, slideClassSlot],
+    chartSlots: [],
+    componentSlots: [
+      { name: "item_1", component: "icon-marker", required: true, fields: iconMarkerFields },
+      { name: "item_2", component: "icon-marker", required: true, fields: iconMarkerFields },
+      { name: "item_3", component: "icon-marker", required: true, fields: iconMarkerFields },
+      { name: "item_4", component: "icon-marker", required: false, fields: iconMarkerFields },
+      { name: "item_5", component: "icon-marker", required: false, fields: iconMarkerFields },
+      sourceComponent(false),
+    ],
+  },
+  {
+    id: "CL-08", name: "Brief Map", category: "content",
+    dataShapes: [], densityRange: [0, 0],
     slots: [
-      headlineSlot, subheadSlot, slideClassSlot,
-      { name: "items", type: "list", required: true, constraints: { maxItems: 6 } },
+      headlineSlot,
+      subheadSlot,
+      slideClassSlot,
+      { name: "eyebrow", type: "text", required: false, constraints: { maxLength: 28 } },
+      { name: "callout_title", type: "text", required: true, constraints: { maxLength: 36 } },
+      { name: "callout_body", type: "text", required: true, constraints: { maxLength: 180 } },
+      { name: "group_1_title", type: "text", required: true, constraints: { maxLength: 24 } },
+      { name: "group_1_item_1", type: "text", required: true, constraints: { maxLength: 42 } },
+      { name: "group_1_item_2", type: "text", required: true, constraints: { maxLength: 42 } },
+      { name: "group_2_title", type: "text", required: true, constraints: { maxLength: 24 } },
+      { name: "group_2_item_1", type: "text", required: true, constraints: { maxLength: 42 } },
+      { name: "group_2_item_2", type: "text", required: true, constraints: { maxLength: 42 } },
+      { name: "group_3_title", type: "text", required: true, constraints: { maxLength: 24 } },
+      { name: "group_3_item_1", type: "text", required: true, constraints: { maxLength: 42 } },
+      { name: "group_3_item_2", type: "text", required: false, constraints: { maxLength: 42 } },
     ],
     chartSlots: [],
-    componentSlots: [sourceComponent(false)],
+    componentSlots: [],
   },
 
   // ── Composite (CO) ──
@@ -368,14 +401,15 @@ const registry: TemplateRegistryEntry[] = [
   {
     id: "CO-02", name: "Scorecard", category: "composite",
     dataShapes: ["single_metric", "comparison"], densityRange: [4, 6],
-    slots: [headlineSlot, subheadSlot, slideClassSlot],
-    chartSlots: [],
-    componentSlots: [
-      statComponent("stat_1"), statComponent("stat_2"),
-      statComponent("stat_3"), statComponent("stat_4"),
-      statComponent("stat_5", false), statComponent("stat_6", false),
-      sourceComponent(),
+    slots: [
+      headlineSlot,
+      subheadSlot,
+      slideClassSlot,
+      { name: "grade", type: "text", required: true, constraints: { maxLength: 8 } },
+      { name: "grade_label", type: "text", required: true, constraints: { maxLength: 40 } },
     ],
+    chartSlots: [{ name: "chart_primary", chartTypes: ["bar", "horizontal-bar", "line", "donut"], datasetRef: true }],
+    componentSlots: [sourceComponent(false)],
   },
   {
     id: "CO-03", name: "Market Map", category: "composite",
@@ -401,13 +435,39 @@ const registry: TemplateRegistryEntry[] = [
   {
     id: "CO-05", name: "Strategic Recommendation", category: "composite",
     dataShapes: [], densityRange: [3, 4],
-    slots: [headlineSlot, subheadSlot, slideClassSlot],
+    slots: [
+      headlineSlot,
+      subheadSlot,
+      slideClassSlot,
+      { name: "closing", type: "text", required: false, constraints: { maxLength: 200 } },
+    ],
     chartSlots: [],
     componentSlots: [
       { name: "action_1", component: "action-card", required: true, fields: actionCardFields },
       { name: "action_2", component: "action-card", required: true, fields: actionCardFields },
       { name: "action_3", component: "action-card", required: true, fields: actionCardFields },
       statMiniComponent("impact_1", false), statMiniComponent("impact_2", false),
+    ],
+  },
+  {
+    id: "CO-06", name: "Executive Summary Board", category: "composite",
+    dataShapes: [], densityRange: [0, 0],
+    slots: [
+      headlineSlot,
+      subheadSlot,
+      slideClassSlot,
+      { name: "eyebrow", type: "text", required: false, constraints: { maxLength: 28 } },
+      { name: "thesis_label", type: "text", required: true, constraints: { maxLength: 32 } },
+      { name: "thesis_body", type: "text", required: true, constraints: { maxLength: 180 } },
+    ],
+    chartSlots: [],
+    componentSlots: [
+      { name: "summary_1", component: "action-card", required: true, fields: actionCardFields },
+      { name: "summary_2", component: "action-card", required: true, fields: actionCardFields },
+      { name: "summary_3", component: "action-card", required: true, fields: actionCardFields },
+      statMiniComponent("impact_1", false),
+      statMiniComponent("impact_2", false),
+      sourceComponent(false),
     ],
   },
 ];

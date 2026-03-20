@@ -8,19 +8,21 @@
     <p class="slide-subtitle anim d1">{{slot:subhead}}</p>
 
     <div class="two-col anim d2">
-      <div style="text-align: center;">
-        <div class="stat-number cyan" style="font-size: var(--text-hero);">{{slot:grade}}</div>
-        <div class="stat-label" style="margin-top: 8px;">{{slot:grade_label}}</div>
+      <div class="scorecard-grade-block">
+        <div class="stat-number cyan scorecard-grade">{{slot:grade}}</div>
+        <div class="stat-label scorecard-grade-label">{{slot:grade_label}}</div>
       </div>
-      <div>
+      <div class="scorecard-chart">
         <div class="comparison-bars">
           {{slot:chart_primary}}
         </div>
       </div>
     </div>
 
+    {{#if slot:source}}
     <div class="source-list anim d3">
       {{component:source-citation slot:source}}
     </div>
+    {{/if}}
   </div>
 </section>

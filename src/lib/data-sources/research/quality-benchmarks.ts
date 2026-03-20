@@ -59,8 +59,8 @@ export const qualityBenchmarksResearchTool: DataSourceTool = {
     let cmsPolicies: Array<{ id?: string; title?: string }> = [];
     if (cmsResult.available && cmsResult.data) {
       try {
-        const parsed = JSON.parse(cmsResult.data) as Record<string, unknown>;
-        const results = (parsed.results ?? parsed.ncds ?? parsed.documents ?? []) as Record<string, unknown>[];
+        const parsed = JSON.parse(cmsResult.data) as unknown as Record<string, unknown>;
+        const results = (parsed.results ?? parsed.ncds ?? parsed.documents ?? []) as unknown as Record<string, unknown>[];
         cmsCount = Array.isArray(results) ? results.length : 0;
         cmsPolicies = results.slice(0, 5).map((r) => ({
           id: String(r.document_id ?? r.id ?? ""),
@@ -115,7 +115,7 @@ export const qualityBenchmarksResearchTool: DataSourceTool = {
     // AHRQ metrics table
     if (ahrqResults.length > 0) {
       const rows = ahrqResults.slice(0, 5).map((r) => {
-        const data = r.data as Record<string, unknown>;
+        const data = r.data as unknown as Record<string, unknown>;
         return [
           String(data.name ?? "—").slice(0, 40),
           r.result_type ?? "—",

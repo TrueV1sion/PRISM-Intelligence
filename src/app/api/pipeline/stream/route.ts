@@ -2,6 +2,7 @@ import { executePipeline } from "@/lib/pipeline/executor";
 import { prisma } from "@/lib/prisma";
 import { pipelineRateLimiter } from "@/lib/rate-limit";
 import { getEngineById } from "@/lib/engines/registry";
+import { resolveApiKey } from "@/lib/resolve-api-key";
 import type { PipelineEvent, AutonomyMode } from "@/lib/pipeline/types";
 
 export const dynamic = "force-dynamic";
@@ -36,12 +37,16 @@ export async function GET(request: Request) {
     );
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
+  // Resolve API key from DB (Platform Settings) first, then fall back to env
+  const anthropicKey = await resolveApiKey("anthropic");
+  if (!anthropicKey) {
     return new Response(
-      JSON.stringify({ error: "ANTHROPIC_API_KEY is not configured. Set it in .env to enable live mode." }),
+      JSON.stringify({ error: "ANTHROPIC_API_KEY is not configured. Set it in Platform Settings or .env to enable live mode." }),
       { status: 500, headers: { "Content-Type": "application/json" } },
     );
   }
+  // Make key available to downstream code that reads process.env
+  process.env.ANTHROPIC_API_KEY = anthropicKey;
 
   const encoder = new TextEncoder();
   const abortController = new AbortController();
@@ -126,10 +131,9 @@ export async function GET(request: Request) {
           case "emergence_detected":
             send("emergence_detected", {
               insight: event.insight.insight,
-              algorithm: event.insight.algorithm,
-              supportingAgents: event.insight.supportingAgents,
-              qualityScores: event.insight.qualityScores,
-              whyMultiAgent: event.insight.whyMultiAgent,
+              type: event.insight.algorithm as "convergent" | "pattern" | "tension" | "gap",
+              contributingAgents: event.insight.supportingAgents,
+              quality: event.insight.qualityScores,
             });
             break;
           case "critic_review":

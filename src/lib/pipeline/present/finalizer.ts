@@ -1,15 +1,14 @@
 /**
  * Presentation Finalizer
  *
- * Post-processes generated HTML (CSS/JS inlining, animation baking, counter baking),
+ * Post-processes generated HTML (CSS/JS inlining and design-system cleanup),
  * writes the deck to disk, and persists quality telemetry to the database.
  */
 
 import { readFileSync, writeFileSync, mkdirSync } from "fs";
 import { resolve, dirname, join } from "path";
 import { prisma } from "@/lib/prisma";
-import { computeQualityScorecard, type ScorecardInput } from "./quality-scorecard";
-import type { QualityScorecard, PipelineTimings, DesignReview } from "./types";
+import type { QualityScorecard, PipelineTimings, DesignReview, SlideStructure } from "./types";
 
 /**
  * Inline external CSS and JS assets into the HTML so the deck is fully
@@ -22,6 +21,9 @@ function inlineAssets(html: string): string {
 
   let processed = html;
 
+  // Strip any LLM-generated <style> blocks that override the design system
+  processed = processed.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "");
+
   // Inline CSS — replace external <link> with inlined <style> for self-contained deck
   try {
     const css = readFileSync(cssPath, "utf-8");
@@ -30,7 +32,7 @@ function inlineAssets(html: string): string {
       /<link[^>]*href="[^"]*presentation\.css"[^>]*>\s*/g,
       "",
     );
-    if (processed.includes("</head>") && !processed.includes("<style>")) {
+    if (processed.includes("</head>")) {
       processed = processed.replace(
         "</head>",
         `  <style>\n${css}\n  </style>\n</head>`,
@@ -38,6 +40,24 @@ function inlineAssets(html: string): string {
     }
   } catch {
     // Keep external link if CSS file not found (already present from assembler)
+  }
+
+  // Inline ECharts — replace external <script src> with inlined <script> for self-contained deck
+  try {
+    const echartsJs = readFileSync(join(publicDir, "js", "echarts.min.js"), "utf-8");
+    // Remove external echarts script tag if present
+    processed = processed.replace(
+      /<script[^>]*src="[^"]*echarts\.min\.js"[^>]*><\/script>\s*/g,
+      "",
+    );
+    if (processed.includes("</body>")) {
+      processed = processed.replace(
+        "</body>",
+        `  <script>\n${echartsJs}\n  </script>\n</body>`,
+      );
+    }
+  } catch {
+    // Keep external script if ECharts file not found
   }
 
   // Inline JS — replace external <script src> with inlined <script> for self-contained deck
@@ -62,63 +82,183 @@ function inlineAssets(html: string): string {
 }
 
 /**
- * Bake animation states into the HTML so animated elements render correctly
- * in standalone decks without a running IntersectionObserver.
+ * Deterministically enhance LLM-generated HTML with design system features
+ * that the model tends to under-use: animation diversity, background variants,
+ * and inline style cleanup.
+ *
+ * This runs BEFORE animation baking so the upgraded classes get the
+ * `.visible` treatment.
  */
-function bakeAnimationStates(html: string): string {
+function enhanceDesignSystem(html: string): string {
   let processed = html;
 
-  // Add 'visible' class to anim/anim-scale/anim-blur elements
+  // ── 0a. Normalize hero stat counters: .value[data-target] → .stat-number[data-target] ──
+  // The agent sometimes uses <div class="value cyan" data-target="56"> on hero slides
+  // but the JS counter animation targets .stat-number[data-target]
   processed = processed.replace(
-    /class="([^"]*\b(anim|anim-scale|anim-blur)\b[^"]*)"/g,
-    (match, classes) => {
-      if (classes.includes("visible")) return match;
-      return `class="${classes} visible"`;
+    /<(div|span)\s+class="value([^"]*)"\s+data-target="(\d+)">/g,
+    '<$1 class="stat-number$2" data-target="$3">',
+  );
+
+  // ── 1. Upgrade animation classes based on element context ──
+  // Slide titles: anim → anim-blur (blur-reveal for headings)
+  processed = processed.replace(
+    /class="([^"]*\bslide-title\b[^"]*)\banim\b(?!-)([^"]*)"/g,
+    (match, before, after) => {
+      if (/anim-(blur|slide|spring|fade|zoom|scale)/.test(before + after)) return match;
+      return `class="${before}anim-blur${after}"`;
     },
   );
 
-  // Add 'animate' class to bar-fill elements
+  // Hero titles: anim → anim-blur
   processed = processed.replace(
-    /class="([^"]*\bbar-fill\b[^"]*)"/g,
-    (match, classes) => {
-      if (classes.includes("animate")) return match;
-      return `class="${classes} animate"`;
+    /class="([^"]*\bhero-title\b[^"]*)\banim\b(?!-)([^"]*)"/g,
+    (match, before, after) => {
+      if (/anim-(blur|slide|spring|fade|zoom|scale)/.test(before + after)) return match;
+      return `class="${before}anim-blur${after}"`;
     },
   );
 
-  // Add 'is-visible' class to chart containers so CSS animations trigger
+  // Stat grids/blocks: anim on grid-3 → stagger-children
   processed = processed.replace(
-    /class="([^"]*\b(bar-chart|line-chart|donut-chart|sparkline)\b[^"]*)"/g,
-    (match, classes) => {
-      if (classes.includes("is-visible")) return match;
-      return `class="${classes} is-visible"`;
+    /class="([^"]*\bgrid-3\b[^"]*)\banim\b(?!-)([^"]*)"/g,
+    (match, before, after) => {
+      if (/stagger-children/.test(before + after)) return match;
+      return `class="${before}stagger-children${after}"`;
     },
   );
 
-  return processed;
-}
-
-/**
- * Bake counter target values directly into text content so they display
- * correctly without the JS counter animation.
- */
-function bakeCounterValues(html: string): string {
-  let processed = html;
-
-  // Handle data-prefix and data-suffix on counters (formatted with toLocaleString)
+  // Stat blocks and stat cards: anim → anim-scale
   processed = processed.replace(
-    /(<span[^>]*class="[^"]*stat-number[^"]*"[^>]*data-target="(\d+)"[^>]*(?:data-prefix="([^"]*)")?[^>]*(?:data-suffix="([^"]*)")?[^>]*>)(\d+)(<\/span>)/g,
-    (match, openTag, target, prefix, suffix, _currentText, closeTag) => {
-      const val = parseInt(target).toLocaleString();
-      return `${openTag}${prefix || ""}${val}${suffix || ""}${closeTag}`;
+    /class="([^"]*\bstat-card\b[^"]*)\banim\b(?!-)([^"]*)"/g,
+    (match, before, after) => {
+      if (/anim-(blur|slide|spring|fade|zoom|scale)/.test(before + after)) return match;
+      return `class="${before}anim-scale${after}"`;
     },
   );
 
-  // Simpler fallback: bake plain data-target values without prefix/suffix
+  // Hero stats: anim → anim-spring
   processed = processed.replace(
-    /(<span[^>]*class="[^"]*stat-number[^"]*"[^>]*data-target="(\d+)"[^>]*>)(\d+)(<\/span>)/g,
-    (match, openTag, target, _currentText, closeTag) => {
-      return `${openTag}${target}${closeTag}`;
+    /class="([^"]*\bhero-stats\b[^"]*)\banim\b(?!-)([^"]*)"/g,
+    (match, before, after) => {
+      if (/anim-(blur|slide|spring|fade|zoom|scale)/.test(before + after)) return match;
+      return `class="${before}anim-spring${after}"`;
+    },
+  );
+
+  // Emergence cards in grid: anim on grid-2 inside emergent sections → stagger-children
+  processed = processed.replace(
+    /class="([^"]*\bemergence-card\b[^"]*)\banim\b(?!-)([^"]*)"/g,
+    (match, before, after) => {
+      if (/anim-(blur|slide|spring|fade|zoom|scale)/.test(before + after)) return match;
+      return `class="${before}anim-scale${after}"`;
+    },
+  );
+
+  // Emergent number: anim → anim-zoom
+  processed = processed.replace(
+    /class="([^"]*\bemergent-number\b[^"]*)\banim\b(?!-)([^"]*)"/g,
+    (match, before, after) => {
+      if (/anim-(blur|slide|spring|fade|zoom|scale)/.test(before + after)) return match;
+      return `class="${before}anim-zoom${after}"`;
+    },
+  );
+
+  // Source lists and footnotes: anim → anim-fade
+  processed = processed.replace(
+    /class="([^"]*\bsource-list\b[^"]*)\banim\b(?!-)([^"]*)"/g,
+    (match, before, after) => {
+      if (/anim-(blur|slide|spring|fade|zoom|scale)/.test(before + after)) return match;
+      return `class="${before}anim-fade${after}"`;
+    },
+  );
+  processed = processed.replace(
+    /class="([^"]*\bdagger-footnote\b[^"]*)\banim\b(?!-)([^"]*)"/g,
+    (match, before, after) => {
+      if (/anim-(blur|slide|spring|fade|zoom|scale)/.test(before + after)) return match;
+      return `class="${before}anim-fade${after}"`;
+    },
+  );
+
+  // Validation box: anim → anim-scale
+  processed = processed.replace(
+    /class="([^"]*\bvalidation-box\b[^"]*)\banim\b(?!-)([^"]*)"/g,
+    (match, before, after) => {
+      if (/anim-(blur|slide|spring|fade|zoom|scale)/.test(before + after)) return match;
+      return `class="${before}anim-scale${after}"`;
+    },
+  );
+
+  // ── 2. Add background variant classes to bare <section> elements ──
+  // Rotate through variants based on slide position
+  const bgVariants = [
+    "gradient-dark",     // slide 1: title
+    "gradient-dark",     // slide 2: TOC
+    "gradient-blue",     // slide 3: exec summary
+    "gradient-blue",     // slide 4+: data slides
+    "dark-particles",
+    "gradient-dark",
+    "dark-mesh",
+    "gradient-blue",
+    "dark-particles",
+    "gradient-dark",
+    "dark-mesh",
+    "gradient-blue",
+    "dark-particles",
+    "gradient-radial",   // emergence slides tend to be later
+    "gradient-radial",
+    "dark-mesh",
+    "gradient-dark",
+    "dark-particles",
+    "gradient-blue",
+    "gradient-dark",
+  ];
+
+  let slideIdx = 0;
+  processed = processed.replace(
+    /<section\s+class="slide(?:\s+emergent-slide)?(?:\s+title-slide)?"(\s+id="s\d+")/g,
+    (match, idPart) => {
+      // Don't touch sections that already have a background variant
+      if (/gradient-dark|gradient-blue|gradient-radial|dark-mesh|dark-particles/.test(match)) {
+        slideIdx++;
+        return match;
+      }
+      const variant = bgVariants[slideIdx % bgVariants.length] || "gradient-dark";
+      slideIdx++;
+      // Check if it has emergent-slide or title-slide modifiers
+      if (match.includes("emergent-slide")) {
+        return `<section class="slide ${variant} emergent-slide"${idPart}`;
+      }
+      if (match.includes("title-slide")) {
+        return `<section class="slide ${variant} title-slide"${idPart}`;
+      }
+      return `<section class="slide ${variant}"${idPart}`;
+    },
+  );
+
+  // ── 3. Strip non-allowed inline styles ──
+  // Keep ONLY: slide-bg-glow styles, legend-dot/dot background, bar-fill, SVG attributes, chart elements
+  processed = processed.replace(
+    /(\<(?!div\s+class="[^"]*slide-bg-glow)[^\>]*?)\s+style="([^"]*)"([^\>]*\>)/g,
+    (fullMatch, before, styleValue, after) => {
+      // Allow legend-dot and dot background colors
+      if (/class="[^"]*\b(legend-dot|dot)\b/.test(before) && /background/.test(styleValue)) {
+        return fullMatch;
+      }
+      // Allow bar-fill (--fill-pct, width, background)
+      if (/class="[^"]*\bbar-fill\b/.test(before)) {
+        return fullMatch;
+      }
+      // Allow SVG elements (stroke, fill, height, width, etc.)
+      if (/\<(circle|rect|line|polyline|path|svg|text)\b/.test(before)) {
+        return fullMatch;
+      }
+      // Allow chart containers with max-width
+      if (/class="[^"]*\b(chart-container|donut-chart|bar-chart|line-chart)\b/.test(before)) {
+        return fullMatch;
+      }
+      // Strip all other inline styles
+      return `${before}${after}`;
     },
   );
 
@@ -192,12 +332,10 @@ async function persistQuality(
 
 /**
  * Finalize a generated presentation:
- * 1. Inline CSS/JS assets
- * 2. Bake animation states
- * 3. Bake counter values
- * 4. Recover from LLM truncation
- * 5. Write HTML file to disk
- * 6. Persist quality telemetry to the database
+ * 1. Strip LLM-generated embedded styles, then inline canonical CSS/JS assets
+ * 2. Recover from LLM truncation
+ * 3. Write HTML file to disk
+ * 4. Persist quality telemetry to the database
  *
  * Returns the relative path to the written HTML file (e.g. `public/decks/<runId>.html`).
  */
@@ -208,27 +346,25 @@ export async function finalize(
   review?: DesignReview | null,
   timings?: PipelineTimings,
   remediationRounds?: number,
+  slideStructures?: SlideStructure[],
 ): Promise<string> {
   // 1. CSS/JS inlining
   let processed = html;
   processed = inlineAssets(processed);
 
-  // 2. Animation state baking
-  processed = bakeAnimationStates(processed);
+  // 1b. Design system enhancement (animation upgrades, background variants, inline style cleanup)
+  processed = enhanceDesignSystem(processed);
 
-  // 3. Counter value baking
-  processed = bakeCounterValues(processed);
-
-  // 4. Truncation recovery
+  // 2. Truncation recovery
   processed = recoverTruncation(processed);
 
-  // 5. Write file
+  // 3. Write file
   const htmlPath = `public/decks/${runId}.html`;
   const fullPath = resolve(process.cwd(), htmlPath);
   mkdirSync(dirname(fullPath), { recursive: true });
   writeFileSync(fullPath, processed, "utf-8");
 
-  // 6. Persist quality telemetry (non-blocking — don't crash pipeline on DB errors)
+  // 4. Persist quality telemetry (non-blocking — don't crash pipeline on DB errors)
   try {
     await persistQuality(runId, quality, review, timings, remediationRounds);
   } catch (dbError) {
@@ -237,8 +373,69 @@ export async function finalize(
     );
   }
 
-  // TODO: When pipelineVersion === "v2", persist template scorecard fields
-  // using computeQualityScorecard() and the new PresentationQuality columns
+  // 7. Persist structured slide data for editor (Phase 4a)
+  if (slideStructures && slideStructures.length > 0) {
+    try {
+      await persistSlideStructures(runId, slideStructures);
+    } catch (dbError) {
+      console.warn(
+        `[finalizer] Failed to persist slide structures for run ${runId}: ${dbError instanceof Error ? dbError.message : String(dbError)}`,
+      );
+    }
+  }
 
   return htmlPath;
+}
+
+/**
+ * Persist slide structures as PresentationVersion + SlideVersion records.
+ * Creates the initial "AI-generated" version (v1) that the editor can modify.
+ */
+async function persistSlideStructures(
+  runId: string,
+  structures: SlideStructure[],
+): Promise<void> {
+  // Find the presentation record for this run
+  const presentation = await prisma.presentation.findUnique({
+    where: { runId },
+  });
+
+  if (!presentation) {
+    console.warn(`[finalizer] No Presentation record found for run ${runId}, skipping structure persistence`);
+    return;
+  }
+
+  // Create version v1 with all slide structures
+  const version = await prisma.presentationVersion.create({
+    data: {
+      presentationId: presentation.id,
+      versionNumber: 1,
+      status: "published",
+      label: "AI-generated",
+      publishedAt: new Date(),
+      slides: {
+        create: structures.map((s) => ({
+          slideNumber: s.slideNumber,
+          templateId: s.templateId,
+          backgroundVariant: s.backgroundVariant,
+          animationType: s.animationType,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          content: s.content as any, // Prisma Json field accepts any serializable value
+          sourceAgentIds: s.sourceAgentIds,
+          sourceFindingIds: s.sourceFindingIds,
+        })),
+      },
+    },
+  });
+
+  // Set as current and published version
+  await prisma.presentation.update({
+    where: { id: presentation.id },
+    data: {
+      currentVersionId: version.id,
+      publishedVersionId: version.id,
+    },
+  });
+
+  console.log(`[finalizer] Persisted ${structures.length} slide structures as version v1 for presentation ${presentation.id}`);
 }

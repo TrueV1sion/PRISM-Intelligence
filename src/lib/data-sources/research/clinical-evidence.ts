@@ -55,8 +55,8 @@ export const clinicalEvidenceResearchTool: DataSourceTool = {
     let articleTitles: string[] = [];
     if (pubmedResult.available && pubmedResult.data) {
       try {
-        const parsed = JSON.parse(pubmedResult.data) as Record<string, unknown>;
-        const articles = (parsed.articles ?? parsed.esearchresult ?? []) as Record<string, unknown>[];
+        const parsed = JSON.parse(pubmedResult.data) as unknown as Record<string, unknown>;
+        const articles = (parsed.articles ?? parsed.esearchresult ?? []) as unknown as Record<string, unknown>[];
         articleCount = Array.isArray(articles) ? articles.length : 0;
         articleTitles = articles.slice(0, 3).map((a) => String(a.title ?? a.Title ?? "Untitled")).filter(Boolean);
       } catch {
@@ -68,8 +68,8 @@ export const clinicalEvidenceResearchTool: DataSourceTool = {
     let trials: Array<{ nctId?: string; title?: string; phase?: string; status?: string }> = [];
     if (trialsResult.available && trialsResult.data) {
       try {
-        const parsed = JSON.parse(trialsResult.data) as Record<string, unknown>;
-        const rawTrials = (parsed.trials ?? parsed.studies ?? []) as Record<string, unknown>[];
+        const parsed = JSON.parse(trialsResult.data) as unknown as Record<string, unknown>;
+        const rawTrials = (parsed.trials ?? parsed.studies ?? []) as unknown as Record<string, unknown>[];
         trialCount = Array.isArray(rawTrials) ? rawTrials.length : 0;
         trials = rawTrials.slice(0, 5).map((t) => ({
           nctId: String(t.nctId ?? t.nct_id ?? ""),
@@ -85,7 +85,7 @@ export const clinicalEvidenceResearchTool: DataSourceTool = {
     let preprintCount = 0;
     if (biorxivResult.available && biorxivResult.data) {
       try {
-        const parsed = JSON.parse(biorxivResult.data) as Record<string, unknown>;
+        const parsed = JSON.parse(biorxivResult.data) as unknown as Record<string, unknown>;
         const preprints = (parsed.preprints ?? parsed.collection ?? []) as unknown[];
         preprintCount = Array.isArray(preprints) ? preprints.length : 0;
       } catch {

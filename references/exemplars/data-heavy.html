@@ -1,20 +1,25 @@
 <!-- EXEMPLAR: Data-Heavy Slide
      Teaches: Compact table with threat meters, stat-blocks with animated counters,
-              finding cards alongside quantitative data, grid-2 layout, source list
+              finding cards alongside quantitative data, grid-2 layout, source list,
+              dark-particles background for analytical slides, anim-scale for cards,
+              stagger-children on data grids, process-flow for methodology,
+              NO inline styles except glow position + SVG attributes
      Key tokens: compact-table, threat-meter, threat-dot, stat-block, stat-number,
-                 stat-eyebrow, stat-trend, finding-card, grid-2, source-list, tag
+                 stat-eyebrow, stat-trend, finding-card, grid-2, source-list, tag,
+                 anim-scale, stagger-children, dark-particles, process-flow, process-step
      Component choices: compact-table for structured comparisons, threat-meter for
                         severity visualization, stat-block for key metrics,
-                        finding-card for qualitative analysis alongside data -->
-<section class="slide" id="slide-N">
+                        finding-card for qualitative analysis alongside data,
+                        process-flow for methodology pipeline -->
+<section class="slide dark-particles" id="slide-N">
   <div class="slide-bg-glow" style="background:var(--inov-cerulean);bottom:-200px;right:-150px;"></div>
   <div class="slide-inner">
     <div class="eyebrow anim"><span class="tag tag-red">Dimension N</span> Agent Name</div>
-    <h2 class="slide-title anim d1">Competitive <span style="color:var(--accent-error)">Positioning Matrix</span></h2>
-    <p class="section-intro anim d2">Brief strategic framing of the data that follows. One to two sentences establishing what the viewer will learn from this slide.</p>
+    <h2 class="slide-title anim-blur d1">Competitive <span class="accent-error">Positioning Matrix</span></h2>
+    <p class="section-intro anim d2">Brief strategic framing of the data that follows.</p>
 
-    <div class="anim d3" style="margin-bottom:1.5rem;">
-      <table class="compact-table" style="width:100%;">
+    <div class="anim-scale d3">
+      <table class="compact-table">
         <thead>
           <tr>
             <th>Category</th>
@@ -50,20 +55,30 @@
       </table>
     </div>
 
-    <div class="grid-2 anim d4">
-      <div class="finding-card opportunity">
+    <div class="grid-2 stagger-children d4">
+      <div class="finding-card opportunity anim-scale">
         <div class="finding-title">Strength-Based Insight Title</div>
-        <div class="finding-body">Detailed analysis of the opportunity with specific evidence, metrics, and strategic implications. Reference source tiers and confidence levels.</div>
+        <div class="finding-body">Detailed analysis of the opportunity with specific evidence, metrics, and strategic implications.</div>
         <span class="confidence-badge high">HIGH &mdash; Cross-Agent Synthesis</span>
       </div>
-      <div class="finding-card risk">
+      <div class="finding-card risk anim-scale">
         <div class="finding-title">Risk-Based Insight Title</div>
-        <div class="finding-body">Detailed analysis of the risk with specific evidence, competitive dynamics, and timeline implications. Include quantitative support where available.</div>
+        <div class="finding-body">Detailed analysis of the risk with specific evidence, competitive dynamics, and timeline implications.</div>
         <span class="confidence-badge high">HIGH &mdash; Agent Finding N</span>
       </div>
     </div>
 
-    <div class="dagger-footnote">&dagger; Methodological caveat or data quality note relevant to the analysis above.</div>
+    <div class="process-flow anim d5">
+      <div class="process-step">Data Collection</div>
+      <div class="process-arrow">&rarr;</div>
+      <div class="process-step">Cross-Validation</div>
+      <div class="process-arrow">&rarr;</div>
+      <div class="process-step">Synthesis</div>
+      <div class="process-arrow">&rarr;</div>
+      <div class="process-step">Confidence Scoring</div>
+    </div>
+
+    <div class="dagger-footnote anim-fade d6">&dagger; Methodological caveat or data quality note relevant to the analysis above.</div>
   </div>
   <div class="slide-footer">
     <span>PRISM Intelligence &mdash; Agent Name</span>

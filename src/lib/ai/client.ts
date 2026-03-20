@@ -8,12 +8,22 @@
 import Anthropic from "@anthropic-ai/sdk";
 
 let client: Anthropic | null = null;
+let clientApiKey: string | undefined;
 
 export function getAnthropicClient(): Anthropic {
-  if (!client) {
-    client = new Anthropic(); // reads ANTHROPIC_API_KEY from env
+  const currentKey = process.env.ANTHROPIC_API_KEY;
+  // Recreate client if the API key has changed (e.g., user saved a new key via Platform Settings)
+  if (!client || (currentKey && currentKey !== clientApiKey)) {
+    clientApiKey = currentKey;
+    client = new Anthropic({ apiKey: currentKey });
   }
   return client;
+}
+
+/** Reset the cached client — forces re-creation on next getAnthropicClient() call */
+export function resetAnthropicClient(): void {
+  client = null;
+  clientApiKey = undefined;
 }
 
 // ─── Model Routing ──────────────────────────────────────────
@@ -25,7 +35,7 @@ export const MODELS = {
   DEPLOY: "claude-sonnet-4-6",
   CRITIC: "claude-opus-4-6",
   SYNTHESIZE: "claude-opus-4-6",
-  PRESENT: "claude-sonnet-4-6",
+  PRESENT: "claude-opus-4-6",
 } as const;
 
 export type PipelinePhase = keyof typeof MODELS;

@@ -13,12 +13,192 @@ import Anthropic from "@anthropic-ai/sdk";
 import { ComponentCatalog } from "./component-catalog";
 import { generateSlideContent } from "./content-generator";
 import { renderSlide } from "./template-renderer";
-import type { RemediationInput, SlideHTML, ChartData, ContentGeneratorInput, ContentGeneratorOutput } from "./types";
+import type { RemediationInput, SlideHTML, ContentGeneratorInput, ContentGeneratorOutput } from "./types";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const REMEDIATOR_MODEL = "claude-sonnet-4-20250514";
 const REMEDIATOR_TIMEOUT_MS = 45_000;
+
+const BASE_REMEDIATION_CLASSES = [
+  "slide",
+  "slide-inner",
+  "slide-bg-glow",
+  "slide-footer",
+  "slide-title",
+  "slide-subtitle",
+  "eyebrow",
+  "section-intro",
+  "source-list",
+  "source-item",
+  "anim",
+  "anim-scale",
+  "anim-blur",
+  "anim-slide-left",
+  "anim-slide-right",
+  "anim-spring",
+  "anim-fade",
+  "stagger-children",
+  "d1",
+  "d2",
+  "d3",
+  "d4",
+  "gradient-dark",
+  "gradient-blue",
+  "gradient-radial",
+  "dark-mesh",
+  "dark-particles",
+] as const;
+
+const SLIDE_TYPE_REMEDIATION_CLASSES: Record<string, readonly string[]> = {
+  title: [
+    "title-slide",
+    "hero-title",
+    "hero-sub",
+    "hero-date",
+    "hero-badge",
+    "hero-stats",
+    "hero-stat",
+    "agent-chip",
+    "dot",
+    "validation-box",
+    "validation-card",
+    "framework-card",
+    "val-row",
+    "val-icon",
+    "framework-visual",
+    "fw-node",
+    "fw-arrow",
+    "fw-center",
+  ],
+  "findings-toc": [
+    "grid-3",
+    "stat-card",
+    "callout",
+    "callout-title",
+    "toc-group-header",
+    "toc-item",
+    "highlight",
+  ],
+  "executive-summary": [
+    "grid-2",
+    "callout",
+    "callout-title",
+    "summary-card-stack",
+    "finding-card",
+    "finding-title",
+    "finding-body",
+    "stat-grid",
+    "strategic-impact-grid",
+    "stat-block",
+    "stat-block-mini",
+  ],
+  "dimension-deep-dive": [
+    "grid-2",
+    "finding-card",
+    "finding-title",
+    "finding-body",
+    "confidence-badge",
+    "tag",
+    "quote-block",
+    "quote-attr",
+  ],
+  "data-metrics": [
+    "grid-2",
+    "grid-3",
+    "stat-block",
+    "stat-number",
+    "chart-container",
+    "donut-chart",
+    "bar-chart",
+    "line-chart",
+    "sparkline",
+    "chart-legend",
+    "legend-item",
+    "legend-dot",
+    "comparison-bars",
+    "bar-row",
+    "bar-label",
+    "bar-track",
+    "bar-fill",
+  ],
+  emergence: [
+    "emergent-slide",
+    "emergent-number",
+    "emergent-content",
+    "emergence-card",
+    "emergent-why",
+    "emergent-why-label",
+    "finding-card",
+  ],
+  tension: [
+    "grid-2",
+    "finding-card",
+    "finding-title",
+    "finding-body",
+    "policy-box",
+    "tag",
+  ],
+  closing: [
+    "grid-3",
+    "finding-card",
+    "finding-title",
+    "finding-body",
+    "stat-grid",
+    "strategic-impact-grid",
+    "section-intro",
+  ],
+};
+
+const TEMPLATE_REMEDIATION_CLASSES: Record<string, readonly string[]> = {
+  "CL-03": [
+    "timeline",
+    "timeline-phase",
+    "timeline-dot",
+    "timeline-year",
+    "timeline-label",
+    "timeline-items",
+  ],
+  "CL-04": [
+    "comparison-bars",
+    "bar-row",
+    "bar-label",
+    "bar-track",
+    "bar-fill",
+  ],
+  "CL-08": [
+    "grid-3",
+    "stat-card",
+    "callout",
+    "callout-title",
+    "toc-group-header",
+    "toc-item",
+    "highlight",
+  ],
+  "CO-05": [
+    "grid-3",
+    "finding-card",
+    "finding-title",
+    "finding-body",
+    "stat-grid",
+    "strategic-impact-grid",
+    "section-intro",
+  ],
+  "CO-06": [
+    "grid-2",
+    "callout",
+    "callout-title",
+    "summary-card-stack",
+    "finding-card",
+    "finding-title",
+    "finding-body",
+    "stat-grid",
+    "strategic-impact-grid",
+    "stat-block",
+    "stat-block-mini",
+    "source-list",
+  ],
+};
 
 // ─── Anthropic Client ─────────────────────────────────────────────────────────
 
@@ -28,6 +208,78 @@ function getAnthropicClient(): Anthropic {
   return new Anthropic({ apiKey });
 }
 
+function inferSlideTypeFromHtml(html: string): string | undefined {
+  const match = html.match(/data-slide-type="([^"]+)"/);
+  return match?.[1];
+}
+
+function extractKnownClassesFromHtml(
+  html: string,
+  validClasses: Set<string>,
+): string[] {
+  const matches = html.matchAll(/class\s*=\s*["']([^"']+)["']/g);
+  const classes = new Set<string>();
+
+  for (const match of matches) {
+    for (const cls of match[1].split(/\s+/)) {
+      if (validClasses.has(cls)) {
+        classes.add(cls);
+      }
+    }
+  }
+
+  return [...classes];
+}
+
+export function buildRemediationContext(
+  input: RemediationInput,
+  catalog: ComponentCatalog,
+): {
+  slideType: string;
+  slideLabel: string;
+  exemplarHtml: string;
+  componentRef: string;
+  componentClasses: string[];
+} {
+  const slideType = input.slideType ?? inferSlideTypeFromHtml(input.originalHtml) ?? "dimension-deep-dive";
+  const templateId = input.templateId ?? undefined;
+  const classCandidates = new Set<string>(BASE_REMEDIATION_CLASSES);
+
+  for (const cls of SLIDE_TYPE_REMEDIATION_CLASSES[slideType] ?? []) {
+    classCandidates.add(cls);
+  }
+
+  if (templateId) {
+    for (const cls of TEMPLATE_REMEDIATION_CLASSES[templateId] ?? []) {
+      classCandidates.add(cls);
+    }
+  }
+
+  for (const cls of input.componentHints ?? []) {
+    classCandidates.add(cls);
+  }
+
+  for (const cls of extractKnownClassesFromHtml(input.originalHtml, catalog.validClasses)) {
+    classCandidates.add(cls);
+  }
+
+  const componentClasses = [...classCandidates]
+    .filter((cls) => catalog.validClasses.has(cls))
+    .sort();
+
+  const slideLabel = templateId
+    ? `${slideType} slide (${templateId})`
+    : `${slideType} slide`;
+
+  return {
+    slideType,
+    slideLabel,
+    exemplarHtml: input.exemplarHtml || catalog.exemplarForSlideType(slideType),
+    componentRef: catalog.componentReference(componentClasses),
+    componentClasses,
+  };
+}
+
 // ─── Prompt Builders ──────────────────────────────────────────────────────────
 
 /**
@@ -35,10 +287,11 @@ function getAnthropicClient(): Anthropic {
  * Includes exemplar HTML and component reference from the catalog.
  */
 function buildRemediatorSystemPrompt(
+  slideLabel: string,
   exemplarHtml: string,
   componentRef: string,
 ): string {
-  return `You are a PRISM Intelligence slide remediator. Your task is to fix a slide that has been flagged with quality issues.
+  return `You are a PRISM Intelligence slide remediator. Your task is to fix a ${slideLabel} that has been flagged with quality issues.
 
 ## Output Rules (CRITICAL)
 1. Output ONLY the raw \`<section>\` element — no \`<!DOCTYPE>\`, no \`<html>\`, no \`<head>\`, no surrounding markup.
@@ -73,8 +326,11 @@ ${exemplarHtml}
  */
 function buildRemediatorUserPrompt(input: RemediationInput): string {
   const parts: string[] = [];
+  const slideTypeLabel = input.slideType ?? inferSlideTypeFromHtml(input.originalHtml) ?? "unknown";
+  const templateLabel = input.templateId ? `Template ${input.templateId}` : "Template unknown";
 
-  parts.push(`# Slide Remediation Request — Slide ${input.slideNumber}`);
+  parts.push(`# Slide Remediation Request — Slide ${input.slideNumber} (${slideTypeLabel})`);
+  parts.push(`- ${templateLabel}`);
   parts.push(``);
 
   // Validator issues
@@ -87,6 +343,16 @@ function buildRemediatorUserPrompt(input: RemediationInput): string {
     parts.push(``);
   }
 
+  // Composition violations (with concrete fix suggestions)
+  if (input.compositionViolations && input.compositionViolations.length > 0) {
+    parts.push(`## COMPOSITION VIOLATIONS (Fix these — your output will be re-validated)`);
+    for (const v of input.compositionViolations) {
+      parts.push(`- [${v.severity.toUpperCase()}] ${v.detail}`);
+      parts.push(`  → FIX: ${v.suggestion}`);
+    }
+    parts.push(``);
+  }
+
   // Reviewer feedback
   if (input.reviewerFeedback) {
     parts.push(`## Design Reviewer Feedback`);
@@ -95,24 +361,18 @@ function buildRemediatorUserPrompt(input: RemediationInput): string {
   }
 
   // Chart data fragments for reference
-  if (input.chartData.length > 0) {
+  if (input.chartFragments.length > 0) {
     parts.push(`## Pre-Computed Chart Fragments`);
     parts.push(`INSERT these fragments directly into the repaired slide if they are missing or malformed.`);
     parts.push(``);
 
-    for (let i = 0; i < input.chartData.length; i++) {
-      const chart = input.chartData[i];
-      parts.push(`### Chart ${i + 1} (type: ${chart.type})`);
-
-      if ("svgFragment" in chart) {
-        parts.push("```html");
-        parts.push((chart as { svgFragment: string }).svgFragment);
-        parts.push("```");
-      } else if ("htmlFragment" in chart) {
-        parts.push("```html");
-        parts.push((chart as { htmlFragment: string }).htmlFragment);
-        parts.push("```");
-      }
+    for (let i = 0; i < input.chartFragments.length; i++) {
+      const chart = input.chartFragments[i];
+      const slotLabel = chart.slotName ? `, slot: ${chart.slotName}` : "";
+      parts.push(`### Chart ${i + 1} (type: ${chart.type}${slotLabel})`);
+      parts.push("```html");
+      parts.push(chart.markup);
+      parts.push("```");
       parts.push(``);
     }
   }
@@ -146,17 +406,12 @@ async function remediateSlide(
   client: Anthropic,
   catalog: ComponentCatalog,
 ): Promise<SlideHTML> {
-  const exemplarHtml = catalog.exemplarForSlideType("dimension-deep-dive");
-  const componentRef = catalog.componentReference([
-    "slide", "slide-inner", "slide-bg-glow", "slide-footer",
-    "slide-title", "section-intro", "eyebrow",
-    "finding-card", "finding-title", "finding-body",
-    "confidence-badge", "tag", "stat-block", "stat-number",
-    "anim", "anim-scale", "anim-blur", "d1", "d2", "d3", "d4", "d5",
-    "grid-2", "grid-3", "chart-container",
-  ]);
-
-  const systemPrompt = buildRemediatorSystemPrompt(exemplarHtml, componentRef);
+  const context = buildRemediationContext(input, catalog);
+  const systemPrompt = buildRemediatorSystemPrompt(
+    context.slideLabel,
+    context.exemplarHtml,
+    context.componentRef,
+  );
   const userPrompt = buildRemediatorUserPrompt(input);
 
   const controller = new AbortController();

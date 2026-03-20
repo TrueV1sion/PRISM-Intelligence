@@ -202,7 +202,9 @@ function summarizeAgentFindings(agentResults: AgentResult[]): string {
           (f, i) =>
             `  ${i + 1}. [${f.confidence} | ${f.sourceTier}] ${f.statement}` +
             `\n     Evidence: ${f.evidence.slice(0, 200)}${f.evidence.length > 200 ? "..." : ""}` +
-            `\n     Implication: ${f.implication}`,
+            `\n     Source: ${f.source}${f.sourceUrl ? ` (${f.sourceUrl})` : ""}` +
+            `\n     Implication: ${f.implication}` +
+            (f.metrics && f.metrics.length > 0 ? `\n     Metrics: ${JSON.stringify(f.metrics)}` : ""),
         )
         .join("\n");
 
@@ -335,22 +337,37 @@ Use "PRISM Intelligence" in the header mark and footer attributions.
 4. Do NOT write inline <style> or <script> tags. Do NOT use inline style="" except for slide-bg-glow background/position and grid column sizing.
 5. The slide-footer is MANDATORY on every slide. Never omit it.
 
-### Component Emphasis (CRITICAL — NO PLAIN BULLETS)
-You MUST use rich components from the spec. Key reminders:
+### Component Emphasis & Content-Aware Routing (CRITICAL)
+You MUST use rich components from the spec contextually based on the data and dimensions provided:
 
-**Quantitative data** — Use SVG charts aggressively:
-- .donut-chart with .segment circles for part-of-whole (use circumference 502.65 for dasharray math)
-- .bar-chart-container with .bar-wrapper > .bar for vertical category comparisons
-- .sparkline-container with .sparkline-line polyline inside .stat-block for inline trends
-- .stat-number[data-target="N"] for animated counters (counters animate via presentation.js)
-- .bar-row > .bar-track > .bar-fill for horizontal comparison bars
+**Metrics & Quantitative Data**:
+- When findings contain 'Metrics', you MUST use data visualizations.
+- Use explicit metric values instead of confidence levels for charts.
+- **CRITICAL**: For SVG attributes (stroke-dashoffset, height, polyline points, animation targets), you MUST strip all symbols ($, %, comma) and use raw numbers. String values cause NaN rendering failures!
+- \`.donut-chart\` with \`.segment\` circles for percentages (use circumference 502.65 for dashoffset math).
+- \`<svg class="bar-chart">\` for vertical value comparisons (WARNING: ONLY use this if X-axis labels are extremely short, like years "2024". SVG text will overlap if labels are long!).
+- \`.stat-block\` with \`.stat-number[data-target="RAW_NUMBER"]\` for animated counters (put symbols in \`data-prefix\` or \`data-suffix\`).
+- \`.bar-row > .bar-track > .bar-fill\` for horizontal comparison bars. ALWAYS use this instead of vertical charts when labels are longer than 6 characters to prevent overlapping.
+
+**Domain-Specific Content Routing**:
+- **Regulatory / Clinical / Policy**: For policy or clinical findings, format using the \`.policy-box\` component. Use \`positive\`, \`neutral\`, or \`risk\` variants based on impact.
+- **Competitive / Landscape**: For company comparisons, use \`.compact-table\` with SVG \`.threat-meter\` dots.
+- **Geographic**: For state-by-state or regional data, use \`.state-grid\`.
+- **Timelines**: For sequence of events, use \`.timeline-bar\`.
+
+**Data Provenance**:
+- ALWAYS use the provided source URL to create explicit hyperlinks (e.g., \`<a href="...">\`) in your source lists. Do not just use hostname strings.
+
+**Headlines & Synthesis**:
+- Synthesize professional, high-impact semantic headlines for slide titles (e.g., "Medicare Advantage Revenue Pressure") instead of using raw truncated finding statements.
+- Use \`.quote-block\` for qualitative findings.
 
 **Emergence slides** — Use the FULL emergence component hierarchy:
-- <section class="slide emergent-slide"> (NOT just "slide")
-- .emergent-number for large visual impact number
-- .emergent-content wrapping all content
-- .emergence-card (NOT .finding-card) for each cross-agent insight
-- .emergent-why > .emergent-why-label explaining multi-agent methodology
+- \`<section class="slide emergent-slide">\` (NOT just "slide")
+- \`.emergent-number\` for large visual impact number
+- \`.emergent-content\` wrapping all content
+- \`.emergence-card\` (NOT .finding-card) for each cross-agent insight
+- \`.emergent-why > .emergent-why-label\` explaining multi-agent methodology
 
 **Animation stagger** — Use .d1 through .d7 CSS classes (NOT inline --delay styles):
 - .anim.d1 = 100ms, .anim.d2 = 200ms, ..., .anim.d7 = 700ms
@@ -361,7 +378,20 @@ You MUST use rich components from the spec. Key reminders:
 - No emergent insights → skip emergence slide entirely, do NOT fabricate
 - Data-heavy agents → full slides with SVG charts and stat grids
 - Qualitative agents → finding cards, quote blocks, policy boxes
-- Use exact numbers, name sources, cite evidence tiers` +
+- Use exact numbers, name sources, cite evidence tiers
+
+### VIEWPORT SAFETY (CRITICAL — CONTENT MUST FIT IN 100vh)
+Each slide is locked to exactly 100vh (one screen). Content that overflows is scrollable but creates a poor experience. You MUST constrain content to fit:
+- **Maximum 3 finding-cards per slide** (not 4 — leave room for title + footer)
+- **Maximum 3 stat-blocks per row** in a .grid-3 (never .grid-4 with large stat blocks)
+- **SVG charts**: max-width 200px for donut-chart, max-height 160px for bar-chart-container
+- **If an agent has 4+ key findings, split across 2 slides** — do NOT cram everything onto one slide
+- **Use accordions** to hide non-critical detail rather than showing all text expanded
+- **Put source-list inside an accordion** at slide bottom instead of showing inline (saves vertical space)
+- **Never stack more than 2 grid rows** (.grid-2 or .grid-3) on a single slide
+- **Maximum 2 emergence-cards or tension cards per slide** — if 3+ tensions exist, split across two slides (e.g., "Tensions I" and "Tensions II")
+- **Slide footer is at the very bottom** — your content must NOT extend past 85% of viewport height
+- The hidden \`#slideCounter\` is disabled — the \`.slide-footer\` third span ("Slide N of T") is the ONLY slide number indicator` +
     buildMemoryBusSections(memoryBus);
 }
 

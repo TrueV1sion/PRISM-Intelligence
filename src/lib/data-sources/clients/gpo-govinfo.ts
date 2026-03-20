@@ -96,7 +96,7 @@ async function makeRequest<T>(
     }
 
     if (!response.ok) {
-      const body = await response.json().catch(() => ({})) as Record<string, unknown>;
+      const body = await response.json().catch(() => ({})) as unknown as Record<string, unknown>;
       throw new Error(
         `GovInfo API error (HTTP ${response.status}): ${body.message ?? "Unknown error"}`,
       );
@@ -188,7 +188,7 @@ export const gpoGovinfoClient = {
         offsetMark: params.offsetMark,
       },
     );
-    const collections = (response.data.collections as Record<string, unknown>[]) ?? [];
+    const collections = (response.data.collections as unknown as Record<string, unknown>[]) ?? [];
     return {
       ...response,
       data: {

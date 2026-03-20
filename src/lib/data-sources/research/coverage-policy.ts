@@ -52,8 +52,8 @@ export const coveragePolicyResearchTool: DataSourceTool = {
     let ncds: Array<{ id?: string; title?: string; status?: string }> = [];
     if (cmsResult.available && cmsResult.data) {
       try {
-        const parsed = JSON.parse(cmsResult.data) as Record<string, unknown>;
-        const results = (parsed.results ?? parsed.ncds ?? parsed.documents ?? []) as Record<string, unknown>[];
+        const parsed = JSON.parse(cmsResult.data) as unknown as Record<string, unknown>;
+        const results = (parsed.results ?? parsed.ncds ?? parsed.documents ?? []) as unknown as Record<string, unknown>[];
         ncdCount = Array.isArray(results) ? results.length : 0;
         ncds = results.slice(0, 5).map((r) => ({
           id: String(r.document_id ?? r.id ?? ""),
@@ -69,8 +69,8 @@ export const coveragePolicyResearchTool: DataSourceTool = {
     let icd10Codes: Array<{ code?: string; description?: string }> = [];
     if (icd10Result.available && icd10Result.data) {
       try {
-        const parsed = JSON.parse(icd10Result.data) as Record<string, unknown>;
-        const results = (parsed.codes ?? parsed.results ?? []) as Record<string, unknown>[];
+        const parsed = JSON.parse(icd10Result.data) as unknown as Record<string, unknown>;
+        const results = (parsed.codes ?? parsed.results ?? []) as unknown as Record<string, unknown>[];
         icd10Count = Array.isArray(results) ? results.length : 0;
         icd10Codes = results.slice(0, 8).map((r) => ({
           code: String(r.code ?? r.Code ?? ""),

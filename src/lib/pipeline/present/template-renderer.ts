@@ -12,15 +12,33 @@
  * Exports: renderSlide(), TemplateRenderError
  */
 
-import { readFileSync, readdirSync } from "fs";
-import { join } from "path";
+import { existsSync, readFileSync, readdirSync } from "fs";
+import { join, resolve } from "path";
 import type { ContentGeneratorOutput } from "./types";
-
-const TEMPLATES_DIR = join(__dirname, "templates");
 
 // ── Template cache (loaded once at module init) ──
 const templateCache = new Map<string, string>();
 const componentCache = new Map<string, string>();
+let resolvedTemplatesDir: string | null = null;
+
+function getTemplatesDir(): string {
+  if (resolvedTemplatesDir) return resolvedTemplatesDir;
+
+  const candidates = [
+    resolve(process.cwd(), "src/lib/pipeline/present/templates"),
+    resolve(__dirname, "templates"),
+  ];
+
+  const match = candidates.find((candidate) => existsSync(candidate));
+  if (!match) {
+    throw new Error(
+      `Unable to locate presentation templates. Checked: ${candidates.join(", ")}`,
+    );
+  }
+
+  resolvedTemplatesDir = match;
+  return match;
+}
 
 function loadTemplateFile(templateId: string): string {
   if (templateCache.has(templateId)) return templateCache.get(templateId)!;
@@ -37,7 +55,7 @@ function loadTemplateFile(templateId: string): string {
   if (!dir) throw new Error(`Unknown template prefix: ${prefix}`);
 
   // Find matching file
-  const fullDir = join(TEMPLATES_DIR, dir);
+  const fullDir = join(getTemplatesDir(), dir);
   const files: string[] = readdirSync(fullDir);
   const file = files.find((f: string) => f.startsWith(templateId));
   if (!file) throw new Error(`Template file not found: ${templateId} in ${fullDir}`);
@@ -49,7 +67,7 @@ function loadTemplateFile(templateId: string): string {
 
 function loadComponent(name: string): string {
   if (componentCache.has(name)) return componentCache.get(name)!;
-  const filePath = join(TEMPLATES_DIR, "components", `${name}.html`);
+  const filePath = join(getTemplatesDir(), "components", `${name}.html`);
   const content = readFileSync(filePath, "utf-8");
   componentCache.set(name, content);
   return content;
@@ -91,6 +109,16 @@ function resolveSlotValue(
   return String(nested);
 }
 
+function resolveSourceText(content: ContentGeneratorOutput): string | undefined {
+  const source = content.slots.source;
+  if (typeof source === "string") return source;
+  if (source && typeof source === "object" && !Array.isArray(source) && "text" in source) {
+    const text = source.text;
+    if (typeof text === "string" && text.trim().length > 0) return text;
+  }
+  return undefined;
+}
+
 export class TemplateRenderError extends Error {
   public templateId: string;
   public unreplacedSlots: string[];
@@ -103,10 +131,17 @@ export class TemplateRenderError extends Error {
   }
 }
 
+export interface RenderSlideOptions {
+  slideNumber?: number;
+  totalSlides?: number;
+  slideType?: string;
+}
+
 export function renderSlide(
   templateId: string,
   content: ContentGeneratorOutput,
   chartFragments: Map<string, string>,
+  options?: RenderSlideOptions,
 ): string {
   let html = loadTemplateFile(templateId);
 
@@ -187,5 +222,84 @@ export function renderSlide(
     throw new TemplateRenderError(templateId, unreplaced);
   }
 
-  return html;
+  return ensureCanonicalShell(html, {
+    slideNumber: options?.slideNumber,
+    totalSlides: options?.totalSlides,
+    slideType: options?.slideType,
+    sourceText: resolveSourceText(content),
+  });
+}
+
+function ensureCanonicalShell(
+  html: string,
+  options: {
+    slideNumber?: number;
+    totalSlides?: number;
+    slideType?: string;
+    sourceText?: string;
+  },
+): string {
+  const trimmed = html.trim();
+  const sectionMatch = trimmed.match(/^<section\b([^>]*)>([\s\S]*)<\/section>$/i);
+  const rawSectionAttrs = sectionMatch?.[1] ?? ' class="slide"';
+  let sectionClasses = extractClassName(rawSectionAttrs);
+  if (!sectionClasses.includes("slide")) {
+    sectionClasses = `slide ${sectionClasses}`.trim();
+  }
+
+  const idMatch = rawSectionAttrs.match(/\sid="([^"]+)"/);
+  const sectionId = idMatch ? ` id="${idMatch[1]}"` : "";
+
+  let body = sectionMatch?.[2]?.trim() ?? trimmed;
+  body = body.replace(/<div class="slide-bg-glow"><\/div>\s*/g, "");
+  body = body.replace(/<div class="slide-footer">[\s\S]*?<\/div>\s*$/g, "").trim();
+
+  if (!/class="[^"]*\bslide-inner\b/.test(body)) {
+    body = `<div class="slide-inner">\n${body}\n</div>`;
+  }
+
+  const footerSource = options.sourceText?.trim() || defaultFooterSource(options.slideType);
+  const footerCount = options.slideNumber && options.totalSlides
+    ? `${String(options.slideNumber).padStart(2, "0")} / ${String(options.totalSlides).padStart(2, "0")}`
+    : "";
+  const slideTypeAttr = options.slideType ? ` data-slide-type="${escapeHtml(options.slideType)}"` : "";
+  const slideNumberAttr = options.slideNumber ? ` data-slide-number="${String(options.slideNumber)}"` : "";
+
+  return [
+    `<section class="${sectionClasses}"${sectionId}${slideTypeAttr}${slideNumberAttr}>`,
+    `  <div class="slide-bg-glow"></div>`,
+    indentBlock(body, 2),
+    `  <div class="slide-footer">`,
+    `    <span>PRISM Intelligence</span>`,
+    `    <span>${escapeHtml(footerSource)}</span>`,
+    `    <span>${escapeHtml(footerCount)}</span>`,
+    `  </div>`,
+    `</section>`,
+  ].join("\n");
+}
+
+function extractClassName(attrs: string): string {
+  const classMatch = attrs.match(/\sclass="([^"]+)"/);
+  return classMatch?.[1] ?? "slide";
+}
+
+function indentBlock(value: string, spaces: number): string {
+  const prefix = " ".repeat(spaces);
+  return value
+    .split("\n")
+    .map(line => `${prefix}${line}`)
+    .join("\n");
+}
+
+function defaultFooterSource(slideType?: string): string {
+  switch (slideType) {
+    case "findings-toc":
+      return "Executive briefing map";
+    case "executive-summary":
+      return "Synthesized from source-backed findings";
+    case "closing":
+      return "Recommended next actions";
+    default:
+      return "Source-backed intelligence synthesis";
+  }
 }

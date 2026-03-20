@@ -119,8 +119,8 @@ const searchSamEntities: DataSourceTool = {
     const headers = ["Business Name", "UEI", "CAGE", "Status", "State"];
     const rows = response.data.results.slice(0, MAX_TABLE_ROWS_LAYER_2).map((entity) => {
       // SAM.gov API can return data at top level or nested under entityRegistration
-      const reg = (entity.entityRegistration as Record<string, unknown> | undefined) ?? entity;
-      const addr = (reg.physicalAddress as Record<string, unknown> | undefined) ?? {};
+      const reg = (entity.entityRegistration as unknown as Record<string, unknown> | undefined) ?? entity;
+      const addr = (reg.physicalAddress as unknown as Record<string, unknown> | undefined) ?? {};
       return [
         (String(reg.legalBusinessName ?? "—")).slice(0, 60),
         String(reg.ueiSAM ?? "—"),

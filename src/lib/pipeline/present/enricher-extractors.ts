@@ -124,6 +124,30 @@ export function extractTrialResults(
   }));
 }
 
+export function extractFdaMetrics(
+  toolName: string,
+  params: unknown,
+  response: unknown,
+): ExtractedMetric[] {
+  const results = genericExtractor(toolName, params, response);
+  return results.map(r => ({
+    ...r,
+    sourceLabel: "FDA / openFDA",
+  }));
+}
+
+export function extractCensusMetrics(
+  toolName: string,
+  params: unknown,
+  response: unknown,
+): ExtractedMetric[] {
+  const results = genericExtractor(toolName, params, response);
+  return results.map(r => ({
+    ...r,
+    sourceLabel: "US Census Bureau",
+  }));
+}
+
 /** Registry of known server+tool extractors */
 export const extractorRegistry: Record<string, ResponseExtractor> = {
   "sec-edgar:get_filing": extractSecFiling,
@@ -131,6 +155,12 @@ export const extractorRegistry: Record<string, ResponseExtractor> = {
   "bls-data:get_series": extractBlsSeries,
   "clinicaltrials:search": extractTrialResults,
   "clinicaltrials:search_trials": extractTrialResults,
+  "data-sources:search_bls_series": extractBlsSeries,
+  "data-sources:get_healthcare_cpi": extractBlsSeries,
+  "data-sources:get_company_facts": extractSecFiling,
+  "data-sources:count_adverse_events": extractFdaMetrics,
+  "data-sources:search_census_data": extractCensusMetrics,
+  "data-sources:get_health_insurance": extractCensusMetrics,
 };
 
 export function getExtractor(mcpServer: string, toolName: string): ResponseExtractor {

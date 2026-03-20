@@ -135,6 +135,7 @@ interface SlideAnalysis {
   slideNumber: number;
   html: string;
   classes: string[];
+  slideType?: string;
   hasSlideInner: boolean;
   hasSlideFooter: boolean;
   hasSlideBgGlow: boolean;
@@ -143,6 +144,7 @@ interface SlideAnalysis {
   hasDataTarget: boolean;
   hasEmergenceClass: boolean;
   footerHasSource: boolean;
+  inlineStyleCount: number;
 }
 
 const CHART_CLASSES = ["donut-chart", "bar-chart", "sparkline", "line-chart"];
@@ -156,6 +158,7 @@ function analyzeSlide(html: string, slideNumber: number): SlideAnalysis {
     classes.push(...splitClasses(val));
   }
   const classSet = new Set(classes);
+  const slideType = extractAttrValue(html, "data-slide-type") ?? undefined;
 
   const hasSlideInner = html.includes('class="slide-inner"') || /class="[^"]*\bslide-inner\b[^"]*"/.test(html);
   const hasSlideFooter = html.includes('class="slide-footer"') || /class="[^"]*\bslide-footer\b[^"]*"/.test(html);
@@ -184,10 +187,31 @@ function analyzeSlide(html: string, slideNumber: number): SlideAnalysis {
       footerContent.includes("data");
   }
 
+  // Count inline styles, excluding legitimate design system uses:
+  // - slide-bg-glow elements (need inline position: top/bottom/left/right + background)
+  // - legend-dot elements (need inline background for chart colors)
+  // - bar-fill elements (need inline width or --fill-pct for bar charts)
+  // - segment elements (need inline stroke-dasharray/offset for donut charts)
+  const allInlineStyles = html.match(/\sstyle="[^"]*"/g) ?? [];
+  const legitimatePatterns = /class="[^"]*(?:slide-bg-glow|legend-dot|bar-fill|hbar-track|segment)[^"]*"[^>]*style=|style="[^"]*"[^>]*class="[^"]*(?:slide-bg-glow|legend-dot|bar-fill|hbar-track|segment)/;
+  // Simplified: count elements with style that are NOT on glow/legend/chart elements
+  // by looking at surrounding context (50 chars before each match)
+  let legitimateCount = 0;
+  const styleMatches = [...html.matchAll(/\sstyle="[^"]*"/g)];
+  for (const m of styleMatches) {
+    const contextStart = Math.max(0, (m.index ?? 0) - 120);
+    const context = html.slice(contextStart, (m.index ?? 0) + (m[0]?.length ?? 0));
+    if (/slide-bg-glow|legend-dot|bar-fill|hbar-track|segment|donut-chart|sparkline|chart-with-legend/.test(context)) {
+      legitimateCount++;
+    }
+  }
+  const inlineStyleCount = Math.max(0, allInlineStyles.length - legitimateCount);
+
   return {
     slideNumber,
     html,
     classes,
+    slideType,
     hasSlideInner,
     hasSlideFooter,
     hasSlideBgGlow,
@@ -196,6 +220,7 @@ function analyzeSlide(html: string, slideNumber: number): SlideAnalysis {
     hasDataTarget,
     hasEmergenceClass,
     footerHasSource,
+    inlineStyleCount,
   };
 }
 
@@ -289,6 +314,75 @@ export function validate(html: string): QualityScorecard {
         : `${structuralDeductions} structural issues across ${analyses.length} slides`,
   };
 
+  // ─── Metric 2b: compositionCompliance (weight 15) ───────────────────────
+  const typedSlides = analyses.filter(a => a.slideType).length;
+  const totalInlineStyles = analyses.reduce((sum, analysis) => sum + analysis.inlineStyleCount, 0);
+
+  for (const analysis of analyses) {
+    if (analysis.inlineStyleCount > 0) {
+      perSlideIssues.push({
+        slideNumber: analysis.slideNumber,
+        severity: "warning",
+        message: `Inline styles remain on slide (${analysis.inlineStyleCount}) — move styling into presentation.css classes`,
+      });
+    }
+
+    if (!analysis.slideType) {
+      perSlideIssues.push({
+        slideNumber: analysis.slideNumber,
+        severity: analyses.length >= 4 ? "error" : "warning",
+        message: "Missing semantic slide type marker (data-slide-type)",
+      });
+    }
+  }
+
+  let sequenceSatisfied = 0;
+  let sequenceChecks = 0;
+  if (analyses.length >= 4) {
+    const expectedPositions: Array<[number, string]> = [
+      [0, "title"],
+      [1, "findings-toc"],
+      [2, "executive-summary"],
+      [analyses.length - 1, "closing"],
+    ];
+
+    for (const [index, expectedType] of expectedPositions) {
+      sequenceChecks++;
+      const actualType = analyses[index]?.slideType;
+      if (actualType === expectedType) {
+        sequenceSatisfied++;
+      } else {
+        perSlideIssues.push({
+          slideNumber: analyses[index]?.slideNumber ?? index + 1,
+          severity: "error",
+          message: `Expected slide type "${expectedType}" in position ${index + 1}, found "${actualType ?? "missing"}"`,
+        });
+      }
+    }
+  }
+
+  const typedSlideScore =
+    analyses.length === 0
+      ? 100
+      : Math.round((typedSlides / analyses.length) * 100);
+  const sequenceScore =
+    sequenceChecks === 0
+      ? 100
+      : Math.round((sequenceSatisfied / sequenceChecks) * 100);
+  const inlineStyleScore =
+    totalInlineStyles === 0
+      ? 100
+      : Math.max(0, 100 - totalInlineStyles * 8);
+  const compositionComplianceScore = Math.round(
+    (typedSlideScore * 0.35) + (sequenceScore * 0.45) + (inlineStyleScore * 0.20),
+  );
+
+  const compositionCompliance: MetricScore = {
+    score: compositionComplianceScore,
+    weight: 15,
+    details: `${typedSlides}/${analyses.length} slides typed, ${sequenceSatisfied}/${sequenceChecks || 1} executive sequence checks satisfied, ${totalInlineStyles} inline style attribute(s) detected`,
+  };
+
   // ─── Metric 3: chartAdoption (weight 10) ────────────────────────────────
   const slidesWithCharts = analyses.filter(a => a.hasChartComponent).length;
   // Score based on proportion of slides using charts; bonus for any chart usage
@@ -376,6 +470,7 @@ export function validate(html: string): QualityScorecard {
     counterAdoption,
     emergenceHierarchy,
     sourceAttribution,
+    compositionCompliance,
   };
 
   const totalWeight = Object.values(metrics).reduce((sum, m) => sum + m.weight, 0);

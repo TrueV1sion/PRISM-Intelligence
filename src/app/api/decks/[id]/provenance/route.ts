@@ -42,6 +42,7 @@ export async function GET(
                 archetype: agent.archetype || "RESEARCHER",
                 confidence: finding.confidence,
                 sources: finding.source || "Not available",
+                sourceUrl: finding.sourceUrl,
                 color: AGENT_COLORS[i % AGENT_COLORS.length],
             }))
         );

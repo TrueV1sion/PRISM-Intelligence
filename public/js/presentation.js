@@ -18,7 +18,8 @@ function updateProgress(){
   const scrollTop=window.scrollY||document.documentElement.scrollTop;
   const docHeight=document.documentElement.scrollHeight-window.innerHeight;
   const pct=docHeight>0?(scrollTop/docHeight)*100:0;
-  document.getElementById('slideProgress').style.width=pct+'%';
+  const progressEl = document.getElementById('progress') || document.getElementById('slideProgress');
+  if (progressEl) progressEl.style.width=pct+'%';
   // Determine current slide
   let closest=0;
   let minDist=Infinity;
@@ -99,12 +100,15 @@ function animateCounter(el) {
   requestAnimationFrame(update);
 }
 
+// All animation class selectors (original + enhanced)
+const ANIM_SELECTOR = '.anim, .anim-scale, .anim-blur, .anim-slide-left, .anim-slide-right, .anim-spring, .anim-fade, .anim-zoom, .stagger-children';
+
 // INTERSECTION OBSERVER FOR ANIMATIONS
 const animObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     // Trigger if ANY part of the slide is intersecting
     if (entry.isIntersecting) {
-      entry.target.querySelectorAll('.anim, .anim-scale, .anim-blur').forEach(el => el.classList.add('visible'));
+      entry.target.querySelectorAll(ANIM_SELECTOR).forEach(el => el.classList.add('visible'));
       entry.target.querySelectorAll('.bar-fill').forEach(bar => {
         setTimeout(() => bar.classList.add('animate'), 300);
       });
@@ -135,10 +139,135 @@ document.addEventListener('mousemove', (e) => {
 // Observe all slides
 document.querySelectorAll('.slide').forEach(s => animObserver.observe(s));
 
-// Fallback: force the first slide to be visible immediately
-setTimeout(() => {
-  const firstSlide = document.querySelector('.slide');
-  if (firstSlide) {
-    firstSlide.querySelectorAll('.anim').forEach(el => el.classList.add('visible'));
+// Fallback: trigger the first slide after the initial hidden state has painted
+requestAnimationFrame(() => {
+  requestAnimationFrame(() => {
+    const firstSlide = document.querySelector('.slide');
+    if (!firstSlide) return;
+    firstSlide.querySelectorAll(ANIM_SELECTOR).forEach(el => el.classList.add('visible'));
+    firstSlide.querySelectorAll('.bar-fill').forEach(bar => {
+      setTimeout(() => bar.classList.add('animate'), 300);
+    });
+    firstSlide.querySelectorAll('.bar-chart, .line-chart, .donut-chart, .sparkline').forEach(chart => {
+      chart.classList.add('is-visible');
+    });
+    firstSlide.querySelectorAll('.stat-number[data-target]').forEach(el => {
+      if (!el.dataset.animated) {
+        el.dataset.animated = 'true';
+        animateCounter(el);
+      }
+    });
+  });
+});
+
+// ─── ACCORDION ──────────────────────────────────────────────
+document.querySelectorAll('.accordion-trigger').forEach(trigger => {
+  trigger.addEventListener('click', () => {
+    const item = trigger.closest('.accordion-item');
+    if (!item) return;
+    // Close siblings in same container
+    const parent = item.parentElement;
+    if (parent) {
+      parent.querySelectorAll('.accordion-item.open').forEach(open => {
+        if (open !== item) open.classList.remove('open');
+      });
+    }
+    item.classList.toggle('open');
+  });
+});
+
+// ─── TABS ───────────────────────────────────────────────────
+document.querySelectorAll('.tab-group').forEach(group => {
+  const buttons = group.querySelectorAll('.tab-button');
+  const panels = group.querySelectorAll('.tab-panel');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.tab;
+      buttons.forEach(b => b.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      // Support both data-tab and data-panel on panels
+      const panel = group.querySelector(`.tab-panel[data-tab="${target}"]`) ||
+                    group.querySelector(`.tab-panel[data-panel="${target}"]`);
+      if (panel) panel.classList.add('active');
+    });
+  });
+});
+
+// NAV ITEM CLICK → SLIDE NAVIGATION
+document.querySelectorAll('.nav-item[data-slide]').forEach(item => {
+  item.addEventListener('click', () => {
+    const idx = parseInt(item.dataset.slide);
+    if (!isNaN(idx)) { goToSlide(idx); toggleNav(); }
+  });
+});
+
+// ─── ECHARTS INITIALIZATION ─────────────────────────────────
+(function initECharts() {
+  if (typeof echarts === 'undefined') return;
+
+  // Track initialized elements to avoid double-init
+  const initialized = new WeakSet();
+  const chartInstances = [];
+
+  /**
+   * Initialize a single div[data-echart] element.
+   */
+  function initChart(el) {
+    if (initialized.has(el)) return;
+    initialized.add(el);
+
+    try {
+      const option = JSON.parse(el.dataset.echart);
+
+      // Remove non-serializable function references (animationDelay, formatter)
+      // ECharts handles delay internally via series config
+      if (option.series) {
+        option.series.forEach(function(s) {
+          if (s.animationDelay) delete s.animationDelay;
+        });
+      }
+
+      // Initialize with dark theme for PRISM styling
+      const chart = echarts.init(el, 'dark', { renderer: 'canvas' });
+      chart.setOption(option);
+      chartInstances.push(chart);
+    } catch (e) {
+      console.warn('[PRISM] ECharts init failed:', e, el);
+    }
   }
-}, 50);
+
+  /**
+   * Initialize all charts within a slide element.
+   */
+  function initChartsInSlide(slide) {
+    slide.querySelectorAll('[data-echart]').forEach(initChart);
+  }
+
+  // Lazy-init charts when their slide enters viewport
+  const chartObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        initChartsInSlide(entry.target);
+      }
+    });
+  }, { threshold: 0.05 });
+
+  document.querySelectorAll('.slide').forEach(function(s) { chartObserver.observe(s); });
+
+  // Init charts in first visible slide immediately
+  requestAnimationFrame(function() {
+    var firstSlide = document.querySelector('.slide');
+    if (firstSlide) initChartsInSlide(firstSlide);
+  });
+
+  // Resize all chart instances on window resize
+  var resizeTimer;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+      chartInstances.forEach(function(c) { c.resize(); });
+    }, 200);
+  });
+})();
+
